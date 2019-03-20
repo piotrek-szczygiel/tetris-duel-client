@@ -1,0 +1,21 @@
+EMPTY = 0
+CYAN = 1
+YELLOW = 2
+PURPLE = 3
+GREEN = 4
+RED = 5
+BLUE = 6
+ORANGE = 7
+
+RGB_COLORS = {
+    EMPTY: (255, 255, 255),
+    CYAN: (0, 255, 255),
+    YELLOW: (255, 255, 0),
+    PURPLE: (192, 0, 255),
+    GREEN: (0, 255, 0),
+    RED: (255, 0, 0),
+    BLUE: (0, 0, 255),
+    ORANGE: (255, 128, 0)
+}
+
+BACKGROUND_RGB = (16, 16, 32)

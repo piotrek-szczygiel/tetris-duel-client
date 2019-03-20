@@ -1,10 +1,10 @@
-from src.color import *
+from src.colors import *
 
 
 class Piece:
-
-    def __init__(self, tiles):
-        self.tiles = tiles
+    def __init__(self, color, tiles):
+        self.color = color
+        self.tiles = tiles[:]
 
         self.board_x = None
         self.board_y = None
