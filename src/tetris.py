@@ -1,51 +1,30 @@
 import pygame
+from blinker import signal
 
-from src.bag import Bag
-from src.board import Board, BACKGROUND_RGB
-from src.mixer import Mixer
-from src.piece import Piece
+from brain import Brain
+from mixer import Mixer
+from renderer import Renderer
 
 
 class Tetris:
     def __init__(self):
         self.mixer = Mixer()
+        self.brain = Brain()
+        self.renderer = Renderer()
 
-        self.bag = Bag()
-        self.board = Board()
-
-        self.display = None
-        self.running = False
-
-        self.current_piece = None
+        self.running = True
 
     def initialize(self):
-        self.mixer.initialize()
         pygame.init()
-
-        self.bag.initialize()
-        self.board.initialize()
-
-        self.display = pygame.display.set_mode((1500, 1000))
-        pygame.display.set_caption("Tetris")
+        self.renderer.initialize_display()
 
     def quit(self):
         pygame.quit()
 
-    def render(self):
-        self.display.fill(BACKGROUND_RGB)
-
-        self.board.render()
-        self.display.blit(self.board.surface, (0, 0))
-
-    def update(self):
-        pass
-
     def run(self):
         self.initialize()
-        self.running = True
 
-        self.current_piece = Piece(*self.bag.pop_tetromino())
-
+        self.brain.new_piece()
         fps_clock = pygame.time.Clock()
         while self.running:
             for event in pygame.event.get():
@@ -54,9 +33,9 @@ class Tetris:
                          and event.key == pygame.K_q)):
                     self.running = False
 
-            self.render()
-            pygame.display.flip()
-
+            self.brain.tick()
+            self.renderer.tick(self.brain)
             fps_clock.tick(120)
 
+        signal('cleanup').send()
         self.quit()

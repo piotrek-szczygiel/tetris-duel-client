@@ -2,14 +2,13 @@ from collections import deque
 
 import random
 
-from src.piece import PIECES
+from piece import PIECES, Piece
 
 
 class Bag:
     def __init__(self):
         self.bag = deque(maxlen=14)
 
-    def initialize(self):
         for _ in range(2):
             self.fill_half()
 
@@ -17,13 +16,13 @@ class Bag:
         pieces = list(PIECES.values())
         random.shuffle(pieces)
         for piece in pieces:
-            self.bag.append(piece)
+            self.bag.append(Piece(*piece))
 
-    def pop_tetromino(self):
+    def pop_piece(self):
         if len(self.bag) == 7:
             self.fill_half()
 
         return self.bag.pop()
 
-    def show(self, elements=7):
+    def get(self, elements=7):
         return list(self.bag)[:elements]

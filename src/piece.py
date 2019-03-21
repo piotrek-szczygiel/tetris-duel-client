@@ -1,4 +1,6 @@
-from src.colors import *
+import pygame
+
+from colors import *
 
 
 class Piece:
@@ -8,6 +10,8 @@ class Piece:
 
         self.board_x = None
         self.board_y = None
+
+        self.surface = None
 
     def tiles_width(self):
         return len(self.tiles[0])
@@ -22,6 +26,9 @@ class Piece:
     def rotate_tiles_ccw(self):
         self.tiles = [[self.tiles[y][x] for y in range(self.tiles_height())]
                       for x in range(self.tiles_width() - 1, -1, -1)]
+
+    def render(self):
+        pass
 
 
 PIECES = {
