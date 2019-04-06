@@ -12,4 +12,4 @@ class Game(State):
         pass
 
     def draw(self):
-        pass
+        self.matrix.draw(10, 10)
