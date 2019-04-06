@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 class State(ABC):
     @abstractmethod
-    def update(self): pass
+    def update(self) -> None: pass
 
     @abstractmethod
-    def draw(self): pass
+    def draw(self) -> None: pass
