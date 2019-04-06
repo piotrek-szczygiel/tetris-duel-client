@@ -1,0 +1,2 @@
+running = True
+display = None
