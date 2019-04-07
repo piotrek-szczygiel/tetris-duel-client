@@ -7,7 +7,7 @@ from shape import Shape, SHAPES
 
 class Bag:
     def __init__(self) -> None:
-        self.bag: List[Shape] = []
+        self.bag: List[Shape] = list()
         self._fill()
 
     def take(self) -> Piece:

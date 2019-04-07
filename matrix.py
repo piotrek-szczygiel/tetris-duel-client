@@ -3,6 +3,7 @@ import pygame
 import config
 import ctx
 from block import draw_block
+from piece import Piece
 from shape import SHAPE_COLORS
 
 
@@ -10,10 +11,12 @@ class Matrix:
     def __init__(self) -> None:
         self.width = config.cols
         self.height = config.rows
-        self.vanish = 4
 
         self.grid = [[0 for _ in range(self.width)]
-                     for _ in range(self.height + self.vanish)]
+                     for _ in range(self.height)]
+
+    def collision(self, piece: Piece) -> bool:
+        return False
 
     def draw(self, x: int, y: int) -> None:
         size = config.size
@@ -35,10 +38,10 @@ class Matrix:
 
         for my in range(self.height):
             for mx in range(self.width):
-                if self.grid[my + self.vanish][mx] == 0:
+                if self.grid[my][mx] == 0:
                     continue
 
-                draw_block(SHAPE_COLORS[self.grid[my + self.vanish][mx]],
+                draw_block(SHAPE_COLORS[self.grid[my][mx]],
                            x + mx * size,
                            y + my * size,
                            size,

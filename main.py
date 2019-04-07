@@ -1,5 +1,6 @@
 import pygame
 
+import config
 import ctx
 from game import Game
 
@@ -7,7 +8,7 @@ if __name__ == '__main__':
     pygame.init()
     pygame.display.set_caption('Tetris Duel')
 
-    ctx.display = pygame.display.set_mode((420, 820))
+    ctx.display = pygame.display.set_mode((config.width, config.height))
 
     state = Game()
 
@@ -20,6 +21,9 @@ if __name__ == '__main__':
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
                     state = Game()
+                elif event.key in (pygame.K_q, pygame.K_ESCAPE):
+                    ctx.running = False
+                    break
 
         state.update()
 

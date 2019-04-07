@@ -1,13 +1,7 @@
 from collections import Callable
-from enum import Enum
 
 import config
-from shape import Shape, ShapeGrid
-
-
-class Direction(Enum):
-    cw = 0
-    ccw = 1
+from shape import Shape, ShapeGrid, WallKicks
 
 
 class Piece:
@@ -28,22 +22,36 @@ class Piece:
 
         return True
 
-    def rotate(self, direction: Direction, collision: Callable) -> bool:
+    def rotate(self, clockwise: bool, collision: Callable) -> bool:
         last_rotation = self.rotation
+        if self.shape.wall_kicks:
+            wall_kicks: WallKicks = self.shape.wall_kicks[self.rotation]
+        else:
+            wall_kicks = ([], [])
 
-        if direction == Direction.cw:
-            self.rotation = self.rotation + 1 % len(self.shape.grid)
-        elif direction == Direction.ccw:
-            if self.rotation <= 0:
-                self.rotation = len(self.shape.grid) - 1
-            else:
-                self.rotation = self.rotation - 1
+        if clockwise:
+            kicks = wall_kicks[0]
+            self.rotation += 1
+        else:
+            kicks = wall_kicks[1]
+            self.rotation -= 1
 
-        if collision(self):
-            self.rotation = last_rotation
-            return False
+        rotation_count = len(self.shape.grid)
 
-        return True
+        if self.rotation < 0:
+            self.rotation = rotation_count - 1
+        elif self.rotation >= rotation_count:
+            self.rotation = 0
+
+        if not collision(self):
+            return True
+
+        for kick in kicks:
+            if self.move(kick[0], kick[1], collision):
+                return True
+
+        self.rotation = last_rotation
+        return False
 
     def get_grid(self) -> ShapeGrid:
         return self.shape.grid[self.rotation]

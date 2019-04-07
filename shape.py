@@ -3,7 +3,7 @@ from typing import List, Tuple
 
 from block import draw_block
 
-WallKick = Tuple[List[Tuple[int, int]], List[Tuple[int, int]]]
+WallKicks = Tuple[List[Tuple[int, int]], List[Tuple[int, int]]]
 
 
 @dataclass
@@ -18,14 +18,16 @@ class ShapeGrid:
 @dataclass
 class Shape:
     grid: List[ShapeGrid]
-    wall_kicks: List[WallKick]
+    wall_kicks: List[WallKicks]
 
     def draw(self, rotation: int, x: int, y: int, size: int) -> None:
         grid = self.grid[rotation]
+        height = len(grid.grid)
+        width = len(grid.grid[0])
 
-        for my in range(grid.height):
-            for mx in range(grid.width):
-                c = grid.grid[grid.y + my][grid.x + mx]
+        for my in range(height):
+            for mx in range(width):
+                c = grid.grid[my][mx]
                 if c == 0:
                     continue
 
@@ -149,7 +151,7 @@ SHAPE_S = Shape(
     [ShapeGrid(0, 0, 3, 2,
                [[0, 5, 5],
                 [5, 5, 0],
-                0, 0, 0]),
+                [0, 0, 0]]),
      ShapeGrid(1, 0, 2, 3,
                [[0, 5, 0],
                 [0, 5, 5],
