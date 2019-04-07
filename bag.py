@@ -27,4 +27,4 @@ class Bag:
     def _add_7(self) -> None:
         shapes = SHAPES[:]
         random.shuffle(shapes)
-        self.bag.append(shapes)
+        self.bag.extend(shapes)

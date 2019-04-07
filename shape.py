@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import List, Tuple
 
+from block import draw_block
+
 WallKick = Tuple[List[Tuple[int, int]], List[Tuple[int, int]]]
 
 
@@ -18,6 +20,23 @@ class Shape:
     grid: List[ShapeGrid]
     wall_kicks: List[WallKick]
 
+    def draw(self, rotation: int, x: int, y: int, size: int, highlight: bool) -> None:
+        grid = self.grid[rotation]
+
+        for my in range(grid.height):
+            for mx in range(grid.width):
+                c = grid.grid[grid.y + my][grid.x + mx]
+                if c == 0:
+                    continue
+
+                draw_block(SHAPE_COLORS[c],
+                           x + mx * size,
+                           y + my * size,
+                           size,
+                           highlight)
+
+
+# https://tetris.fandom.com/wiki/SRS
 
 WALL_KICKS_JLSTZ = [
     ([(-1, 0), (-1, -1), (0, 2), (-1, 2)],
@@ -55,128 +74,132 @@ SHAPE_COLORS = [
     (128, 0, 128),  # purple
     (255, 0, 0)]  # red
 
-SHAPE_I = Shape([
-    ShapeGrid(0, 1, 4, 1,
-              [[0, 0, 0, 0],
-               [1, 1, 1, 1],
-               [0, 0, 0, 0],
-               [0, 0, 0, 0]]),
-    ShapeGrid(2, 0, 1, 4,
-              [[0, 0, 1, 0],
-               [0, 0, 1, 0],
-               [0, 0, 1, 0],
-               [0, 0, 1, 0]]),
-    ShapeGrid(0, 2, 4, 1,
-              [[0, 0, 0, 0],
-               [0, 0, 0, 0],
-               [1, 1, 1, 1],
-               [0, 0, 0, 0]]),
-    ShapeGrid(1, 0, 1, 4,
-              [[0, 1, 0, 0],
-               [0, 1, 0, 0],
-               [0, 1, 0, 0],
-               [0, 1, 0, 0]])],
+# We could have used simple matrix rotation for rotating the pieces
+# but than we would have to calculate anchor, width and height
+# on every rotation while maintaining the pivot centered.
+
+SHAPE_I = Shape(
+    [ShapeGrid(0, 1, 4, 1,
+               [[0, 0, 0, 0],
+                [1, 1, 1, 1],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]]),
+     ShapeGrid(2, 0, 1, 4,
+               [[0, 0, 1, 0],
+                [0, 0, 1, 0],
+                [0, 0, 1, 0],
+                [0, 0, 1, 0]]),
+     ShapeGrid(0, 2, 4, 1,
+               [[0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [1, 1, 1, 1],
+                [0, 0, 0, 0]]),
+     ShapeGrid(1, 0, 1, 4,
+               [[0, 1, 0, 0],
+                [0, 1, 0, 0],
+                [0, 1, 0, 0],
+                [0, 1, 0, 0]])],
     WALL_KICKS_I)
 
-SHAPE_J = Shape([
-    ShapeGrid(0, 0, 3, 2,
-              [[2, 0, 0],
-               [2, 2, 2],
-               [0, 0, 0]]),
-    ShapeGrid(1, 0, 2, 3,
-              [[0, 2, 2],
-               [0, 2, 0],
-               [0, 2, 0]]),
-    ShapeGrid(0, 1, 3, 2,
-              [[0, 0, 0],
-               [2, 2, 2],
-               [0, 0, 2]]),
-    ShapeGrid(0, 0, 2, 3,
-              [[0, 2, 0],
-               [0, 2, 0],
-               [2, 2, 0]])],
+SHAPE_J = Shape(
+    [ShapeGrid(0, 0, 3, 2,
+               [[2, 0, 0],
+                [2, 2, 2],
+                [0, 0, 0]]),
+     ShapeGrid(1, 0, 2, 3,
+               [[0, 2, 2],
+                [0, 2, 0],
+                [0, 2, 0]]),
+     ShapeGrid(0, 1, 3, 2,
+               [[0, 0, 0],
+                [2, 2, 2],
+                [0, 0, 2]]),
+     ShapeGrid(0, 0, 2, 3,
+               [[0, 2, 0],
+                [0, 2, 0],
+                [2, 2, 0]])],
     WALL_KICKS_JLSTZ)
 
-SHAPE_L = Shape([
-    ShapeGrid(0, 0, 3, 2,
-              [[0, 0, 3],
-               [3, 3, 3],
-               [0, 0, 0]]),
-    ShapeGrid(1, 0, 2, 3,
-              [[0, 3, 0],
-               [0, 3, 0],
-               [0, 3, 3]]),
-    ShapeGrid(0, 1, 3, 2,
-              [[0, 0, 0],
-               [3, 3, 3],
-               [3, 0, 0]]),
-    ShapeGrid(0, 0, 2, 3,
-              [[3, 3, 0],
-               [0, 3, 0],
-               [0, 3, 0]])],
+SHAPE_L = Shape(
+    [ShapeGrid(0, 0, 3, 2,
+               [[0, 0, 3],
+                [3, 3, 3],
+                [0, 0, 0]]),
+     ShapeGrid(1, 0, 2, 3,
+               [[0, 3, 0],
+                [0, 3, 0],
+                [0, 3, 3]]),
+     ShapeGrid(0, 1, 3, 2,
+               [[0, 0, 0],
+                [3, 3, 3],
+                [3, 0, 0]]),
+     ShapeGrid(0, 0, 2, 3,
+               [[3, 3, 0],
+                [0, 3, 0],
+                [0, 3, 0]])],
     WALL_KICKS_JLSTZ)
 
-SHAPE_O = Shape([
-    ShapeGrid(0, 0, 2, 2,
-              [[4, 4],
-               [4, 4]])],
+SHAPE_O = Shape(
+    [ShapeGrid(0, 0, 2, 2,
+               [[4, 4],
+                [4, 4]])],
     [])
 
-SHAPE_S = Shape([
-    ShapeGrid(0, 0, 3, 2,
-              [[0, 5, 5],
-               [5, 5, 0],
-               0, 0, 0]),
-    ShapeGrid(1, 0, 2, 3,
-              [[0, 5, 0],
-               [0, 5, 5],
-               [0, 0, 5]]),
-    ShapeGrid(0, 1, 3, 2,
-              [[0, 0, 0],
-               [0, 5, 5],
-               [5, 5, 0]]),
-    ShapeGrid(0, 0, 2, 3,
-              [[5, 0, 0],
-               [5, 5, 0],
-               [0, 5, 0]])],
+SHAPE_S = Shape(
+    [ShapeGrid(0, 0, 3, 2,
+               [[0, 5, 5],
+                [5, 5, 0],
+                0, 0, 0]),
+     ShapeGrid(1, 0, 2, 3,
+               [[0, 5, 0],
+                [0, 5, 5],
+                [0, 0, 5]]),
+     ShapeGrid(0, 1, 3, 2,
+               [[0, 0, 0],
+                [0, 5, 5],
+                [5, 5, 0]]),
+     ShapeGrid(0, 0, 2, 3,
+               [[5, 0, 0],
+                [5, 5, 0],
+                [0, 5, 0]])],
     WALL_KICKS_JLSTZ)
 
-SHAPE_T = Shape([
-    ShapeGrid(0, 0, 3, 2,
-              [[0, 6, 0],
-               [6, 6, 6],
-               [0, 0, 0]]),
-    ShapeGrid(1, 0, 2, 3,
-              [[0, 6, 0],
-               [0, 6, 6],
-               [0, 6, 0]]),
-    ShapeGrid(0, 1, 3, 2,
-              [[0, 0, 0],
-               [6, 6, 6],
-               [0, 6, 0]]),
-    ShapeGrid(0, 0, 2, 3,
-              [[0, 6, 0],
-               [6, 6, 0],
-               [0, 6, 0]])],
+SHAPE_T = Shape(
+    [ShapeGrid(0, 0, 3, 2,
+               [[0, 6, 0],
+                [6, 6, 6],
+                [0, 0, 0]]),
+     ShapeGrid(1, 0, 2, 3,
+               [[0, 6, 0],
+                [0, 6, 6],
+                [0, 6, 0]]),
+     ShapeGrid(0, 1, 3, 2,
+               [[0, 0, 0],
+                [6, 6, 6],
+                [0, 6, 0]]),
+     ShapeGrid(0, 0, 2, 3,
+               [[0, 6, 0],
+                [6, 6, 0],
+                [0, 6, 0]])],
     WALL_KICKS_JLSTZ)
 
-SHAPE_Z = Shape([
-    ShapeGrid(0, 0, 3, 2,
-              [[7, 7, 0],
-               [0, 7, 7],
-               [0, 0, 0]]),
-    ShapeGrid(1, 0, 2, 3,
-              [[0, 0, 7],
-               [0, 7, 7],
-               [0, 7, 0]]),
-    ShapeGrid(0, 1, 3, 2,
-              [[0, 0, 0],
-               [7, 7, 0],
-               [0, 7, 7]]),
-    ShapeGrid(0, 0, 2, 3,
-              [[0, 7, 0],
-               [7, 7, 0],
-               [7, 0, 0]])],
+SHAPE_Z = Shape(
+    [ShapeGrid(0, 0, 3, 2,
+               [[7, 7, 0],
+                [0, 7, 7],
+                [0, 0, 0]]),
+     ShapeGrid(1, 0, 2, 3,
+               [[0, 0, 7],
+                [0, 7, 7],
+                [0, 7, 0]]),
+     ShapeGrid(0, 1, 3, 2,
+               [[0, 0, 0],
+                [7, 7, 0],
+                [0, 7, 7]]),
+     ShapeGrid(0, 0, 2, 3,
+               [[0, 7, 0],
+                [7, 7, 0],
+                [7, 0, 0]])],
     WALL_KICKS_JLSTZ)
 
 SHAPES = [SHAPE_I, SHAPE_J, SHAPE_L, SHAPE_O, SHAPE_S, SHAPE_T, SHAPE_Z]
