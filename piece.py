@@ -1,6 +1,7 @@
 from collections import Callable
 from enum import Enum
 
+import config
 from shape import Shape, ShapeGrid
 
 
@@ -10,11 +11,11 @@ class Direction(Enum):
 
 
 class Piece:
-    def __init__(self, shape: Shape, x: int, y: int) -> None:
+    def __init__(self, shape: Shape) -> None:
         self.shape = shape
-        self.x = x
-        self.y = y
         self.rotation = 0
+        self.x = config.cols // 2 - 2
+        self.y = -shape.grid[0].height
 
     def move(self, x: int, y: int, collision: Callable) -> bool:
         self.x += x
@@ -47,5 +48,9 @@ class Piece:
     def get_grid(self) -> ShapeGrid:
         return self.shape.grid[self.rotation]
 
-    def draw(self, x: int, y: int, size: int) -> None:
-        self.shape.draw(self.rotation, x, y, size, True)
+    def draw(self, x: int, y: int) -> None:
+        size = config.size
+        self.shape.draw(self.rotation,
+                        x + self.x * size,
+                        y + self.y * size,
+                        size)

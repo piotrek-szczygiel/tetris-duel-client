@@ -2,7 +2,6 @@ import pygame
 
 import ctx
 from game import Game
-from state import State
 
 if __name__ == '__main__':
     pygame.init()
@@ -10,8 +9,7 @@ if __name__ == '__main__':
 
     ctx.display = pygame.display.set_mode((420, 820))
 
-    game = Game()
-    state: State = game
+    state = Game()
 
     fps_clock = pygame.time.Clock()
     while ctx.running:
@@ -19,6 +17,9 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 ctx.running = False
                 break
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    state = Game()
 
         state.update()
 

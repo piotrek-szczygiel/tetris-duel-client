@@ -20,7 +20,7 @@ class Shape:
     grid: List[ShapeGrid]
     wall_kicks: List[WallKick]
 
-    def draw(self, rotation: int, x: int, y: int, size: int, highlight: bool) -> None:
+    def draw(self, rotation: int, x: int, y: int, size: int) -> None:
         grid = self.grid[rotation]
 
         for my in range(grid.height):
@@ -33,7 +33,7 @@ class Shape:
                            x + mx * size,
                            y + my * size,
                            size,
-                           highlight)
+                           True)
 
 
 # https://tetris.fandom.com/wiki/SRS

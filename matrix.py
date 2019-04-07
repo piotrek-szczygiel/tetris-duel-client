@@ -8,9 +8,9 @@ from shape import SHAPE_COLORS
 
 class Matrix:
     def __init__(self) -> None:
-        self.width = 10
-        self.height = 20
-        self.vanish = 20
+        self.width = config.cols
+        self.height = config.rows
+        self.vanish = 4
 
         self.grid = [[0 for _ in range(self.width)]
                      for _ in range(self.height + self.vanish)]

@@ -1,6 +1,7 @@
 import random
 from typing import List
 
+from piece import Piece
 from shape import Shape, SHAPES
 
 
@@ -9,10 +10,10 @@ class Bag:
         self.bag: List[Shape] = []
         self._fill()
 
-    def take(self) -> Shape:
+    def take(self) -> Piece:
         shape = self.bag.pop(0)
         self._fill()
-        return shape
+        return Piece(shape)
 
     def peek(self, n: int) -> List[Shape]:
         return self.bag[:n]
