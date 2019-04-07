@@ -5,8 +5,9 @@ from shape import Shape, ShapeGrid, WallKicks
 
 
 class Piece:
-    def __init__(self, shape: Shape) -> None:
+    def __init__(self, shape: Shape, shadow=False) -> None:
         self.shape = shape
+        self.shadow = shadow
         self.rotation = 0
         self.x = config.cols // 2 - 2
         self.y = -shape.grid[0].height - shape.grid[0].y
@@ -57,9 +58,22 @@ class Piece:
     def get_grid(self) -> ShapeGrid:
         return self.shape.grid[self.rotation]
 
+    def fall(self, collision: Callable) -> int:
+        counter = 0
+        while self.move(0, 1, collision):
+            counter += 1
+
+        return counter
+
     def draw(self, x: int, y: int) -> None:
         size = config.size
+        if self.shadow:
+            ratio = 0.5
+        else:
+            ratio = 1.0
+
         self.shape.draw(self.rotation,
                         x + self.x * size,
                         y + self.y * size,
-                        size)
+                        size,
+                        ratio)

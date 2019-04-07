@@ -20,12 +20,13 @@ class Matrix:
         x = piece.x + grid.x
         y = piece.y + grid.y
 
+        if x < 0 or x + grid.width > self.width:
+            return True
+
         if y + grid.height <= 0:
             return False
 
-        if (x < 0
-                or x + grid.width > self.width
-                or y + grid.height > self.height):
+        if y + grid.height > self.height:
             return True
 
         for my in range(grid.height):
@@ -39,15 +40,21 @@ class Matrix:
 
         return False
 
-    def lock(self, piece: Piece) -> None:
+    def lock(self, piece: Piece) -> bool:
         grid = piece.get_grid()
         x = piece.x + grid.x
         y = piece.y + grid.y
+
+        if y < 0:
+            return False
+
         for my in range(grid.height):
             for mx in range(grid.width):
                 c = grid.grid[my + grid.y][mx + grid.x]
                 if c != 0:
                     self.grid[y + my][x + mx] = c
+
+        return True
 
     def draw(self, x: int, y: int) -> None:
         size = config.size
@@ -76,4 +83,4 @@ class Matrix:
                            x + mx * size,
                            y + my * size,
                            size,
-                           False)
+                           0.75)

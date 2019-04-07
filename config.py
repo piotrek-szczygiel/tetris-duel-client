@@ -1,7 +1,7 @@
-width = 500
-height = 900
+width = 800
+height = 800
 
-size = 40
+size = 32
 cols = 10
 rows = 20
 

@@ -20,7 +20,7 @@ class Shape:
     grid: List[ShapeGrid]
     wall_kicks: List[WallKicks]
 
-    def draw(self, rotation: int, x: int, y: int, size: int) -> None:
+    def draw(self, rotation: int, x: int, y: int, size: int, ratio: float) -> None:
         grid = self.grid[rotation]
         height = len(grid.grid)
         width = len(grid.grid[0])
@@ -35,10 +35,10 @@ class Shape:
                            x + mx * size,
                            y + my * size,
                            size,
-                           True)
+                           ratio)
 
 
-# https://tetris.fandom.com/wiki/SRS
+# https://harddrop.com/wiki/SRS
 
 WALL_KICKS_JLSTZ = [
     ([(-1, 0), (-1, -1), (0, 2), (-1, 2)],

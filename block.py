@@ -21,22 +21,22 @@ def color_shade(color: Color, ratio: float) -> Color:
         color[2] * ratio)
 
 
+def color_get(color: Color, ratio: float) -> Color:
+    if ratio >= 1.0:
+        return color_tint(color, ratio - 1.0)
+    else:
+        return color_shade(color, ratio)
+
+
 def draw_block(color: Color, x: float, y: float,
-               size: float, highlight=False) -> None:
+               size: float, shade: float) -> None:
     display = ctx.display
 
-    if highlight:
-        color_down = color_shade(color, 0.4)
-        color_right = color_shade(color, 0.5)
-        color_middle = color_shade(color, 0.9)
-        color_left = color_tint(color, 0.2)
-        color_up = color_tint(color, 0.4)
-    else:
-        color_down = color_shade(color, 0.3)
-        color_right = color_shade(color, 0.4)
-        color_middle = color_shade(color, 0.8)
-        color_left = color_tint(color, 0.1)
-        color_up = color_tint(color, 0.3)
+    color_down = color_get(color, 0.4 * shade)
+    color_right = color_get(color, 0.5 * shade)
+    color_middle = color_get(color, 0.9 * shade)
+    color_left = color_get(color, 1.2 * shade)
+    color_up = color_get(color, 1.4 * shade)
 
     border = 0.0625 * size
 
