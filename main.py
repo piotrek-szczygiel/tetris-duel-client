@@ -19,7 +19,7 @@ if __name__ == '__main__':
                 ctx.running = False
                 break
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_r:
+                if event.key == pygame.K_F12:
                     state = Game()
                 elif event.key in (pygame.K_q, pygame.K_ESCAPE):
                     ctx.running = False

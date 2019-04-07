@@ -20,6 +20,15 @@ class Game(State):
         bind(K_LEFT, True, lambda: self.piece.move(-1, 0, collision))
         bind(K_x, False, lambda: self.piece.rotate(True, collision))
         bind(K_z, False, lambda: self.piece.rotate(False, collision))
+        bind(K_s, False, self.lock_and_new)
+        bind(K_r, False, self.new_piece)
+
+    def new_piece(self):
+        self.piece = self.bag.take()
+
+    def lock_and_new(self):
+        self.matrix.lock(self.piece)
+        self.piece = self.bag.take()
 
     def update(self) -> None:
         self.input.update()

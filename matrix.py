@@ -16,7 +16,38 @@ class Matrix:
                      for _ in range(self.height)]
 
     def collision(self, piece: Piece) -> bool:
+        grid = piece.get_grid()
+        x = piece.x + grid.x
+        y = piece.y + grid.y
+
+        if y + grid.height <= 0:
+            return False
+
+        if (x < 0
+                or x + grid.width > self.width
+                or y + grid.height > self.height):
+            return True
+
+        for my in range(grid.height):
+            if y + my < 0:
+                continue
+
+            for mx in range(grid.width):
+                c = grid.grid[my + grid.y][mx + grid.x]
+                if c != 0 and self.grid[y + my][x + mx] != 0:
+                    return True
+
         return False
+
+    def lock(self, piece: Piece) -> None:
+        grid = piece.get_grid()
+        x = piece.x + grid.x
+        y = piece.y + grid.y
+        for my in range(grid.height):
+            for mx in range(grid.width):
+                c = grid.grid[my + grid.y][mx + grid.x]
+                if c != 0:
+                    self.grid[y + my][x + mx] = c
 
     def draw(self, x: int, y: int) -> None:
         size = config.size
