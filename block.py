@@ -42,11 +42,11 @@ def draw_block(color: RGB, x: float, y: float,
     color_right = color_get(color, 0.6, alpha)
     color_middle = color_get(color, 0.8, alpha)
     color_left = color_get(color, 1.2, alpha)
-    color_up = color_get(color, 1.6, alpha)
+    color_up = color_get(color, 1.8, alpha)
 
     border = 0.125 * size
     if hollow:
-        border *= 1.5
+        border *= 0.75
 
     if not hollow:
         # middle rect

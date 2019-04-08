@@ -1,4 +1,5 @@
-from typing import List, Optional
+from random import randint
+from typing import List, Optional, Tuple
 
 import pygame
 
@@ -15,9 +16,47 @@ class Matrix:
 
         self.height = config.rows
         self.vanish = config.rows
+        self.grid: List[List[int]] = list()
+        self.reset()
 
+    def reset(self) -> None:
         self.grid = [[0 for _ in range(self.width)]
                      for _ in range(self.height + self.vanish)]
+
+    def debug_add(self, bricks: List[Tuple[int, int]]) -> None:
+        self.reset()
+        for y, x in bricks:
+            self.grid[y][x] = randint(1, 7)
+
+    def debug_tower(self) -> None:
+        bricks = [
+            (39, 0), (39, 1),
+            (38, 0),
+            (37, 0), (37, 1),
+            (36, 0), (36, 1),
+            (35, 0),
+            (34, 0), (34, 1),
+            (33, 0), (33, 1),
+            (32, 0),
+            (31, 0), (31, 1),
+            (30, 0), (30, 1),
+            (29, 0),
+            (28, 0), (28, 1),
+            (26, 2),
+            (25, 2)
+        ]
+
+        for y in range(14):
+            bricks.append((39 - y, 3))
+
+        for y in range(12):
+            for x in range(4, 10):
+                bricks.append((39 - y, x))
+
+        self.debug_add(bricks)
+
+    def get_grid(self) -> List[List[int]]:
+        return self.grid
 
     def collision(self, piece: Piece) -> bool:
         grid = piece.get_grid()
@@ -81,8 +120,9 @@ class Matrix:
 
     def get_ghost(self, piece: Piece) -> Optional[Piece]:
         ghost = Piece(piece.shape, piece.rotation, piece.x, piece.y, ghost=True)
-        if ghost.fall(self.collision) > 1:
+        if ghost.fall(self.collision) >= piece.get_height():
             return ghost
+
         return None
 
     def draw(self, x: int, y: int) -> None:
@@ -103,18 +143,18 @@ class Matrix:
 
     def draw_grid(self, x: int, y: int):
         size = config.size
-        grid_color = (32, 32, 64, 128)
+        grid_color = (32, 96, 96, 128)
 
         for row in range(self.height + 1):
             pygame.draw.line(ctx.surface,
                              grid_color,
                              (x, y + row * size),
                              (x + size * self.width, y + row * size),
-                             3)
+                             1)
 
         for column in range(self.width + 1):
             pygame.draw.line(ctx.surface,
                              grid_color,
                              (x + column * size, y),
                              (x + column * size, y + size * self.height),
-                             3)
+                             1)

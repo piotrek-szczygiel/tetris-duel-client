@@ -1,7 +1,7 @@
 from collections import Callable
 
 import config
-from shape import Shape, ShapeGrid, WallKicks
+from shape import Kicks, Shape, ShapeGrid
 
 
 class Piece:
@@ -18,6 +18,9 @@ class Piece:
         self.x = config.cols // 2 - (self.shape.grid[0].width + 1) // 2
         self.y = config.rows - self.shape.grid[0].height - self.shape.grid[0].y
 
+    def get_height(self) -> int:
+        return self.shape.get_height(self.rotation)
+
     def move(self, x: int, y: int, collision: Callable) -> bool:
         self.x += x
         self.y += y
@@ -31,19 +34,19 @@ class Piece:
 
     def rotate(self, clockwise: bool, collision: Callable) -> bool:
         last_rotation = self.rotation
-        if self.shape.wall_kicks:
-            wall_kicks: WallKicks = self.shape.wall_kicks[self.rotation]
+        if self.shape.kicks:
+            all_kicks: Kicks = self.shape.kicks[self.rotation]
         else:
-            wall_kicks = ([], [])
+            all_kicks = ([], [])
 
         if clockwise:
-            kicks = wall_kicks[0]
+            kicks = all_kicks[0]
             self.rotation += 1
         else:
-            kicks = wall_kicks[1]
+            kicks = all_kicks[1]
             self.rotation -= 1
 
-        rotation_count = len(self.shape.grid)
+        rotation_count = self.shape.get_rotations()
 
         if self.rotation < 0:
             self.rotation = rotation_count - 1
@@ -73,16 +76,9 @@ class Piece:
     def draw(self, x: int, y: int) -> None:
         size = config.size
 
-        if not self.ghost:
-            self.shape.draw(self.rotation,
-                            x + self.x * size,
-                            y + (self.y - config.rows) * size,
-                            size,
-                            255)
-        else:
-            self.shape.draw(self.rotation,
-                            x + self.x * size,
-                            y + (self.y - config.rows) * size,
-                            size,
-                            224,
-                            hollow=True)
+        self.shape.draw(self.rotation,
+                        x + self.x * size,
+                        y + (self.y - config.rows) * size,
+                        size,
+                        255,
+                        hollow=self.ghost)
