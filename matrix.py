@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 
 import pygame
 
@@ -58,10 +58,10 @@ class Matrix:
                 if c != 0:
                     self.grid[y + my][x + mx] = c
 
-        self.check_full_row()
         return True
 
-    def check_full_row(self):
+    def get_full_rows(self) -> List[int]:
+        rows = []
         for y in range(self.height + self.vanish):
             full = True
             for x in range(self.width):
@@ -69,12 +69,15 @@ class Matrix:
                     full = False
                     break
 
-            if not full:
-                continue
+            if full:
+                rows.append(y)
 
-            for y_copy in range(y, 0, -1):
-                for x in range(self.width):
-                    self.grid[y_copy][x] = self.grid[y_copy - 1][x]
+        return rows
+
+    def clear_row(self, row: int) -> None:
+        for y in range(row, 0, -1):
+            for x in range(self.width):
+                self.grid[y][x] = self.grid[y - 1][x]
 
     def get_ghost(self, piece: Piece) -> Optional[Piece]:
         ghost = Piece(piece.shape, piece.rotation, piece.x, piece.y, ghost=True)
@@ -84,21 +87,8 @@ class Matrix:
 
     def draw(self, x: int, y: int) -> None:
         size = config.size
-        grid_color = (48, 48, 96)
 
-        for row in range(self.height + 1):
-            pygame.draw.line(ctx.surface,
-                             grid_color,
-                             (x, y + row * size - 1),
-                             (x + size * self.width, y + row * size - 1),
-                             2)
-
-        for column in range(self.width + 1):
-            pygame.draw.line(ctx.surface,
-                             grid_color,
-                             (x + column * size - 1, y),
-                             (x + column * size - 1, y + size * self.height),
-                             2)
+        self.draw_grid(x, y)
 
         for my in range(self.height):
             for mx in range(self.width):
@@ -110,3 +100,21 @@ class Matrix:
                            y + my * size,
                            size,
                            224)
+
+    def draw_grid(self, x: int, y: int):
+        size = config.size
+        grid_color = (32, 32, 64, 128)
+
+        for row in range(self.height + 1):
+            pygame.draw.line(ctx.surface,
+                             grid_color,
+                             (x, y + row * size),
+                             (x + size * self.width, y + row * size),
+                             3)
+
+        for column in range(self.width + 1):
+            pygame.draw.line(ctx.surface,
+                             grid_color,
+                             (x + column * size, y),
+                             (x + column * size, y + size * self.height),
+                             3)

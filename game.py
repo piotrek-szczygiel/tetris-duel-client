@@ -79,6 +79,12 @@ class Game(State):
             self.piece = self.bag.take()
             self.reset_fall()
 
+        rows = self.matrix.get_full_rows()
+        if rows:
+            print('Rows cleared:', len(rows))
+            for row in rows:
+                self.matrix.clear_row(row)
+
     def update(self) -> None:
         self.input.update()
 

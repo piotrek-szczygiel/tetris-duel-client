@@ -20,7 +20,8 @@ class Shape:
     grid: List[ShapeGrid]
     wall_kicks: List[WallKicks]
 
-    def draw(self, rotation: int, x: int, y: int, size: int, alpha: float) -> None:
+    def draw(self, rotation: int, x: int, y: int, size: int,
+             alpha: float, hollow: bool = False) -> None:
         grid = self.grid[rotation]
         height = len(grid.grid)
         width = len(grid.grid[0])
@@ -35,7 +36,8 @@ class Shape:
                            x + mx * size,
                            y + my * size,
                            size,
-                           alpha)
+                           alpha,
+                           hollow)
 
 
 # https://harddrop.com/wiki/SRS

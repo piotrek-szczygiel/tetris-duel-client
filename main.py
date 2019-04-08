@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
         state.update()
 
-        ctx.display.fill((0, 32, 64))
+        ctx.display.fill((0, 0, 32))
         ctx.surface.fill((0, 0, 0, 0))
         state.draw()
         ctx.display.blit(ctx.surface, (0, 0))
