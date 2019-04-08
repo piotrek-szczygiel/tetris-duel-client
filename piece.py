@@ -9,10 +9,15 @@ class Piece:
         self.shape = shape
         self.shadow = shadow
         self.rotation = 0
+        self.x = 0
+        self.y = 0
+        self.reset()
 
+    def reset(self) -> None:
         # spawn the new piece in the 'left middle'
-        self.x = config.cols // 2 - (shape.grid[0].width + 1) // 2
-        self.y = config.rows - shape.grid[0].height - shape.grid[0].y
+        self.rotation = 0
+        self.x = config.cols // 2 - (self.shape.grid[0].width + 1) // 2
+        self.y = config.rows - self.shape.grid[0].height - self.shape.grid[0].y
 
     def move(self, x: int, y: int, collision: Callable) -> bool:
         self.x += x
@@ -50,7 +55,6 @@ class Piece:
             return True
 
         for kick in kicks:
-            print(kick)
             if self.move(kick[0], kick[1], collision):
                 return True
 
