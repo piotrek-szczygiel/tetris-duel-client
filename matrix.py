@@ -54,7 +54,23 @@ class Matrix:
                 if c != 0:
                     self.grid[y + my][x + mx] = c
 
+        self.check_full_row()
         return True
+
+    def check_full_row(self):
+        for y in range(self.height):
+            full = True
+            for x in range(self.width):
+                if self.grid[y][x] == 0:
+                    full = False
+                    break
+
+            if not full:
+                continue
+
+            for y_copy in range(y, 0, -1):
+                for x in range(self.width):
+                    self.grid[y_copy][x] = self.grid[y_copy - 1][x]
 
     def draw(self, x: int, y: int) -> None:
         size = config.size

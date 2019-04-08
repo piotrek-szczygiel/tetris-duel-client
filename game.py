@@ -30,23 +30,23 @@ class Game(State):
         bind(K_s, False, self.soft_fall)
         bind(K_r, False, self.debug_new_piece)
 
-    def debug_new_piece(self):
+    def debug_new_piece(self) -> None:
         self.piece = self.bag.take()
         self.last_fall = time.monotonic()
 
-    def move_down(self):
+    def move_down(self) -> None:
         if self.piece.move(0, 1, self.matrix.collision):
             self.last_fall = time.monotonic()
 
-    def soft_fall(self):
+    def soft_fall(self) -> None:
         if self.piece.fall(self.matrix.collision) > 0:
             self.last_fall = time.monotonic()
 
-    def hard_fall(self):
+    def hard_fall(self) -> None:
         self.piece.fall(self.matrix.collision)
         self.lock_and_new()
 
-    def lock_and_new(self):
+    def lock_and_new(self) -> None:
         if not self.matrix.lock(self.piece):
             ctx.running = False
         else:

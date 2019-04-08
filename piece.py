@@ -9,7 +9,9 @@ class Piece:
         self.shape = shape
         self.shadow = shadow
         self.rotation = 0
-        self.x = config.cols // 2 - 2
+
+        # spawn the new piece in the 'left middle'
+        self.x = config.cols // 2 - (shape.grid[0].width + 1) // 2
         self.y = -shape.grid[0].height - shape.grid[0].y
 
     def move(self, x: int, y: int, collision: Callable) -> bool:

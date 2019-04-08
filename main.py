@@ -1,3 +1,5 @@
+import os
+
 import pygame
 
 import config
@@ -5,10 +7,11 @@ import ctx
 from game import Game
 
 if __name__ == '__main__':
+    os.environ['SDL_VIDEO_WINDOW_POS'] = 'center'
     pygame.init()
     pygame.display.set_caption('Tetris Duel')
-
-    ctx.display = pygame.display.set_mode((config.width, config.height))
+    ctx.display = pygame.display.set_mode((config.width, config.height), pygame.RESIZABLE)
+    pygame.mouse.set_visible(False)
 
     state = Game()
 
@@ -18,6 +21,9 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 ctx.running = False
                 break
+            elif event.type == pygame.VIDEORESIZE:
+                ctx.display = pygame.display.set_mode(event.dict['size'],
+                                                      pygame.RESIZABLE)
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_F12:
                     state = Game()
