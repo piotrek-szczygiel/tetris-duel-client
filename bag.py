@@ -14,7 +14,9 @@ class Bag:
     def take(self) -> Piece:
         shape = self.bag.pop(0)
         self.fill()
-        return Piece(shape)
+        piece = Piece(shape)
+        piece.reset()
+        return piece
 
     def peek(self, n: int) -> List[Shape]:
         return self.bag[:n]
@@ -37,4 +39,4 @@ class Bag:
         gap = size * 4
 
         for i, shape in enumerate(bag):
-            shape.draw(0, x, y + i * gap, size, 1.0)
+            shape.draw(0, x, y + i * gap, size, 255)

@@ -5,13 +5,12 @@ from shape import Shape, ShapeGrid, WallKicks
 
 
 class Piece:
-    def __init__(self, shape: Shape, shadow=False) -> None:
+    def __init__(self, shape: Shape, rotation: int = 0, x: int = 0, y: int = 0, ghost=False) -> None:
         self.shape = shape
-        self.shadow = shadow
-        self.rotation = 0
-        self.x = 0
-        self.y = 0
-        self.reset()
+        self.ghost = ghost
+        self.rotation = rotation
+        self.x = x
+        self.y = y
 
     def reset(self) -> None:
         # spawn the new piece in the 'left middle'
@@ -73,13 +72,13 @@ class Piece:
 
     def draw(self, x: int, y: int) -> None:
         size = config.size
-        if self.shadow:
-            ratio = 0.5
+        if self.ghost:
+            alpha = 160
         else:
-            ratio = 1.0
+            alpha = 255
 
         self.shape.draw(self.rotation,
                         x + self.x * size,
                         y + (self.y - config.rows) * size,
                         size,
-                        ratio)
+                        alpha)

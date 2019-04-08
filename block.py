@@ -4,41 +4,47 @@ import pygame.gfxdraw
 
 import ctx
 
-Color = Tuple[float, float, float]
+RGB = Tuple[float, float, float]
+RGBA = Tuple[float, float, float, float]
 
 
-def color_tint(color: Color, ratio: float) -> Color:
+def color_tint(color: RGB, ratio: float) -> RGB:
     return (
         color[0] + (255 - color[0]) * ratio,
         color[1] + (255 - color[1]) * ratio,
         color[2] + (255 - color[2]) * ratio)
 
 
-def color_shade(color: Color, ratio: float) -> Color:
+def color_shade(color: RGB, ratio: float) -> RGB:
     return (
         color[0] * ratio,
         color[1] * ratio,
         color[2] * ratio)
 
 
-def color_get(color: Color, ratio: float) -> Color:
-    if ratio >= 1.0:
-        return color_tint(color, ratio - 1.0)
+def color_alpha(color: RGB, alpha: float) -> RGBA:
+    return color[0], color[1], color[2], alpha
+
+
+def color_get(color: RGB, shade: float, alpha: float) -> RGBA:
+    if shade > 1.0:
+        return color_alpha(color_tint(color, shade - 1.0), alpha)
     else:
-        return color_shade(color, ratio)
+        return color_alpha(color_shade(color, shade), alpha)
 
 
-def draw_block(color: Color, x: float, y: float,
-               size: float, shade: float) -> None:
-    display = ctx.display
+def draw_block(color: RGB, x: float, y: float,
+               size: float, alpha: float = 255) -> None:
+    display = ctx.surface
 
-    color_down = color_get(color, 0.4 * shade)
-    color_right = color_get(color, 0.5 * shade)
-    color_middle = color_get(color, 0.9 * shade)
-    color_left = color_get(color, 1.2 * shade)
-    color_up = color_get(color, 1.4 * shade)
+    color_down = color_get(color, 0.2, alpha)
+    color_right = color_get(color, 0.4, alpha)
+    color_middle = color_get(color, 0.8, alpha)
+    color_left = color_get(color, 1.2, alpha)
+    color_up = color_get(color, 1.4, alpha)
 
-    border = 0.0625 * size
+    border = 0.125 * size
+    # border = 0.0625 * size
 
     # middle rect
     pygame.gfxdraw.box(

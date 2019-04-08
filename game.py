@@ -89,9 +89,17 @@ class Game(State):
                 self.reset_fall()
 
     def draw(self) -> None:
-        self.matrix.draw(170, 100)
-        self.piece.draw(170, 100)
+        board_position = (170, 100)
+
+        self.matrix.draw(*board_position)
+
+        ghost = self.matrix.get_ghost(self.piece)
+        if ghost is not None:
+            ghost.draw(*board_position)
+
+        self.piece.draw(*board_position)
+
         self.bag.draw(550, 150)
 
         if self.holder is not None:
-            self.holder.shape.draw(0, 50, 150, config.size * 0.75, 1.0)
+            self.holder.shape.draw(0, 50, 150, config.size * 0.75, 255)

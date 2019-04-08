@@ -1,3 +1,5 @@
+from typing import Optional
+
 import pygame
 
 import config
@@ -74,19 +76,25 @@ class Matrix:
                 for x in range(self.width):
                     self.grid[y_copy][x] = self.grid[y_copy - 1][x]
 
+    def get_ghost(self, piece: Piece) -> Optional[Piece]:
+        ghost = Piece(piece.shape, piece.rotation, piece.x, piece.y, ghost=True)
+        if ghost.fall(self.collision) > 1:
+            return ghost
+        return None
+
     def draw(self, x: int, y: int) -> None:
         size = config.size
         grid_color = (48, 48, 96)
 
         for row in range(self.height + 1):
-            pygame.draw.line(ctx.display,
+            pygame.draw.line(ctx.surface,
                              grid_color,
                              (x, y + row * size - 1),
                              (x + size * self.width, y + row * size - 1),
                              2)
 
         for column in range(self.width + 1):
-            pygame.draw.line(ctx.display,
+            pygame.draw.line(ctx.surface,
                              grid_color,
                              (x + column * size - 1, y),
                              (x + column * size - 1, y + size * self.height),
@@ -101,4 +109,4 @@ class Matrix:
                            x + mx * size,
                            y + my * size,
                            size,
-                           0.6)
+                           224)
