@@ -10,10 +10,12 @@ from shape import SHAPE_COLORS
 class Matrix:
     def __init__(self) -> None:
         self.width = config.cols
+
         self.height = config.rows
+        self.vanish = config.rows
 
         self.grid = [[0 for _ in range(self.width)]
-                     for _ in range(self.height)]
+                     for _ in range(self.height + self.vanish)]
 
     def collision(self, piece: Piece) -> bool:
         grid = piece.get_grid()
@@ -23,14 +25,14 @@ class Matrix:
         if x < 0 or x + grid.width > self.width:
             return True
 
-        if y + grid.height <= 0:
+        if y + grid.height <= self.vanish:
             return False
 
-        if y + grid.height > self.height:
+        if y + grid.height > self.height + self.vanish:
             return True
 
         for my in range(grid.height):
-            if y + my < 0:
+            if y + my < self.vanish:
                 continue
 
             for mx in range(grid.width):
@@ -45,7 +47,7 @@ class Matrix:
         x = piece.x + grid.x
         y = piece.y + grid.y
 
-        if y < 0:
+        if y + grid.height <= self.vanish:
             return False
 
         for my in range(grid.height):
@@ -58,7 +60,7 @@ class Matrix:
         return True
 
     def check_full_row(self):
-        for y in range(self.height):
+        for y in range(self.height + self.vanish):
             full = True
             for x in range(self.width):
                 if self.grid[y][x] == 0:
@@ -92,11 +94,11 @@ class Matrix:
 
         for my in range(self.height):
             for mx in range(self.width):
-                if self.grid[my][mx] == 0:
+                if self.grid[self.vanish + my][mx] == 0:
                     continue
 
-                draw_block(SHAPE_COLORS[self.grid[my][mx]],
+                draw_block(SHAPE_COLORS[self.grid[self.vanish + my][mx]],
                            x + mx * size,
                            y + my * size,
                            size,
-                           0.75)
+                           0.6)

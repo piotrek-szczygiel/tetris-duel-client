@@ -12,7 +12,7 @@ class Piece:
 
         # spawn the new piece in the 'left middle'
         self.x = config.cols // 2 - (shape.grid[0].width + 1) // 2
-        self.y = -shape.grid[0].height - shape.grid[0].y
+        self.y = config.rows - shape.grid[0].height - shape.grid[0].y
 
     def move(self, x: int, y: int, collision: Callable) -> bool:
         self.x += x
@@ -76,6 +76,6 @@ class Piece:
 
         self.shape.draw(self.rotation,
                         x + self.x * size,
-                        y + self.y * size,
+                        y + (self.y - config.rows) * size,
                         size,
                         ratio)
