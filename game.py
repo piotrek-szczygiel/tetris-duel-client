@@ -64,5 +64,6 @@ class Game(State):
                 self.last_fall = now
 
     def draw(self) -> None:
-        self.matrix.draw(70, 70)
-        self.piece.draw(70, 70)
+        self.matrix.draw(170, 100)
+        self.piece.draw(170, 100)
+        self.bag.draw(550, 150)
