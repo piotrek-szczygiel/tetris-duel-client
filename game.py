@@ -60,8 +60,8 @@ class Game(State):
         bind(K_t, False, self.matrix.debug_tower)
         bind(K_g, False, lambda: self.add_garbage(5))
 
-        self.text_hold = ctx.font.render('Hold', True, config.ui_text)
-        self.text_next = ctx.font.render('Next', True, config.ui_text)
+        self.text_hold = ctx.font.render("Hold", True, config.ui_text)
+        self.text_next = ctx.font.render("Next", True, config.ui_text)
 
     def is_running(self) -> bool:
         return self.running
@@ -109,8 +109,7 @@ class Game(State):
         self.hold_lock = False
         t_spin = False
 
-        if (self.matrix.collision(self.piece)
-                or not self.matrix.lock(self.piece)):
+        if self.matrix.collision(self.piece) or not self.matrix.lock(self.piece):
             self.game_over = True
         else:
             if TSpin.detect(self.matrix, self.piece):
@@ -123,17 +122,17 @@ class Game(State):
         if rows:
             row_count = len(rows)
             if t_spin:
-                message = 'T-spin '
+                message = "T-spin "
                 if row_count == 1:
-                    message += 'single!'
+                    message += "single!"
                 elif row_count == 2:
-                    message += 'double!'
+                    message += "double!"
                 elif row_count == 3:
-                    message += 'triple!'
+                    message += "triple!"
             elif row_count == 4:
-                message = 'Tetris!'
+                message = "Tetris!"
             else:
-                message = str(row_count) + ' cleared'
+                message = str(row_count) + " cleared"
 
             print(message)
 
@@ -169,8 +168,7 @@ class Game(State):
                     self.reset_fall()
 
         if self.garbage_allow and not self.rows_to_clear:
-            if (self.garbage_to_add > 0
-                    and ctx.now - self.garbage_add_last > 0.05):
+            if self.garbage_to_add > 0 and ctx.now - self.garbage_add_last > 0.05:
                 self.matrix.add_garbage(self.garbage_hole)
                 self.garbage_to_add -= 1
                 self.garbage_add_last = ctx.now
@@ -192,7 +190,7 @@ class Game(State):
                 self.reset_fall()
 
         if self.game_over:
-            print('Game over!')
+            print("Game over!")
             self.running = False
 
     def draw(self) -> None:

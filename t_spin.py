@@ -6,7 +6,7 @@ from piece import Piece
 class TSpin:
     @staticmethod
     def detect(matrix: Matrix, piece: Piece) -> bool:
-        if piece.shape.name != 'T':
+        if piece.shape.name != "T":
             return False
 
         if piece.last_movement != Movement.rotate:
@@ -29,9 +29,11 @@ class TSpin:
         if matrix.height <= y + 2 or matrix_grid[y + 2][x] != 0:
             occupied += 1
 
-        if (matrix.width <= y + 2
+        if (
+                matrix.width <= y + 2
                 or matrix.height <= x + 2
-                or matrix_grid[y + 2][x + 2] != 0):
+                or matrix_grid[y + 2][x + 2] != 0
+        ):
             occupied += 1
 
         return occupied >= 3

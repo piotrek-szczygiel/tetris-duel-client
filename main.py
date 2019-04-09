@@ -26,7 +26,7 @@ class Main:
                 ctx.running = False
                 return False
             elif event.type == pg.VIDEORESIZE:
-                w, h = event.dict['size']
+                w, h = event.dict["size"]
                 old_w, old_h = self.last_size
 
                 if h != old_h:
@@ -46,16 +46,16 @@ class Main:
         return True
 
     def run(self) -> None:
-        os.environ['SDL_VIDEO_WINDOW_POS'] = 'center'
+        os.environ["SDL_VIDEO_WINDOW_POS"] = "center"
         pg.init()
 
         self.display = pg.display.set_mode(config.window_size, pg.RESIZABLE)
         ctx.surface = pg.Surface(config.window_size)
 
-        pg.display.set_caption('Tetris Duel')
+        pg.display.set_caption("Tetris Duel")
 
-        ctx.font = pg.font.Font(resources.path('tetris.ttf'), 24)
-        ctx.debug_font = pg.font.Font(resources.path('tetris.ttf'), 16)
+        ctx.font = pg.font.Font(resources.path("tetris.ttf"), 24)
+        ctx.debug_font = pg.font.Font(resources.path("tetris.ttf"), 16)
 
         self.switch_state(Game())
 
@@ -73,15 +73,15 @@ class Main:
             ctx.surface.fill(config.background)
             self.state.draw()
 
-            fps = 'FPS: ' + "{0:.1f}".format(fps_clock.get_fps())
+            fps = "FPS: " + "{0:.1f}".format(fps_clock.get_fps())
             fps_text = ctx.debug_font.render(fps, True, (255, 255, 255))
             ctx.surface.blit(fps_text, (5, 5))
 
             pg.transform.scale(ctx.surface, self.display.get_size(), self.display)
             pg.display.flip()
 
-            fps_clock.tick(120)
+            fps_clock.tick(60)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     Main().run()

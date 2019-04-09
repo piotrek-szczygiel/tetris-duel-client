@@ -24,8 +24,9 @@ class Matrix:
         self.clear()
 
     def clear(self) -> None:
-        self.grid = [[0 for _ in range(self.width)]
-                     for _ in range(self.height + self.vanish)]
+        self.grid = [
+            [0 for _ in range(self.width)] for _ in range(self.height + self.vanish)
+        ]
 
     def debug_add(self, bricks: List[Tuple[int, int]]) -> None:
         self.clear()
@@ -34,20 +35,28 @@ class Matrix:
 
     def debug_tower(self) -> None:
         bricks = [
-            (39, 0), (39, 1),
+            (39, 0),
+            (39, 1),
             (38, 0),
-            (37, 0), (37, 1),
-            (36, 0), (36, 1),
+            (37, 0),
+            (37, 1),
+            (36, 0),
+            (36, 1),
             (35, 0),
-            (34, 0), (34, 1),
-            (33, 0), (33, 1),
+            (34, 0),
+            (34, 1),
+            (33, 0),
+            (33, 1),
             (32, 0),
-            (31, 0), (31, 1),
-            (30, 0), (30, 1),
+            (31, 0),
+            (31, 1),
+            (30, 0),
+            (30, 1),
             (29, 0),
-            (28, 0), (28, 1),
+            (28, 0),
+            (28, 1),
             (26, 2),
-            (25, 2)
+            (25, 2),
         ]
 
         for y in range(14):
@@ -150,11 +159,13 @@ class Matrix:
                 if my == -1:
                     alpha = 0.3
 
-                draw_block(SHAPE_COLORS[self.grid[self.vanish + my][mx]],
-                           x + mx * size,
-                           y + my * size,
-                           size,
-                           alpha)
+                draw_block(
+                    SHAPE_COLORS[self.grid[self.vanish + my][mx]],
+                    x + mx * size,
+                    y + my * size,
+                    size,
+                    alpha,
+                )
 
     def draw_grid(self, x: int, y: int) -> None:
 
@@ -167,15 +178,19 @@ class Matrix:
         grid_color = (64, 64, 64)
 
         for row in range(self.height + 1):
-            pg.draw.line(ctx.surface,
-                         grid_color,
-                         (x, y + row * size),
-                         (x + size * self.width, y + row * size),
-                         width)
+            pg.draw.line(
+                ctx.surface,
+                grid_color,
+                (x, y + row * size),
+                (x + size * self.width, y + row * size),
+                width,
+            )
 
         for column in range(self.width + 1):
-            pg.draw.line(ctx.surface,
-                         grid_color,
-                         (x + column * size, y),
-                         (x + column * size, y + size * self.height),
-                         width)
+            pg.draw.line(
+                ctx.surface,
+                grid_color,
+                (x + column * size, y),
+                (x + column * size, y + size * self.height),
+                width,
+            )

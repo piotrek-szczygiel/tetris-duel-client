@@ -6,8 +6,9 @@ from shape import Shape, ShapeGrid
 
 
 class Piece:
-    def __init__(self, shape: Shape, rotation: int = 0,
-                 x: int = 0, y: int = 0, ghost=False) -> None:
+    def __init__(
+            self, shape: Shape, rotation: int = 0, x: int = 0, y: int = 0, ghost=False
+    ) -> None:
         self.shape = shape
         self.ghost = ghost
         self.rotation = rotation
@@ -110,8 +111,10 @@ class Piece:
         else:
             alpha = 1.0
 
-        self.shape.draw(self.rotation,
-                        x + self.x * size,
-                        y + (self.y - config.rows) * size,
-                        size,
-                        alpha)
+        self.shape.draw(
+            self.rotation,
+            x + self.x * size,
+            y + (self.y - config.rows) * size,
+            size,
+            alpha,
+        )
