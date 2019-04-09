@@ -1,6 +1,7 @@
 from collections import Callable
 
 import config
+from movement import Movement
 from shape import Kicks, Shape, ShapeGrid
 
 
@@ -11,26 +12,42 @@ class Piece:
         self.rotation = rotation
         self.x = x
         self.y = y
+        self.last_movement = Movement.none
+        self.cancel_lock = False
 
     def reset(self) -> None:
         # spawn the new piece in the 'left middle'
         self.rotation = 0
         self.x = config.cols // 2 - (self.shape.grid[0].width + 1) // 2
         self.y = config.rows - self.shape.grid[0].height - self.shape.grid[0].y
+        self.last_movement = Movement.none
 
     def get_height(self) -> int:
         return self.shape.get_height(self.rotation)
 
     def move(self, x: int, y: int, collision: Callable) -> bool:
+        if self.check_collision(x, y, collision):
+            return False
+
+        self.x += x
+        self.y += y
+        self.last_movement = Movement.move
+
+        if self.check_collision(0, 1, collision):
+            self.cancel_lock = True
+
+        return True
+
+    def check_collision(self, x: int, y: int, collision: Callable) -> bool:
         self.x += x
         self.y += y
 
-        if collision(self):
-            self.x -= x
-            self.y -= y
-            return False
+        result = collision(self)
 
-        return True
+        self.x -= x
+        self.y -= y
+
+        return result
 
     def rotate(self, clockwise: bool, collision: Callable) -> bool:
         last_rotation = self.rotation
@@ -53,15 +70,25 @@ class Piece:
         elif self.rotation >= rotation_count:
             self.rotation = 0
 
+        rotated = False
+
         if not collision(self):
+            self.last_movement = Movement.rotate
+            rotated = True
+        else:
+            for kick in kicks:
+                if self.move(kick[0], kick[1], collision):
+                    self.last_movement = Movement.rotate
+                    rotated = True
+                    break
+
+        if rotated:
+            if self.check_collision(0, 1, collision):
+                self.cancel_lock = True
             return True
-
-        for kick in kicks:
-            if self.move(kick[0], kick[1], collision):
-                return True
-
-        self.rotation = last_rotation
-        return False
+        else:
+            self.rotation = last_rotation
+            return False
 
     def get_grid(self) -> ShapeGrid:
         return self.shape.grid[self.rotation]
@@ -70,6 +97,9 @@ class Piece:
         counter = 0
         while self.move(0, 1, collision):
             counter += 1
+
+        if counter > 0:
+            self.last_movement = Movement.move
 
         return counter
 

@@ -84,7 +84,10 @@ SHAPE_COLORS = [
     (255, 255, 0),  # yellow
     (0, 255, 0),  # green
     (128, 0, 128),  # purple
-    (255, 0, 0)]  # red
+    (255, 0, 0),  # red
+    (128, 128, 128)]  # gray
+
+GARBAGE_COLOR = 8
 
 # We could have used simple matrix rotation for rotating the pieces
 # but than we would have to calculate anchor, width and height

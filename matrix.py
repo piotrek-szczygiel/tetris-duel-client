@@ -7,7 +7,7 @@ import config
 import ctx
 from block import draw_block
 from piece import Piece
-from shape import SHAPE_COLORS
+from shape import GARBAGE_COLOR, SHAPE_COLORS
 
 
 class Matrix:
@@ -58,7 +58,7 @@ class Matrix:
     def get_grid(self) -> List[List[int]]:
         return self.grid
 
-    def collision(self, piece: Piece, check_vanish: bool = False) -> bool:
+    def collision(self, piece: Piece) -> bool:
         grid = piece.get_grid()
         x = piece.x + grid.x
         y = piece.y + grid.y
@@ -66,16 +66,10 @@ class Matrix:
         if x < 0 or x + grid.width > self.width:
             return True
 
-        if not check_vanish and y + grid.height <= self.vanish:
-            return False
-
         if y + grid.height > self.height + self.vanish:
             return True
 
         for my in range(grid.height):
-            if not check_vanish and y + my < self.vanish:
-                continue
-
             for mx in range(grid.width):
                 c = grid.grid[my + grid.y][mx + grid.x]
                 if c != 0 and self.grid[y + my][x + mx] != 0:
@@ -118,6 +112,17 @@ class Matrix:
             for x in range(self.width):
                 self.grid[y][x] = self.grid[y - 1][x]
 
+    def add_garbage(self, hole: int) -> None:
+        for y in range(self.height + self.vanish - 1):
+            for x in range(self.width):
+                self.grid[y][x] = self.grid[y + 1][x]
+
+        for x in range(self.width):
+            if x != hole:
+                self.grid[self.height + self.vanish - 1][x] = GARBAGE_COLOR
+            else:
+                self.grid[self.height + self.vanish - 1][x] = 0
+
     def get_ghost(self, piece: Piece) -> Piece:
         ghost = Piece(piece.shape, piece.rotation, piece.x, piece.y, ghost=True)
         ghost.fall(self.collision)
@@ -128,16 +133,20 @@ class Matrix:
 
         self.draw_grid(x, y)
 
-        for my in range(self.height):
+        for my in range(-1, self.height):
             for mx in range(self.width):
                 if self.grid[self.vanish + my][mx] == 0:
                     continue
+
+                alpha = 0.7
+                if my == -1:
+                    alpha = 0.3
 
                 draw_block(SHAPE_COLORS[self.grid[self.vanish + my][mx]],
                            x + mx * size,
                            y + my * size,
                            size,
-                           0.6)
+                           alpha)
 
     def draw_grid(self, x: int, y: int):
         size = config.size
