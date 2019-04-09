@@ -30,8 +30,8 @@ class Shape:
     def get_rotations(self) -> int:
         return len(self.grid)
 
-    def draw(self, rotation: int, x: int, y: int, size: int,
-             alpha: float, hollow: bool = False) -> None:
+    def draw(self, rotation: int, x: int, y: int,
+             size: int, ratio: float) -> None:
         grid = self.grid[rotation]
         width, height = self.get_width(rotation), self.get_height(rotation)
 
@@ -45,8 +45,7 @@ class Shape:
                            x + mx * size,
                            y + my * size,
                            size,
-                           alpha,
-                           hollow)
+                           ratio)
 
 
 # https://harddrop.com/wiki/SRS

@@ -75,10 +75,13 @@ class Piece:
 
     def draw(self, x: int, y: int) -> None:
         size = config.size
+        if self.ghost:
+            alpha = 0.3
+        else:
+            alpha = 1.0
 
         self.shape.draw(self.rotation,
                         x + self.x * size,
                         y + (self.y - config.rows) * size,
                         size,
-                        255,
-                        hollow=self.ghost)
+                        alpha)

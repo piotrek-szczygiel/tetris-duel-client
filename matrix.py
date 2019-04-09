@@ -1,5 +1,5 @@
 from random import randint
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
 import pygame
 
@@ -118,12 +118,10 @@ class Matrix:
             for x in range(self.width):
                 self.grid[y][x] = self.grid[y - 1][x]
 
-    def get_ghost(self, piece: Piece) -> Optional[Piece]:
+    def get_ghost(self, piece: Piece) -> Piece:
         ghost = Piece(piece.shape, piece.rotation, piece.x, piece.y, ghost=True)
-        if ghost.fall(self.collision) >= piece.get_height():
-            return ghost
-
-        return None
+        ghost.fall(self.collision)
+        return ghost
 
     def draw(self, x: int, y: int) -> None:
         size = config.size
@@ -139,11 +137,11 @@ class Matrix:
                            x + mx * size,
                            y + my * size,
                            size,
-                           224)
+                           0.6)
 
     def draw_grid(self, x: int, y: int):
         size = config.size
-        grid_color = (32, 96, 96, 128)
+        grid_color = (64, 64, 64)
 
         for row in range(self.height + 1):
             pygame.draw.line(ctx.surface,

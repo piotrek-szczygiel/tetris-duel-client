@@ -1,5 +1,4 @@
 import os
-from typing import Tuple
 
 import pygame
 from pygame.locals import *
@@ -12,44 +11,46 @@ from state import State
 
 class Main:
     def __init__(self) -> None:
-        ctx.display = None
-        ctx.surface = None
+        self.display = None
         self.state: State = Game()
 
-    def initialize_video(self, dimensions: Tuple[int, int]) -> None:
-        ctx.display = pygame.display.set_mode(dimensions, RESIZABLE)
-        ctx.surface = pygame.Surface(dimensions, SRCALPHA | HWSURFACE)
+    def handle_events(self) -> bool:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                ctx.running = False
+                return False
+            elif event.type == VIDEORESIZE:
+                ctx.display = pygame.display.set_mode(event.dict['size'], RESIZABLE)
+            elif event.type == KEYDOWN:
+                if event.key == K_F12:
+                    self.state = Game()
+                elif event.key == K_q:
+                    ctx.running = False
+                    return False
+
+        return True
 
     def run(self) -> None:
         os.environ['SDL_VIDEO_WINDOW_POS'] = 'center'
         pygame.init()
-        self.initialize_video((config.width, config.height))
+        self.display = pygame.display.set_mode(config.window_size, HWSURFACE | RESIZABLE)
+        ctx.surface = pygame.Surface(config.window_size, HWSURFACE)
         pygame.display.set_caption('Tetris Duel')
-        pygame.mouse.set_visible(False)
 
         fps_clock = pygame.time.Clock()
         while ctx.running:
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    ctx.running = False
-                    break
-                elif event.type == VIDEORESIZE:
-                    self.initialize_video(event.dict['size'])
-                elif event.type == KEYDOWN:
-                    if event.key == K_F12:
-                        self.state = Game()
-                    elif event.key == K_q:
-                        ctx.running = False
-                        break
+            if not self.handle_events():
+                return
 
             self.state.update()
 
-            ctx.display.fill((0, 0, 32))
-            ctx.surface.fill((0, 0, 0, 0))
+            ctx.surface.fill(config.background)
             self.state.draw()
-            ctx.display.blit(ctx.surface, (0, 0))
+
+            pygame.transform.scale(ctx.surface, self.display.get_size(), self.display)
             pygame.display.flip()
-            fps_clock.tick(60)
+
+            fps_clock.tick(120)
 
 
 if __name__ == '__main__':

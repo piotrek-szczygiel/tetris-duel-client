@@ -17,7 +17,8 @@ class Game(State):
     def __init__(self) -> None:
         self.matrix = Matrix()
         self.bag = Bag()
-        self.piece = self.bag.take()
+        self.piece: Piece = self.bag.take()
+
         self.input = Input()
 
         self.last_fall = time.monotonic()
@@ -29,11 +30,11 @@ class Game(State):
         self.last_movement = Movement.none
 
         self.pause = False
+        self.game_over = False
 
         self.enemy = Matrix()
         self.enemy.debug_tower()
 
-        collision = self.matrix.collision
         bind = self.input.subscribe
         bind(K_DOWN, True, self.move_down)
         bind(K_RIGHT, True, self.move_right)
@@ -107,7 +108,7 @@ class Game(State):
         self.hold_lock = False
         t_spin = False
         if not self.matrix.lock(self.piece):
-            ctx.running = False
+            self.game_over = True
         else:
             if TSpin.detect(self.matrix, self.piece, self.last_movement):
                 t_spin = True
@@ -133,19 +134,20 @@ class Game(State):
             else:
                 self.reset_fall()
 
+        if self.game_over:
+            print('Game over!')
+            ctx.running = False
+
     def draw(self) -> None:
         board_position = (170, 100)
 
         self.matrix.draw(*board_position)
         self.enemy.draw(700, 100)
 
+        self.matrix.get_ghost(self.piece).draw(*board_position)
         self.piece.draw(*board_position)
-
-        ghost = self.matrix.get_ghost(self.piece)
-        if ghost is not None:
-            ghost.draw(*board_position)
 
         self.bag.draw(510, 150)
 
         if self.holder is not None:
-            self.holder.shape.draw(0, 80, 150, config.size * 0.75, 255)
+            self.holder.shape.draw(0, 80, 150, config.size * 0.75, 1.0)

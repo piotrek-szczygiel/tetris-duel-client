@@ -39,4 +39,4 @@ class Bag:
         gap = size * 4
 
         for i, shape in enumerate(bag):
-            shape.draw(0, x, y + i * gap, size, 255)
+            shape.draw(0, x, y + i * gap, size, 1.0)
