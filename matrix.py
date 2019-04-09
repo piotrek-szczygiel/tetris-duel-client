@@ -113,7 +113,7 @@ class Matrix:
 
         return rows
 
-    def clear_row(self, row: int) -> None:
+    def collapse_row(self, row: int) -> None:
         for y in range(row, 0, -1):
             for x in range(self.width):
                 self.grid[y][x] = self.grid[y - 1][x]

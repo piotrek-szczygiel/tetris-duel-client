@@ -29,6 +29,10 @@ class Game(State):
 
         self.last_movement = Movement.none
 
+        self.clearing = False
+        self.rows_to_clear = []
+        self.last_clear = None
+
         self.pause = False
         self.game_over = False
 
@@ -120,15 +124,29 @@ class Game(State):
             print('Rows cleared:', len(rows))
             if t_spin:
                 print('T-spin!')
-            for row in rows:
-                self.matrix.clear_row(row)
+
+            self.clearing = True
+            self.rows_to_clear = rows
+            self.last_clear = time.monotonic()
 
         self.last_movement = Movement.move
 
     def update(self) -> None:
+        now = time.monotonic()
+
+        if self.clearing:
+            if self.rows_to_clear:
+                if now - self.last_clear > 0.03:
+                    row = self.rows_to_clear.pop(0)
+                    self.matrix.collapse_row(row)
+                    self.last_clear = now
+            else:
+                self.clearing = False
+                self.last_fall = now
+
         self.input.update()
 
-        if not self.pause and time.monotonic() - self.last_fall > self.fall_interval:
+        if not self.pause and now - self.last_fall > self.fall_interval:
             if not self.piece.move(0, 1, self.matrix.collision):
                 self.lock_and_new()
             else:
