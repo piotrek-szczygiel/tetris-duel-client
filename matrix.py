@@ -58,7 +58,7 @@ class Matrix:
     def get_grid(self) -> List[List[int]]:
         return self.grid
 
-    def collision(self, piece: Piece) -> bool:
+    def collision(self, piece: Piece, check_vanish: bool = False) -> bool:
         grid = piece.get_grid()
         x = piece.x + grid.x
         y = piece.y + grid.y
@@ -66,14 +66,14 @@ class Matrix:
         if x < 0 or x + grid.width > self.width:
             return True
 
-        if y + grid.height <= self.vanish:
+        if not check_vanish and y + grid.height <= self.vanish:
             return False
 
         if y + grid.height > self.height + self.vanish:
             return True
 
         for my in range(grid.height):
-            if y + my < self.vanish:
+            if not check_vanish and y + my < self.vanish:
                 continue
 
             for mx in range(grid.width):

@@ -1,4 +1,4 @@
-window_size = 1200, 800
+window_size = 700, 800
 
 size = 30
 cols = 10

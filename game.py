@@ -36,9 +36,6 @@ class Game(State):
         self.pause = False
         self.game_over = False
 
-        self.enemy = Matrix()
-        self.enemy.debug_tower()
-
         bind = self.input.subscribe
         bind(K_DOWN, True, self.move_down)
         bind(K_RIGHT, True, self.move_right)
@@ -55,21 +52,36 @@ class Game(State):
     def debug_pause(self) -> None:
         self.pause = not self.pause
 
+    def lock_delay(self) -> None:
+        if self.piece.move(0, 1, self.matrix.collision):
+            self.piece.move(0, -1, self.matrix.collision)
+        else:
+            self.reset_fall()
+
     def move_right(self) -> None:
         self.piece.move(1, 0, self.matrix.collision)
         self.last_movement = Movement.move
+        self.lock_delay()
 
     def move_left(self) -> None:
         self.piece.move(-1, 0, self.matrix.collision)
         self.last_movement = Movement.move
+        self.lock_delay()
+
+    def move_down(self) -> None:
+        if self.piece.move(0, 1, self.matrix.collision):
+            self.reset_fall()
+            self.last_movement = Movement.move
 
     def rotate_right(self) -> None:
         if self.piece.rotate(True, self.matrix.collision):
             self.last_movement = Movement.rotate
+        self.lock_delay()
 
     def rotate_left(self) -> None:
         if self.piece.rotate(False, self.matrix.collision):
             self.last_movement = Movement.rotate
+        self.lock_delay()
 
     def hold(self) -> None:
         if self.hold_lock:
@@ -85,11 +97,6 @@ class Game(State):
             self.piece = self.bag.take()
 
         self.reset_fall()
-
-    def move_down(self) -> None:
-        if self.piece.move(0, 1, self.matrix.collision):
-            self.reset_fall()
-            self.last_movement = Movement.move
 
     def soft_fall(self) -> None:
         if self.piece.fall(self.matrix.collision) > 0:
@@ -118,6 +125,9 @@ class Game(State):
                 t_spin = True
             self.piece = self.bag.take()
             self.reset_fall()
+
+            if self.matrix.collision(self.piece, check_vanish=True):
+                self.game_over = True
 
         rows = self.matrix.get_full_rows()
         if rows:
@@ -160,7 +170,6 @@ class Game(State):
         board_position = (170, 100)
 
         self.matrix.draw(*board_position)
-        self.enemy.draw(700, 100)
 
         self.matrix.get_ghost(self.piece).draw(*board_position)
         self.piece.draw(*board_position)
