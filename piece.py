@@ -2,11 +2,12 @@ from collections import Callable
 
 import config
 from movement import Movement
-from shape import Kicks, Shape, ShapeGrid
+from shape import Shape, ShapeGrid
 
 
 class Piece:
-    def __init__(self, shape: Shape, rotation: int = 0, x: int = 0, y: int = 0, ghost=False) -> None:
+    def __init__(self, shape: Shape, rotation: int = 0,
+                 x: int = 0, y: int = 0, ghost=False) -> None:
         self.shape = shape
         self.ghost = ghost
         self.rotation = rotation
@@ -16,7 +17,6 @@ class Piece:
         self.cancel_lock = False
 
     def reset(self) -> None:
-        # spawn the new piece in the 'left middle'
         self.rotation = 0
         self.x = config.cols // 2 - (self.shape.grid[0].width + 1) // 2
         self.y = config.rows - self.shape.grid[0].height - self.shape.grid[0].y
@@ -52,7 +52,7 @@ class Piece:
     def rotate(self, clockwise: bool, collision: Callable) -> bool:
         last_rotation = self.rotation
         if self.shape.kicks:
-            all_kicks: Kicks = self.shape.kicks[self.rotation]
+            all_kicks = self.shape.kicks[self.rotation]
         else:
             all_kicks = ([], [])
 

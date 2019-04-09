@@ -1,6 +1,7 @@
-import time
+from random import randint
 from typing import List, Optional
 
+import pygame
 from pygame.locals import *
 
 import config
@@ -15,82 +16,32 @@ from t_spin import TSpin
 
 class Game(State):
     def __init__(self) -> None:
-        self.matrix: Matrix = Matrix()
-        self.bag: Bag = Bag()
-        self.piece: Piece = self.bag.take()
+        self.matrix = Matrix()
+        self.bag = Bag()
+        self.piece = self.bag.take()
 
-        self.input: Input = Input()
+        self.input = Input()
 
-        self.last_fall: float = time.monotonic()
-        self.fall_interval: float = 1.0
+        self.last_fall = ctx.now
+        self.fall_interval = 1.0
 
         self.holder: Optional[Piece] = None
-        self.hold_lock: bool = False
+        self.hold_lock = False
 
         self.rows_to_clear: List[int] = []
-        self.last_clear: float = time.monotonic()
+        self.last_clear = ctx.now
 
-        self.garbage_allow: bool = False
-        self.garbage_to_add: int = 0
-        self.garbage_add_last: float = time.monotonic()
+        self.garbage_allow = False
+        self.garbage_hole = 0
+        self.garbage_to_add = 0
+        self.garbage_add_last = ctx.now
 
-        self.pause: bool = False
-        self.game_over: bool = False
+        self.pause = False
+        self.game_over = False
 
-        self.bind_keys()
+        self.text_hold: pygame.Surface
 
-    def update(self) -> None:
-        now = time.monotonic()
-
-        if self.rows_to_clear:
-            if now - self.last_clear > 0.02:
-                row = self.rows_to_clear.pop(0)
-                self.matrix.collapse_row(row)
-                self.last_clear = now
-
-                if not self.rows_to_clear:
-                    self.reset_fall()
-
-        if self.garbage_allow and self.garbage_to_add > 0:
-            if now - self.garbage_add_last > 0.05:
-                self.matrix.add_garbage(3)
-                self.garbage_to_add -= 1
-                self.garbage_add_last = now
-
-                if self.garbage_to_add == 0:
-                    self.garbage_allow = False
-                    self.reset_fall()
-
-        self.input.update()
-
-        if self.piece.cancel_lock:
-            self.piece.cancel_lock = False
-            self.reset_fall()
-
-        if not self.pause and now - self.last_fall > self.fall_interval:
-            if not self.piece.move(0, 1, self.matrix.collision):
-                self.lock_and_new()
-            else:
-                self.reset_fall()
-
-        if self.game_over:
-            print('Game over!')
-            ctx.running = False
-
-    def draw(self) -> None:
-        board_position = (170, 100)
-
-        self.matrix.draw(*board_position)
-
-        self.matrix.get_ghost(self.piece).draw(*board_position)
-        self.piece.draw(*board_position)
-
-        self.bag.draw(510, 150)
-
-        if self.holder is not None:
-            self.holder.shape.draw(0, 80, 150, config.size * 0.75, 1.0)
-
-    def bind_keys(self):
+    def initialize(self) -> None:
         bind = self.input.subscribe
         bind(K_DOWN, True, self.move_down)
         bind(K_RIGHT, True, self.move_right)
@@ -105,6 +56,8 @@ class Game(State):
         bind(K_t, False, self.matrix.debug_tower)
         bind(K_g, False, lambda: self.add_garbage(5))
 
+        self.text_hold = ctx.font.render('Hold', True, (224, 224, 255))
+
     def debug_pause(self) -> None:
         self.pause = not self.pause
 
@@ -114,7 +67,8 @@ class Game(State):
 
     def add_garbage(self, rows: int) -> None:
         self.garbage_to_add += rows
-        self.garbage_add_last = time.monotonic()
+        self.garbage_hole = randint(0, self.matrix.width - 1)
+        self.garbage_add_last = ctx.now
 
     def move_right(self) -> None:
         self.piece.move(1, 0, self.matrix.collision)
@@ -141,13 +95,14 @@ class Game(State):
         self.lock_and_new()
 
     def reset_fall(self) -> None:
-        self.last_fall = time.monotonic()
+        self.last_fall = ctx.now
 
     def lock_and_new(self) -> None:
         self.hold_lock = False
         t_spin = False
 
-        if self.matrix.collision(self.piece) or not self.matrix.lock(self.piece):
+        if (self.matrix.collision(self.piece)
+                or not self.matrix.lock(self.piece)):
             self.game_over = True
         else:
             if TSpin.detect(self.matrix, self.piece):
@@ -162,8 +117,11 @@ class Game(State):
             if t_spin:
                 print('T-spin!')
 
+            for row in rows:
+                self.matrix.empty_row(row)
+
             self.rows_to_clear = rows
-            self.last_clear = time.monotonic()
+            self.last_clear = ctx.now + 0.15
 
     def hold(self) -> None:
         if self.hold_lock:
@@ -179,3 +137,55 @@ class Game(State):
             self.piece = self.bag.take()
 
         self.reset_fall()
+
+    def update(self) -> None:
+        if self.rows_to_clear:
+            if ctx.now - self.last_clear > 0.02:
+                row = self.rows_to_clear.pop(0)
+                self.matrix.collapse_row(row)
+                self.last_clear = ctx.now
+
+                if not self.rows_to_clear:
+                    self.reset_fall()
+
+        if self.garbage_allow and not self.rows_to_clear:
+            if (self.garbage_to_add > 0
+                    and ctx.now - self.garbage_add_last > 0.05):
+                self.matrix.add_garbage(self.garbage_hole)
+                self.garbage_to_add -= 1
+                self.garbage_add_last = ctx.now
+
+            if self.garbage_to_add == 0:
+                self.reset_fall()
+                self.garbage_allow = False
+
+        self.input.update()
+
+        if self.piece.cancel_lock:
+            self.piece.cancel_lock = False
+            self.reset_fall()
+
+        if not self.pause and ctx.now - self.last_fall > self.fall_interval:
+            if not self.piece.move(0, 1, self.matrix.collision):
+                self.lock_and_new()
+            else:
+                self.reset_fall()
+
+        if self.game_over:
+            print('Game over!')
+            ctx.running = False
+
+    def draw(self) -> None:
+        board_position = (120, 80)
+
+        self.matrix.draw(*board_position)
+
+        self.matrix.get_ghost(self.piece).draw(*board_position)
+        self.piece.draw(*board_position)
+
+        self.bag.draw(440, 100)
+
+        if self.holder is not None:
+            self.holder.shape.draw(0, 10, 100, config.size * 0.75, 1.0)
+
+        ctx.surface.blit(self.text_hold, (0, 10))

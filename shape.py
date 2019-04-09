@@ -1,25 +1,27 @@
-from dataclasses import dataclass
 from typing import List, Tuple
 
 from block import draw_block
 
+Grid = List[List[int]]
 Kicks = Tuple[List[Tuple[int, int]], List[Tuple[int, int]]]
 
 
-@dataclass
 class ShapeGrid:
-    x: int
-    y: int
-    width: int
-    height: int
-    grid: List[List[int]]
+    def __init__(self, x: int, y: int,
+                 width: int, height: int, grid: Grid) -> None:
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.grid = grid
 
 
-@dataclass
 class Shape:
-    name: str
-    grid: List[ShapeGrid]
-    kicks: List[Kicks]
+    def __init__(self, name: str,
+                 grid: List[ShapeGrid], kicks: List[Kicks]) -> None:
+        self.name = name
+        self.grid = grid
+        self.kicks = kicks
 
     def get_width(self, rotation: int) -> int:
         return len(self.grid[rotation].grid[0])
@@ -30,8 +32,8 @@ class Shape:
     def get_rotations(self) -> int:
         return len(self.grid)
 
-    def draw(self, rotation: int, x: int, y: int,
-             size: int, ratio: float) -> None:
+    def draw(self, rotation: int,
+             x: int, y: int, size: int, ratio: float) -> None:
         grid = self.grid[rotation]
         width, height = self.get_width(rotation), self.get_height(rotation)
 

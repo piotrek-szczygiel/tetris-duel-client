@@ -9,6 +9,8 @@ from block import draw_block
 from piece import Piece
 from shape import GARBAGE_COLOR, SHAPE_COLORS
 
+Grid = List[List[int]]
+
 
 class Matrix:
     def __init__(self) -> None:
@@ -16,15 +18,16 @@ class Matrix:
 
         self.height = config.rows
         self.vanish = config.rows
-        self.grid: List[List[int]] = list()
-        self.reset()
+        self.grid: Grid
 
-    def reset(self) -> None:
+        self.clear()
+
+    def clear(self) -> None:
         self.grid = [[0 for _ in range(self.width)]
                      for _ in range(self.height + self.vanish)]
 
     def debug_add(self, bricks: List[Tuple[int, int]]) -> None:
-        self.reset()
+        self.clear()
         for y, x in bricks:
             self.grid[y][x] = randint(1, 7)
 
@@ -55,7 +58,7 @@ class Matrix:
 
         self.debug_add(bricks)
 
-    def get_grid(self) -> List[List[int]]:
+    def get_grid(self) -> Grid:
         return self.grid
 
     def collision(self, piece: Piece) -> bool:
@@ -112,6 +115,10 @@ class Matrix:
             for x in range(self.width):
                 self.grid[y][x] = self.grid[y - 1][x]
 
+    def empty_row(self, row: int) -> None:
+        for x in range(self.width):
+            self.grid[row][x] = 0
+
     def add_garbage(self, hole: int) -> None:
         for y in range(self.height + self.vanish - 1):
             for x in range(self.width):
@@ -148,7 +155,7 @@ class Matrix:
                            size,
                            alpha)
 
-    def draw_grid(self, x: int, y: int):
+    def draw_grid(self, x: int, y: int) -> None:
         size = config.size
         grid_color = (64, 64, 64)
 

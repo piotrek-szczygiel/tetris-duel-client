@@ -1,9 +1,9 @@
-import time
 from typing import Callable, Dict, List, Tuple
 
 import pygame
 
 import config
+import ctx
 
 Key = int
 
@@ -34,24 +34,22 @@ class Input:
                 del self.last_repeat[key]
             return False
 
-        now = time.monotonic()
-
         if key not in self.last_press:
-            self.last_press[key] = now
+            self.last_press[key] = ctx.now
             return True
 
         if not repeat:
             return False
 
-        if now - self.last_press[key] < config.key_repeat_delay:
+        if ctx.now - self.last_press[key] < config.key_repeat_delay:
             return False
 
         if key not in self.last_repeat:
-            self.last_repeat[key] = now
+            self.last_repeat[key] = ctx.now
             return True
 
-        if now - self.last_repeat[key] < config.key_repeat_interval:
+        if ctx.now - self.last_repeat[key] < config.key_repeat_interval:
             return False
 
-        self.last_repeat[key] = now
+        self.last_repeat[key] = ctx.now
         return True
