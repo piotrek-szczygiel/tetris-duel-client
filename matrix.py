@@ -1,7 +1,8 @@
+import math
 from random import randint
 from typing import List, Tuple
 
-import pygame
+import pygame as pg
 
 import config
 import ctx
@@ -156,19 +157,25 @@ class Matrix:
                            alpha)
 
     def draw_grid(self, x: int, y: int) -> None:
+
+        # make grid wider on smaller resolutions
+        display_w = pg.display.get_surface().get_size()[0]
+        starting_w = config.window_size[0]
+        width = math.ceil(starting_w / display_w)
+
         size = config.size
         grid_color = (64, 64, 64)
 
         for row in range(self.height + 1):
-            pygame.draw.line(ctx.surface,
-                             grid_color,
-                             (x, y + row * size),
-                             (x + size * self.width, y + row * size),
-                             1)
+            pg.draw.line(ctx.surface,
+                         grid_color,
+                         (x, y + row * size),
+                         (x + size * self.width, y + row * size),
+                         width)
 
         for column in range(self.width + 1):
-            pygame.draw.line(ctx.surface,
-                             grid_color,
-                             (x + column * size, y),
-                             (x + column * size, y + size * self.height),
-                             1)
+            pg.draw.line(ctx.surface,
+                         grid_color,
+                         (x + column * size, y),
+                         (x + column * size, y + size * self.height),
+                         width)

@@ -219,4 +219,6 @@ SHAPE_Z = Shape('Z',
                             [7, 0, 0]])],
                 KICKS_JLSTZ)
 
+SHAPE_HOLD_NONE = Shape('.', [ShapeGrid(0, 0, 1, 1, [[8]])], [])
+
 SHAPES = [SHAPE_I, SHAPE_J, SHAPE_L, SHAPE_O, SHAPE_S, SHAPE_T, SHAPE_Z]

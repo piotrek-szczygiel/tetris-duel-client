@@ -6,6 +6,7 @@ from pygame.locals import *
 
 import config
 import ctx
+import shape
 from bag import Bag
 from input import Input
 from matrix import Matrix
@@ -16,6 +17,8 @@ from t_spin import TSpin
 
 class Game(State):
     def __init__(self) -> None:
+        self.running = True
+
         self.matrix = Matrix()
         self.bag = Bag()
         self.piece = self.bag.take()
@@ -40,6 +43,7 @@ class Game(State):
         self.game_over = False
 
         self.text_hold: pygame.Surface
+        self.text_next: pygame.Surface
 
     def initialize(self) -> None:
         bind = self.input.subscribe
@@ -56,7 +60,11 @@ class Game(State):
         bind(K_t, False, self.matrix.debug_tower)
         bind(K_g, False, lambda: self.add_garbage(5))
 
-        self.text_hold = ctx.font.render('Hold', True, (224, 224, 255))
+        self.text_hold = ctx.font.render('Hold', True, config.ui_text)
+        self.text_next = ctx.font.render('Next', True, config.ui_text)
+
+    def is_running(self) -> bool:
+        return self.running
 
     def debug_pause(self) -> None:
         self.pause = not self.pause
@@ -113,9 +121,21 @@ class Game(State):
 
         rows = self.matrix.get_full_rows()
         if rows:
-            print('Rows cleared:', len(rows))
+            row_count = len(rows)
             if t_spin:
-                print('T-spin!')
+                message = 'T-spin '
+                if row_count == 1:
+                    message += 'single!'
+                elif row_count == 2:
+                    message += 'double!'
+                elif row_count == 3:
+                    message += 'triple!'
+            elif row_count == 4:
+                message = 'Tetris!'
+            else:
+                message = str(row_count) + ' cleared'
+
+            print(message)
 
             for row in rows:
                 self.matrix.empty_row(row)
@@ -173,7 +193,7 @@ class Game(State):
 
         if self.game_over:
             print('Game over!')
-            ctx.running = False
+            self.running = False
 
     def draw(self) -> None:
         board_position = (120, 80)
@@ -183,9 +203,13 @@ class Game(State):
         self.matrix.get_ghost(self.piece).draw(*board_position)
         self.piece.draw(*board_position)
 
-        self.bag.draw(440, 100)
+        self.bag.draw(440, 150)
 
         if self.holder is not None:
-            self.holder.shape.draw(0, 10, 100, config.size * 0.75, 1.0)
+            x = 55 - self.holder.shape.get_width(0) * config.size * 0.75 / 2
+            self.holder.shape.draw(0, x, 140, config.size * 0.75, 1.0)
+        else:
+            shape.SHAPE_HOLD_NONE.draw(0, 45, 140, config.size * 0.75, 1.0)
 
-        ctx.surface.blit(self.text_hold, (0, 10))
+        ctx.surface.blit(self.text_hold, (10, 100))
+        ctx.surface.blit(self.text_next, (435, 100))
