@@ -1,3 +1,4 @@
+from functools import lru_cache
 from typing import Tuple
 
 import pygame.gfxdraw
@@ -20,6 +21,7 @@ def color_shade(color: RGB, ratio: float) -> RGB:
     return color[0] * ratio, color[1] * ratio, color[2] * ratio
 
 
+@lru_cache()
 def color_get(color: RGB, brightness: float, alpha: float) -> RGB:
     if brightness > 1.0:
         color = color_tint(color, brightness - 1.0)
@@ -45,48 +47,52 @@ def draw_block(color: RGB, x: float, y: float, size: float, alpha: float = 1.0) 
     border = 0.1 * size
 
     # middle rect
-    pygame.gfxdraw.box(ctx.surface, pygame.Rect(x, y, size, size), color_middle)
+    pygame.draw.rect(ctx.surface, color_middle, pygame.Rect(x, y, size, size))
 
     # upper trapezoid
-    upper_poly = [
-        (x, y),
-        (x + border, y + border),
-        (x + size - border, y + border),
-        (x + size, y),
-    ]
-
-    pygame.gfxdraw.aapolygon(ctx.surface, upper_poly, color_up)
-    pygame.gfxdraw.filled_polygon(ctx.surface, upper_poly, color_up)
+    pygame.draw.polygon(
+        ctx.surface,
+        color_up,
+        [
+            (x, y),
+            (x + border, y + border),
+            (x + size - border, y + border),
+            (x + size, y),
+        ],
+    )
 
     # left trapezoid
-    left_poly = [
-        (x, y + size),
-        (x + border, y + size - border),
-        (x + border, y + border),
-        (x, y),
-    ]
-
-    pygame.gfxdraw.aapolygon(ctx.surface, left_poly, color_left)
-    pygame.gfxdraw.filled_polygon(ctx.surface, left_poly, color_left)
+    pygame.draw.polygon(
+        ctx.surface,
+        color_left,
+        [
+            (x, y + size),
+            (x + border, y + size - border),
+            (x + border, y + border),
+            (x, y),
+        ],
+    )
 
     # right trapezoid
-    right_poly = [
-        (x + size, y + size),
-        (x + size - border, y + size - border),
-        (x + size - border, y + border),
-        (x + size, y),
-    ]
-
-    pygame.gfxdraw.aapolygon(ctx.surface, right_poly, color_right)
-    pygame.gfxdraw.filled_polygon(ctx.surface, right_poly, color_right)
+    pygame.draw.polygon(
+        ctx.surface,
+        color_right,
+        [
+            (x + size, y + size),
+            (x + size - border, y + size - border),
+            (x + size - border, y + border),
+            (x + size, y),
+        ],
+    )
 
     # lower trapezoid
-    lower_poly = [
-        (x, y + size),
-        (x + border, y + size - border),
-        (x + size - border, y + size - border),
-        (x + size, y + size),
-    ]
-
-    pygame.gfxdraw.aapolygon(ctx.surface, lower_poly, color_down)
-    pygame.gfxdraw.filled_polygon(ctx.surface, lower_poly, color_down)
+    pygame.draw.polygon(
+        ctx.surface,
+        color_down,
+        [
+            (x, y + size),
+            (x + border, y + size - border),
+            (x + size - border, y + size - border),
+            (x + size, y + size),
+        ],
+    )
