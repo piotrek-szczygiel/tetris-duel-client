@@ -201,13 +201,15 @@ class Game(State):
 
         if self.message:
             if ctx.now > self.message_start + self.message_duration:
+                self.message = None
                 if self.game_over:
                     self.running = False
-            elif (
-                    ctx.now > self.message_start + self.message_duration - self.message_fade
-            ):
+            elif ctx.now > self.message_start + self.message_duration - self.message_fade:
                 self.message_alpha = (
-                        1.0 - ((ctx.now - self.message_start) / self.message_duration) ** 2
+                        1.0
+                        - ((ctx.now - self.message_start - self.message_fade) / (
+                            self.message_duration - self.message_fade))
+                        ** 2
                 )
             else:
                 self.message_alpha = 255

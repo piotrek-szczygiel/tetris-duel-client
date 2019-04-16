@@ -76,11 +76,7 @@ class _Options(object):
         return tuple(getattr(self, field) for field in sorted(self._allfields()))
 
     def getsuboptions(self, optclass):
-        return {
-            field: getattr(self, field)
-            for field in optclass._allfields()
-            if hasattr(self, field)
-        }
+        return {field: getattr(self, field) for field in optclass._allfields() if hasattr(self, field)}
 
 
 _default_surf_sentinel = ()
@@ -340,27 +336,11 @@ class _GetsurfOptions(_Options):
         if self.shade:
             self.gcolor = _applyshade(self.gcolor or self.color, self.shade)
             self.shade = 0
-        self.ocolor = (
-            None
-            if self.owidth is None
-            else _resolvecolor(self.ocolor, DEFAULT_OUTLINE_COLOR)
-        )
-        self.scolor = (
-            None
-            if self.shadow is None
-            else _resolvecolor(self.scolor, DEFAULT_SHADOW_COLOR)
-        )
+        self.ocolor = None if self.owidth is None else _resolvecolor(self.ocolor, DEFAULT_OUTLINE_COLOR)
+        self.scolor = None if self.shadow is None else _resolvecolor(self.scolor, DEFAULT_SHADOW_COLOR)
 
-        self._opx = (
-            None
-            if self.owidth is None
-            else ceil(self.owidth * self.fontsize * OUTLINE_UNIT)
-        )
-        self._spx = (
-            None
-            if self.shadow is None
-            else tuple(ceil(s * self.fontsize * SHADOW_UNIT) for s in self.shadow)
-        )
+        self._opx = None if self.owidth is None else ceil(self.owidth * self.fontsize * OUTLINE_UNIT)
+        self._spx = None if self.shadow is None else tuple(ceil(s * self.fontsize * SHADOW_UNIT) for s in self.shadow)
         self.alpha = _resolvealpha(self.alpha)
         self.angle = _resolveangle(self.angle)
         self.strip = DEFAULT_STRIP if self.strip is None else self.strip
@@ -433,24 +413,11 @@ class _GetfontOptions(_Options):
             self.fontsize = DEFAULT_FONT_SIZE
 
     def getfontpath(self):
-        return (
-            self.fontname
-            if self.fontname is None
-            else FONT_NAME_TEMPLATE % self.fontname
-        )
+        return self.fontname if self.fontname is None else FONT_NAME_TEMPLATE % self.fontname
 
 
 class _FitsizeOptions(_Options):
-    _fields = (
-        "fontname",
-        "sysfontname",
-        "bold",
-        "italic",
-        "underline",
-        "lineheight",
-        "pspace",
-        "strip",
-    )
+    _fields = ("fontname", "sysfontname", "bold", "italic", "underline", "lineheight", "pspace", "strip")
 
     def togetfontoptions(self):
         return self.getsuboptions(_GetfontOptions)
@@ -469,10 +436,7 @@ def getfont(**kwargs):
         return _font_cache[key]
     if options.sysfontname is not None:
         font = pygame.font.SysFont(
-            options.sysfontname,
-            options.fontsize,
-            options.bold or False,
-            options.italic or False,
+            options.sysfontname, options.fontsize, options.bold or False, options.italic or False
         )
     else:
         try:
@@ -601,10 +565,7 @@ def _fitsize(text, size, **kwargs):
         w = max(font.size(line)[0] for line, jpara in texts)
         linesize = font.get_linesize() * options.lineheight
         paraspace = font.get_linesize() * options.pspace
-        h = (
-                int(round((len(texts) - 1) * linesize + texts[-1][1] * paraspace))
-                + font.get_height()
-        )
+        h = int(round((len(texts) - 1) * linesize + texts[-1][1] * paraspace)) + font.get_height()
         return w <= width and h <= height
 
     fontsize = _binarysearch(fits)
@@ -708,15 +669,7 @@ def _gradsurf(h, y0, y1, color0, color1):
     for y in range(h):
         f = min(max((y - y0) / (y1 - y0), 0), 1)
         g = 1 - f
-        surf.set_at(
-            (0, y),
-            (
-                int(round(g * r0 + f * r1)),
-                int(round(g * g0 + f * g1)),
-                int(round(g * b0 + f * b1)),
-                0,
-            ),
-        )
+        surf.set_at((0, y), (int(round(g * r0 + f * r1)), int(round(g * g0 + f * g1)), int(round(g * b0 + f * b1)), 0))
     _grad_cache[key] = surf
     return surf
 
@@ -767,21 +720,9 @@ def getsurf(text, **kwargs):
         surf = _fadesurf(getsurf(text, **options.update(alpha=1.0)), options.alpha)
     elif options._spx is not None:
         color = (0, 0, 0) if _istransparent(options.color) else options.color
-        surf0 = getsurf(
-            text,
-            **options.update(
-                background=(0, 0, 0, 0), color=color, shadow=None, scolor=None
-            ),
-        )
+        surf0 = getsurf(text, **options.update(background=(0, 0, 0, 0), color=color, shadow=None, scolor=None))
         ssurf = getsurf(
-            text,
-            **options.update(
-                background=(0, 0, 0, 0),
-                color=options.scolor,
-                shadow=None,
-                scolor=None,
-                gcolor=None,
-            ),
+            text, **options.update(background=(0, 0, 0, 0), color=options.scolor, shadow=None, scolor=None, gcolor=None)
         )
         w0, h0 = surf0.get_size()
         sx, sy = options._spx
@@ -798,14 +739,7 @@ def getsurf(text, **kwargs):
         color = (0, 0, 0) if _istransparent(options.color) else options.color
         surf0 = getsurf(text, **options.update(color=color, ocolor=None, owidth=None))
         osurf = getsurf(
-            text,
-            **options.update(
-                color=options.ocolor,
-                ocolor=None,
-                owidth=None,
-                background=(0, 0, 0, 0),
-                gcolor=None,
-            ),
+            text, **options.update(color=options.ocolor, ocolor=None, owidth=None, background=(0, 0, 0, 0), gcolor=None)
         )
         w0, h0 = surf0.get_size()
         opx = options._opx
@@ -826,16 +760,11 @@ def getsurf(text, **kwargs):
         tsplits = list(_splitbytags(text, options.underline, options.underlinetag))
         for jsplit, (text, options.underline) in enumerate(tsplits):
             strip = options.strip if jsplit == len(tsplits) - 1 else False
-            texts = wrap(
-                text, firstline=px, **options.update(strip=strip).towrapoptions()
-            )
+            texts = wrap(text, firstline=px, **options.update(strip=strip).towrapoptions())
             font = getfont(**options.togetfontoptions())
             linesize = font.get_linesize() * options.lineheight
             parasize = font.get_linesize() * options.pspace
-            lsurfs += [
-                font.render(line, options.antialias, options.color).convert_alpha()
-                for line, jpara in texts
-            ]
+            lsurfs += [font.render(line, options.antialias, options.color).convert_alpha() for line, jpara in texts]
             for k, (_, jpara) in enumerate(texts):
                 if k:
                     px = 0
@@ -861,24 +790,14 @@ def getsurf(text, **kwargs):
                 or (len(options.background) > 3 and options.background[3] == 0)
                 or options.gcolor is not None
         ):
-            lsurfs = [
-                font.render(text, options.antialias, color).convert_alpha()
-                for text, jpara in texts
-            ]
+            lsurfs = [font.render(text, options.antialias, color).convert_alpha() for text, jpara in texts]
         else:
             lsurfs = [
-                font.render(
-                    text, options.antialias, color, options.background
-                ).convert_alpha()
-                for text, jpara in texts
+                font.render(text, options.antialias, color, options.background).convert_alpha() for text, jpara in texts
             ]
         if options.gcolor is not None:
             gsurf0 = _gradsurf(
-                lsurfs[0].get_height(),
-                0.5 * font.get_ascent(),
-                font.get_ascent(),
-                options.color,
-                options.gcolor,
+                lsurfs[0].get_height(), 0.5 * font.get_ascent(), font.get_ascent(), options.color, options.gcolor
             )
             for lsurf in lsurfs:
                 gsurf = pygame.transform.scale(gsurf0, lsurf.get_size())
@@ -889,10 +808,7 @@ def getsurf(text, **kwargs):
             w = max(lsurf.get_width() for lsurf in lsurfs)
             linesize = font.get_linesize() * options.lineheight
             parasize = font.get_linesize() * options.pspace
-            ys = [
-                int(round(k * linesize + jpara * parasize))
-                for k, (text, jpara) in enumerate(texts)
-            ]
+            ys = [int(round(k * linesize + jpara * parasize)) for k, (text, jpara) in enumerate(texts)]
             h = ys[-1] + font.get_height()
             surf = pygame.Surface((w, h)).convert_alpha()
             surf.fill(options.background or (0, 0, 0, 0))
@@ -943,10 +859,7 @@ def layout(text, **kwargs):
     sw = max(rect.w for rect in rects)
     linesize = fl * options.lineheight
     parasize = fl * options.pspace
-    ys = [
-        int(round(k * linesize + jpara * parasize))
-        for k, (text, jpara) in enumerate(texts)
-    ]
+    ys = [int(round(k * linesize + jpara * parasize)) for k, (text, jpara) in enumerate(texts)]
     sh = ys[-1] + fl
     for y, rect in zip(ys, rects):
         rect.x = int(round(options.align * (sw - rect.w)))
@@ -986,9 +899,7 @@ def drawbox(text, rect, **kwargs):
     x = rect.x + hanchor * rect.width
     y = rect.y + vanchor * rect.height
     fontsize = _fitsize(text, rect.size, **options.tofitsizeoptions())
-    return draw(
-        text, pos=(x, y), width=rect.width, fontsize=fontsize, **options.todrawoptions()
-    )
+    return draw(text, pos=(x, y), width=rect.width, fontsize=fontsize, **options.todrawoptions())
 
 
 def clean():

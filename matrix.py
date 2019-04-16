@@ -24,9 +24,7 @@ class Matrix:
         self.clear()
 
     def clear(self) -> None:
-        self.grid = [
-            [0 for _ in range(self.width)] for _ in range(self.height + self.vanish)
-        ]
+        self.grid = [[0 for _ in range(self.width)] for _ in range(self.height + self.vanish)]
 
     def debug_add(self, bricks: List[Tuple[int, int]]) -> None:
         self.clear()
@@ -159,13 +157,7 @@ class Matrix:
                 if my == -1:
                     alpha = 0.3
 
-                draw_block(
-                    SHAPE_COLORS[self.grid[self.vanish + my][mx]],
-                    x + mx * size,
-                    y + my * size,
-                    size,
-                    alpha,
-                )
+                draw_block(SHAPE_COLORS[self.grid[self.vanish + my][mx]], x + mx * size, y + my * size, size, alpha)
 
     def draw_grid(self, x: int, y: int) -> None:
 
@@ -178,19 +170,9 @@ class Matrix:
         grid_color = (64, 64, 64)
 
         for row in range(self.height + 1):
-            pg.draw.line(
-                ctx.surface,
-                grid_color,
-                (x, y + row * size),
-                (x + size * self.width, y + row * size),
-                width,
-            )
+            pg.draw.line(ctx.surface, grid_color, (x, y + row * size), (x + size * self.width, y + row * size), width)
 
         for column in range(self.width + 1):
             pg.draw.line(
-                ctx.surface,
-                grid_color,
-                (x + column * size, y),
-                (x + column * size, y + size * self.height),
-                width,
+                ctx.surface, grid_color, (x + column * size, y), (x + column * size, y + size * self.height), width
             )
