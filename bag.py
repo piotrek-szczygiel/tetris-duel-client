@@ -15,7 +15,6 @@ class Bag:
         shape = self.bag.pop(0)
         self.fill()
         piece = Piece(shape)
-        piece.reset()
         return piece
 
     def peek(self, n: int) -> List[Shape]:

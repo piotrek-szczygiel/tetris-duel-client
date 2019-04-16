@@ -1,7 +1,7 @@
 from random import randint
 from typing import List, Optional
 
-import pygame
+import pygame as pg
 from pygame.locals import *
 
 import config
@@ -13,6 +13,7 @@ from matrix import Matrix
 from piece import Piece
 from state import State
 from t_spin import TSpin
+from text import Text
 
 
 class Game(State):
@@ -22,6 +23,7 @@ class Game(State):
         self.matrix = Matrix()
         self.bag = Bag()
         self.piece = self.bag.take()
+        self.reset_piece()
 
         self.input = Input()
 
@@ -34,6 +36,12 @@ class Game(State):
         self.rows_to_clear: List[int] = []
         self.last_clear = ctx.now
 
+        self.message: Optional[str] = None
+        self.message_alpha = 0
+        self.message_start = ctx.now
+        self.message_duration = 0.0
+        self.message_fade = 0.0
+
         self.garbage_allow = False
         self.garbage_hole = 0
         self.garbage_to_add = 0
@@ -42,8 +50,8 @@ class Game(State):
         self.pause = False
         self.game_over = False
 
-        self.text_hold: pygame.Surface
-        self.text_next: pygame.Surface
+        self.text_hold: pg.Surface
+        self.text_next: pg.Surface
 
     def initialize(self) -> None:
         bind = self.input.subscribe
@@ -60,9 +68,6 @@ class Game(State):
         bind(K_t, False, self.matrix.debug_tower)
         bind(K_g, False, lambda: self.add_garbage(5))
 
-        self.text_hold = ctx.font.render("Hold", True, config.ui_text)
-        self.text_next = ctx.font.render("Next", True, config.ui_text)
-
     def is_running(self) -> bool:
         return self.running
 
@@ -70,8 +75,7 @@ class Game(State):
         self.pause = not self.pause
 
     def debug_new_piece(self) -> None:
-        self.piece = self.bag.take()
-        self.reset_fall()
+        self.new_piece()
 
     def add_garbage(self, rows: int) -> None:
         self.garbage_to_add += rows
@@ -114,27 +118,32 @@ class Game(State):
         else:
             if TSpin.detect(self.matrix, self.piece):
                 t_spin = True
-            self.piece = self.bag.take()
-            self.reset_fall()
+
+            self.new_piece()
             self.garbage_allow = True
+
+        if self.game_over:
+            return
 
         rows = self.matrix.get_full_rows()
         if rows:
             row_count = len(rows)
             if t_spin:
-                message = "T-spin "
-                if row_count == 1:
-                    message += "single!"
-                elif row_count == 2:
-                    message += "double!"
+                message = "T-spin"
+                if row_count == 2:
+                    message += " double"
                 elif row_count == 3:
-                    message += "triple!"
+                    message += " triple"
             elif row_count == 4:
-                message = "Tetris!"
+                message = "Tetris"
             else:
-                message = str(row_count) + " cleared"
+                message = None
 
-            print(message)
+            if message is not None:
+                self.message = message
+                self.message_duration = 0.75
+                self.message_fade = 0.3
+                self.message_start = ctx.now
 
             for row in rows:
                 self.matrix.empty_row(row)
@@ -142,20 +151,33 @@ class Game(State):
             self.rows_to_clear = rows
             self.last_clear = ctx.now + 0.15
 
+    def reset_piece(self) -> None:
+        self.piece.reset()
+        for rows in range(self.piece.shape.grid[0].height, 0, -1):
+            if self.piece.move(0, rows, self.matrix.collision):
+                break
+
+        self.reset_fall()
+
+    def new_piece(self) -> None:
+        self.piece = self.bag.take()
+        self.reset_piece()
+        if self.matrix.collision(self.piece):
+            self.game_over = True
+
     def hold(self) -> None:
         if self.hold_lock:
             return
 
         self.hold_lock = True
-        self.piece.reset()
+        self.reset_piece()
 
         if self.holder is not None:
             self.holder, self.piece = self.piece, self.holder
+            self.reset_fall()
         else:
             self.holder = self.piece
-            self.piece = self.bag.take()
-
-        self.reset_fall()
+            self.new_piece()
 
     def update(self) -> None:
         if self.rows_to_clear:
@@ -177,6 +199,19 @@ class Game(State):
                 self.reset_fall()
                 self.garbage_allow = False
 
+        if self.message:
+            if ctx.now > self.message_start + self.message_duration:
+                if self.game_over:
+                    self.running = False
+            elif (
+                    ctx.now > self.message_start + self.message_duration - self.message_fade
+            ):
+                self.message_alpha = (
+                        1.0 - ((ctx.now - self.message_start) / self.message_duration) ** 2
+                )
+            else:
+                self.message_alpha = 255
+
         self.input.update()
 
         if self.piece.cancel_lock:
@@ -189,9 +224,11 @@ class Game(State):
             else:
                 self.reset_fall()
 
-        if self.game_over:
-            print("Game over!")
-            self.running = False
+        if self.game_over and not self.message:
+            self.message = "Game over"
+            self.message_start = ctx.now
+            self.message_duration = 1.5
+            self.message_fade = 0.75
 
     def draw(self) -> None:
         board_position = (120, 80)
@@ -209,5 +246,17 @@ class Game(State):
         else:
             shape.SHAPE_HOLD_NONE.draw(0, 45, 140, config.size * 0.75, 1.0)
 
-        ctx.surface.blit(self.text_hold, (10, 100))
-        ctx.surface.blit(self.text_next, (435, 100))
+        Text.draw("Hold", (10, 100))
+        Text.draw("Next", (435, 100))
+
+        if self.message:
+            Text.draw(
+                self.message,
+                centerx=275,
+                top=300,
+                size=4,
+                color=pg.Color("white"),
+                alpha=self.message_alpha,
+                shadow=(2.0, 2.0),
+                scolor=pg.Color("blue"),
+            )

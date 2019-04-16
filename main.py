@@ -3,11 +3,13 @@ import time
 
 import pygame as pg
 
+import _ptext
 import config
 import ctx
 import resources
 from game import Game
 from state import State
+from text import Text
 
 
 class Main:
@@ -51,12 +53,9 @@ class Main:
 
         self.display = pg.display.set_mode(config.window_size, pg.RESIZABLE)
         ctx.surface = pg.Surface(config.window_size)
+        _ptext.FONT_NAME_TEMPLATE = resources.path("%s.ttf")
 
         pg.display.set_caption("Tetris Duel")
-
-        ctx.font = pg.font.Font(resources.path("tetris.ttf"), 24)
-        ctx.debug_font = pg.font.Font(resources.path("tetris.ttf"), 16)
-
         self.switch_state(Game())
 
         fps_clock = pg.time.Clock()
@@ -64,20 +63,21 @@ class Main:
             if not self.handle_events():
                 return
 
-            if not self.state.is_running():
-                self.switch_state(Game())
-
             ctx.now = time.monotonic()
             self.state.update()
+
+            if not self.state.is_running():
+                self.switch_state(Game())
+                continue
 
             ctx.surface.fill(config.background)
             self.state.draw()
 
             fps = "FPS: " + "{0:.1f}".format(fps_clock.get_fps())
-            fps_text = ctx.debug_font.render(fps, True, (255, 255, 255))
-            ctx.surface.blit(fps_text, (5, 5))
+            Text.draw(fps, (10, 10), size=2, alpha=0.5, color=pg.Color("red"))
 
             pg.transform.scale(ctx.surface, self.display.get_size(), self.display)
+
             pg.display.flip()
 
             fps_clock.tick(60)
