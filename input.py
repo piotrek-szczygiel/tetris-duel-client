@@ -19,6 +19,10 @@ class Input:
     def subscribe(self, key: Key, callback: Callable, repeat=False) -> None:
         self.subscriptions[key] = (repeat, callback)
 
+    def subscribe_list(self, binds: List[Tuple]) -> None:
+        for bind in binds:
+            self.subscribe(*bind)
+
     def update(self) -> None:
         self.pressed_keys = pygame.key.get_pressed()
 

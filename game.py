@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Callable, List, Optional
 
 import pygame as pg
 from pygame.locals import *
@@ -22,6 +22,8 @@ class Game(State):
         self.clearing_rows: List[int] = []
         self.clearing_last: float
 
+        self.ending = False
+
         self.text_hold: pg.Surface
         self.text_next: pg.Surface
 
@@ -30,11 +32,14 @@ class Game(State):
     def initialize(self) -> None:
         self.gameplay.initialize()
 
-        bind = self.input.subscribe
-        bind(K_r, self.debug_new_piece)
-        bind(K_p, self.debug_pause)
-        bind(K_t, self.debug_t_spin_tower)
-        bind(K_g, self.debug_garbage)
+        self.input.subscribe_list(
+            [
+                (K_r, self.debug_new_piece),
+                (K_p, self.debug_pause),
+                (K_t, self.debug_t_spin_tower),
+                (K_g, self.debug_garbage),
+            ]
+        )
 
     def debug_pause(self) -> None:
         self.pause = not self.pause
@@ -52,7 +57,7 @@ class Game(State):
     def clear_rows(self, rows: List[int], t_spin: bool) -> None:
         self.clearing = True
         self.clearing_rows = rows
-        self.clearing_last = ctx.now
+        self.clearing_last = ctx.now + 0.15
 
         for row in rows:
             self.gameplay.get_matrix().empty_row(row)
@@ -60,34 +65,26 @@ class Game(State):
         row_count = len(rows)
 
         message = None
-        shadow_color = pg.Color("black")
+        gcolor = pg.Color("black")
         if t_spin:
-            shadow_color = pg.Color("purple")
-            message = "T-spin"
-            if row_count == 2:
-                message += " double!"
-            elif row_count == 3:
-                message += " triple!"
-        else:
-            if row_count == 2:
-                message = "Double"
-            elif row_count == 3:
-                message = "Triple"
-            elif row_count == 4:
-                shadow_color = pg.Color("darkturquoise")
-                message = "TETRIS!"
+            gcolor = pg.Color("purple")
+            message = "T-Spin"
+        elif row_count == 4:
+            gcolor = pg.Color("cyan")
+            message = "TETRIS"
 
         if message:
-            self.popup = Popup(message, shadow_color=shadow_color)
+            self.popup = Popup(message, gcolor=gcolor)
         else:
             self.popup = None
 
-    def update(self) -> None:
+    def update(self, switch_state: Callable) -> None:
         self.input.update()
         self.gameplay.update(self.clear_rows)
 
-        if self.gameplay.is_over():
-            self.popup = Popup("Game over")
+        if self.gameplay.is_over() and not self.ending:
+            self.popup = Popup("Game over", duration=3.0, gcolor=pg.Color("darkred"))
+            self.ending = True
 
         if self.clearing and ctx.now - self.clearing_last > 0.02:
             self.gameplay.get_matrix().collapse_row(self.clearing_rows.pop(0))
@@ -98,6 +95,9 @@ class Game(State):
 
         if self.popup and not self.popup.update():
             self.popup = None
+
+            if self.gameplay.is_over() and self.ending:
+                switch_state("MainMenu")
 
     def draw(self) -> None:
         board_position = (120, 80)
@@ -111,7 +111,7 @@ class Game(State):
         matrix.get_ghost(piece).draw(*board_position)
         piece.draw(*board_position)
 
-        bag.draw(440, 150)
+        bag.draw(460, 150)
 
         if holder is not None:
             x = 55 - holder.shape.get_width(0) * config.size * 0.75 / 2

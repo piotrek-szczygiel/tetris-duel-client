@@ -8,6 +8,7 @@ import config
 import ctx
 import resources
 from game import Game
+from main_menu import MainMenu
 from state import State
 from text import Text
 
@@ -18,8 +19,12 @@ class Main:
         self.state: State
         self.last_size = config.window_size
 
-    def switch_state(self, state: State) -> None:
-        self.state = state
+    def switch_state(self, state: str) -> None:
+        if state == "Game":
+            self.state = Game()
+        elif state == "MainMenu":
+            self.state = MainMenu()
+
         self.state.initialize()
 
     def handle_events(self) -> bool:
@@ -40,7 +45,7 @@ class Main:
                 self.last_size = w, h
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_F12:
-                    self.switch_state(Game())
+                    self.switch_state("Game")
                 elif event.key == pg.K_q:
                     ctx.running = False
                     return False
@@ -56,7 +61,7 @@ class Main:
         _ptext.FONT_NAME_TEMPLATE = resources.path("%s.ttf")
 
         pg.display.set_caption("Tetris Duel")
-        self.switch_state(Game())
+        self.switch_state("MainMenu")
 
         fps_clock = pg.time.Clock()
         while ctx.running:
@@ -64,13 +69,13 @@ class Main:
                 return
 
             ctx.now = time.monotonic()
-            self.state.update()
+            self.state.update(self.switch_state)
 
             ctx.surface.fill(config.background)
             self.state.draw()
 
             fps = "FPS: " + "{0:.1f}".format(fps_clock.get_fps())
-            Text.draw(fps, (10, 10), size=2, alpha=0.5, color=pg.Color("red"))
+            Text.draw(fps, (10, 10), size=2, alpha=0.5, color=pg.Color("gray"))
 
             pg.transform.scale(ctx.surface, self.display.get_size(), self.display)
 

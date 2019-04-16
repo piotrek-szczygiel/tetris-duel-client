@@ -33,8 +33,8 @@ class Bag:
         self.bag.extend(shapes)
 
     def draw(self, x: int, y: int) -> None:
-        bag = self.peek(4)
-        size = config.size * 0.75
+        bag = self.peek(6)
+        size = config.size * 0.5
         gap = size * 4
 
         for i, shape in enumerate(bag):

@@ -46,20 +46,19 @@ class Gameplay:
         return self.holder
 
     def initialize(self) -> None:
-        binds = [
-            (K_DOWN, self.action_down, True),
-            (K_RIGHT, self.action_right, True),
-            (K_LEFT, self.action_left, True),
-            (K_UP, self.action_rotate_right),
-            (K_x, self.action_rotate_right),
-            (K_z, self.action_rotate_left),
-            (K_LSHIFT, self.action_soft_fall),
-            (K_SPACE, self.action_hard_fall),
-            (K_c, self.action_hold),
-        ]
-
-        for bind in binds:
-            self.input.subscribe(*bind)
+        self.input.subscribe_list(
+            [
+                (K_DOWN, self.action_down, True),
+                (K_RIGHT, self.action_right, True),
+                (K_LEFT, self.action_left, True),
+                (K_UP, self.action_rotate_right),
+                (K_x, self.action_rotate_right),
+                (K_z, self.action_rotate_left),
+                (K_LSHIFT, self.action_soft_fall),
+                (K_SPACE, self.action_hard_fall),
+                (K_c, self.action_hold),
+            ]
+        )
 
         self.new_piece()
 

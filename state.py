@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Callable
 
 
 class State(ABC):
@@ -7,7 +8,7 @@ class State(ABC):
         pass
 
     @abstractmethod
-    def update(self) -> None:
+    def update(self, switch_state: Callable) -> None:
         pass
 
     @abstractmethod

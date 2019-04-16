@@ -8,16 +8,18 @@ class Popup:
     def __init__(
         self,
         text: str,
-        duration=0.5,
-        size=4,
+        duration=0.75,
+        size=5,
         color=pg.Color("white"),
-        shadow_color=pg.Color("black"),
+        scolor=pg.Color("black"),
+        gcolor=None,
     ) -> None:
         self.text = text
         self.duration = duration
         self.size = size
         self.color = color
-        self.shadow_color = shadow_color
+        self.scolor = scolor
+        self.gcolor = gcolor
 
         self.fade = self.duration / 3
         self.alpha = 1.0
@@ -43,5 +45,6 @@ class Popup:
             color=self.color,
             alpha=self.alpha,
             shadow=(2.0, 2.0),
-            scolor=self.shadow_color,
+            scolor=self.scolor,
+            gcolor=self.gcolor,
         )
