@@ -66,10 +66,6 @@ class Main:
             ctx.now = time.monotonic()
             self.state.update()
 
-            if not self.state.is_running():
-                self.switch_state(Game())
-                continue
-
             ctx.surface.fill(config.background)
             self.state.draw()
 

@@ -11,4 +11,6 @@ Position = Tuple[int, int]
 class Text:
     @staticmethod
     def draw(*args, size=3, **kwargs) -> Tuple[pg.Surface, Position]:
-        return _ptext.draw(*args, fontname="tetris", fontsize=8 * size, surf=ctx.surface, **kwargs)
+        return _ptext.draw(
+            *args, fontname="tetris", fontsize=8 * size, surf=ctx.surface, **kwargs
+        )

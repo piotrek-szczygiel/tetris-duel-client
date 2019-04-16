@@ -16,7 +16,7 @@ class Input:
 
         self.subscriptions: Dict[Key, Tuple[bool, Callable]] = dict()
 
-    def subscribe(self, key: Key, repeat: bool, callback: Callable) -> None:
+    def subscribe(self, key: Key, callback: Callable, repeat=False) -> None:
         self.subscriptions[key] = (repeat, callback)
 
     def update(self) -> None:

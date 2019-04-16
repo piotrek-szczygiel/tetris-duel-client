@@ -29,7 +29,11 @@ class TSpin:
         if matrix.height <= y + 2 or matrix_grid[y + 2][x] != 0:
             occupied += 1
 
-        if matrix.width <= y + 2 or matrix.height <= x + 2 or matrix_grid[y + 2][x + 2] != 0:
+        if (
+                matrix.width <= y + 2
+                or matrix.height <= x + 2
+                or matrix_grid[y + 2][x + 2] != 0
+        ):
             occupied += 1
 
         return occupied >= 3

@@ -51,24 +51,48 @@ def draw_block(color: RGB, x: float, y: float, size: float, alpha: float = 1.0) 
 
     # upper trapezoid
     pygame.draw.polygon(
-        ctx.surface, color_up, [(x, y), (x + border, y + border), (x + size - border, y + border), (x + size, y)]
+        ctx.surface,
+        color_up,
+        [
+            (x, y),
+            (x + border, y + border),
+            (x + size - border, y + border),
+            (x + size, y),
+        ],
     )
 
     # left trapezoid
     pygame.draw.polygon(
-        ctx.surface, color_left, [(x, y + size), (x + border, y + size - border), (x + border, y + border), (x, y)]
+        ctx.surface,
+        color_left,
+        [
+            (x, y + size),
+            (x + border, y + size - border),
+            (x + border, y + border),
+            (x, y),
+        ],
     )
 
     # right trapezoid
     pygame.draw.polygon(
         ctx.surface,
         color_right,
-        [(x + size, y + size), (x + size - border, y + size - border), (x + size - border, y + border), (x + size, y)],
+        [
+            (x + size, y + size),
+            (x + size - border, y + size - border),
+            (x + size - border, y + border),
+            (x + size, y),
+        ],
     )
 
     # lower trapezoid
     pygame.draw.polygon(
         ctx.surface,
         color_down,
-        [(x, y + size), (x + border, y + size - border), (x + size - border, y + size - border), (x + size, y + size)],
+        [
+            (x, y + size),
+            (x + border, y + size - border),
+            (x + size - border, y + size - border),
+            (x + size, y + size),
+        ],
     )
