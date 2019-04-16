@@ -42,7 +42,7 @@ def draw_block(color: RGB, x: float, y: float, size: float, alpha: float = 1.0) 
     color_right = color_get(color, 0.6, alpha)
     color_middle = color_get(color, 0.8, alpha)
     color_left = color_get(color, 1.2, alpha)
-    color_up = color_get(color, 1.8, alpha)
+    color_up = color_get(color, 1.7, alpha)
 
     border = 0.1 * size
 

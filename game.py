@@ -33,14 +33,21 @@ class Game(State):
         bind = self.input.subscribe
         bind(K_r, self.debug_new_piece)
         bind(K_p, self.debug_pause)
-        bind(K_t, self.gameplay.get_matrix().debug_tower)
-        bind(K_g, lambda: self.add_garbage(5))
+        bind(K_t, self.debug_t_spin_tower)
+        bind(K_g, self.debug_garbage)
 
     def debug_pause(self) -> None:
         self.pause = not self.pause
 
     def debug_new_piece(self) -> None:
         self.gameplay.new_piece()
+
+    def debug_t_spin_tower(self) -> None:
+        self.gameplay.get_matrix().debug_tower()
+        self.gameplay.new_piece()
+
+    def debug_garbage(self) -> None:
+        self.gameplay.get_matrix().add_garbage(5)
 
     def clear_rows(self, rows: List[int], t_spin: bool) -> None:
         self.clearing = True
@@ -51,19 +58,29 @@ class Game(State):
             self.gameplay.get_matrix().empty_row(row)
 
         row_count = len(rows)
+
+        message = None
+        shadow_color = pg.Color("black")
         if t_spin:
+            shadow_color = pg.Color("purple")
             message = "T-spin"
             if row_count == 2:
-                message += " double"
+                message += " double!"
             elif row_count == 3:
-                message += " triple"
-        elif row_count == 4:
-            message = "Tetris"
+                message += " triple!"
+        else:
+            if row_count == 2:
+                message = "Double"
+            elif row_count == 3:
+                message = "Triple"
+            elif row_count == 4:
+                shadow_color = pg.Color("darkturquoise")
+                message = "TETRIS!"
+
+        if message:
+            self.popup = Popup(message, shadow_color=shadow_color)
         else:
             self.popup = None
-            return
-
-        self.popup = Popup(message)
 
     def update(self) -> None:
         self.input.update()

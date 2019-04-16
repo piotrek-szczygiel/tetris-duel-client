@@ -6,12 +6,12 @@ from text import Text
 
 class Popup:
     def __init__(
-            self,
-            text: str,
-            duration=1.0,
-            size=4,
-            color=pg.Color("white"),
-            shadow_color=pg.Color("blue"),
+        self,
+        text: str,
+        duration=0.5,
+        size=4,
+        color=pg.Color("white"),
+        shadow_color=pg.Color("black"),
     ) -> None:
         self.text = text
         self.duration = duration

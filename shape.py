@@ -68,7 +68,7 @@ SHAPE_COLORS = [
     (0, 255, 0),  # green
     (128, 0, 128),  # purple
     (255, 0, 0),  # red
-    (128, 128, 128),  # gray
+    (224, 224, 224),  # gray
 ]
 
 GARBAGE_COLOR = 8

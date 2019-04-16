@@ -7,7 +7,7 @@ from shape import Shape, ShapeGrid
 
 class Piece:
     def __init__(
-            self, shape: Shape, rotation: int = 0, x: int = 0, y: int = 0, ghost=False
+        self, shape: Shape, rotation: int = 0, x: int = 0, y: int = 0, ghost=False
     ) -> None:
         self.shape = shape
         self.ghost = ghost
@@ -15,7 +15,7 @@ class Piece:
         self.x = x
         self.y = y
         self.last_movement = Movement.none
-        self.cancel_lock = False
+        self.reset_lock = False
 
     def reset(self) -> None:
         self.rotation = 0
@@ -35,7 +35,7 @@ class Piece:
         self.last_movement = Movement.move
 
         if self.check_collision(0, 1, collision):
-            self.cancel_lock = True
+            self.reset_lock = True
 
         return True
 
@@ -85,7 +85,7 @@ class Piece:
 
         if rotated:
             if self.check_collision(0, 1, collision):
-                self.cancel_lock = True
+                self.reset_lock = True
             return True
         else:
             self.rotation = last_rotation

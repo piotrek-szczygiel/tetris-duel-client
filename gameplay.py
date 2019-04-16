@@ -25,6 +25,8 @@ class Gameplay:
         self.last_fall: float
         self.fall_interval = 1.0
 
+        self.last_lock_cancel: float
+
         self.t_spin = False
         self.rows_to_clear: List[int] = []
 
@@ -154,13 +156,15 @@ class Gameplay:
             clear_rows(self.rows_to_clear, self.t_spin)
             self.rows_to_clear = []
 
-        if self.piece.cancel_lock:
-            self.piece.cancel_lock = False
+        if self.piece.reset_lock:
+            self.piece.reset_lock = False
             self.reset_fall()
-            # lock delay
+            self.last_lock_cancel = ctx.now
+
+        if self.piece.check_collision(0, 1, self.matrix.collision):
+            if ctx.now - self.last_lock_cancel > 0.5:
+                self.lock_piece()
 
         if ctx.now - self.last_fall > self.fall_interval:
             if self.piece.move(0, 1, self.matrix.collision):
                 self.reset_fall()
-            else:
-                self.lock_piece()

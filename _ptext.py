@@ -370,12 +370,12 @@ class _GetsurfOptions(_Options):
 
     def checkinline(self):
         if (
-                self.angle is None
-                or self._opx is not None
-                or self._spx is not None
-                or self.align != 0
-                or self.gcolor
-                or self.shade
+            self.angle is None
+            or self._opx is not None
+            or self._spx is not None
+            or self.align != 0
+            or self.gcolor
+            or self.shade
         ):
             raise ValueError(
                 "Inline style not compatible with rotation, outline, drop shadow, gradient, or non-left-aligned text."
@@ -528,14 +528,14 @@ def wrap(text, **kwargs):
         line = para[:a]
         while a + 1 < len(para):
             # b is the next break point, with bline the corresponding line to add.
-            if " " not in para[a + 1:]:
+            if " " not in para[a + 1 :]:
                 b = len(para)
                 bline = para
             else:
                 # Find a space character that immediately follows a non-space character.
                 b = para.index(" ", a + 1)
                 while para[b - 1] == " ":
-                    if " " in para[b + 1:]:
+                    if " " in para[b + 1 :]:
                         b = para.index(" ", b + 1)
                     else:
                         b = len(para)
@@ -602,8 +602,8 @@ def _fitsize(text, size, **kwargs):
         linesize = font.get_linesize() * options.lineheight
         paraspace = font.get_linesize() * options.pspace
         h = (
-                int(round((len(texts) - 1) * linesize + texts[-1][1] * paraspace))
-                + font.get_height()
+            int(round((len(texts) - 1) * linesize + texts[-1][1] * paraspace))
+            + font.get_height()
         )
         return w <= width and h <= height
 
@@ -733,7 +733,7 @@ def _splitbytags(text, underline, underlinetag):
         a, tag = min((text.index(tag), tag) for tag in tagsin)
         if a > 0:
             yield text[:a], underline
-        text = text[a + len(tag):]
+        text = text[a + len(tag) :]
         if tag == underlinetag:
             underline = not underline
     if text:
@@ -857,9 +857,9 @@ def getsurf(text, **kwargs):
             color = 0, 0, 0
         # pygame.Font.render does not allow passing None as an argument value for background.
         if (
-                options.background is None
-                or (len(options.background) > 3 and options.background[3] == 0)
-                or options.gcolor is not None
+            options.background is None
+            or (len(options.background) > 3 and options.background[3] == 0)
+            or options.gcolor is not None
         ):
             lsurfs = [
                 font.render(text, options.antialias, color).convert_alpha()
