@@ -146,7 +146,7 @@ class Matrix:
         return ghost
 
     def draw(self, x: int, y: int) -> None:
-        size = config.size
+        size = 30
 
         self.draw_grid(x, y)
 
@@ -174,7 +174,7 @@ class Matrix:
         starting_w = config.window_size[0]
         width = math.ceil(starting_w / display_w)
 
-        size = config.size
+        size = 30
         grid_color = (64, 64, 64)
 
         for row in range(self.height + 1):

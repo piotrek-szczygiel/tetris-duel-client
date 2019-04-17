@@ -1,7 +1,6 @@
 import random
 from typing import List
 
-import config
 from piece import Piece
 from shape import Shape, SHAPES
 
@@ -34,7 +33,7 @@ class Bag:
 
     def draw(self, x: int, y: int) -> None:
         bag = self.peek(6)
-        size = config.size * 0.5
+        size = 15
         gap = size * 4
 
         for i, shape in enumerate(bag):

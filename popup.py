@@ -36,11 +36,11 @@ class Popup:
 
         return True
 
-    def draw(self) -> None:
+    def draw(self, x: int, y: int) -> None:
         Text.draw(
             self.text,
-            centerx=275,
-            top=300,
+            centerx=x + 155,
+            top=y + 220,
             size=self.size,
             color=self.color,
             alpha=self.alpha,

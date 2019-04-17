@@ -14,10 +14,10 @@ class MainMenu(State):
     def __init__(self) -> None:
         self.input = Input()
 
-        self.position = 1
-        self.min_position = 1
+        self.position = 0
+        self.min_position = 0
         self.max_position = 2
-        self.cursor = shape.SHAPE_T
+        self.cursor = shape.SHAPE_S
 
         self.entered = False
 
@@ -45,26 +45,29 @@ class MainMenu(State):
 
         if self.entered:
             if self.position == 0:
-                pass
+                switch_state("Duel")
             elif self.position == 1:
-                switch_state("Game")
+                switch_state("Single")
             elif self.position == 2:
                 ctx.running = False
 
     def draw(self) -> None:
-        Text.draw("Tetris", centerx=275, top=30, size=6)
+        Text.draw("Tetris", centerx=650, top=30, size=10)
         Text.draw(
             "Duel",
-            centerx=275,
-            top=100,
-            size=6,
+            centerx=650,
+            top=130,
+            size=8,
             color=pg.Color("red"),
             gcolor=pg.Color("yellow"),
         )
 
-        Text.draw("Duel", centerx=275, top=240, color=pg.Color("dimgray"))
-        Text.draw("Single", centerx=275, top=300)
-        Text.draw("Quit", centerx=275, top=360)
+        gcolors = [None, None, None]
+        gcolors[self.position] = pg.Color("green")
 
-        x = 240 + self.position * 60
-        self.cursor.draw(1, 150, x, 8, 1.0)
+        Text.draw("Duel", centerx=650, top=300, size=4, gcolor=gcolors[0])
+        Text.draw("Single", centerx=650, top=370, size=4, gcolor=gcolors[1])
+        Text.draw("Quit", centerx=650, top=440, size=4, gcolor=gcolors[2])
+
+        y = 300 + self.position * 70
+        self.cursor.draw(0, 460, y, 15, 1.0)

@@ -3,7 +3,6 @@ from typing import Callable, List, Optional
 import pygame as pg
 from pygame.locals import *
 
-import config
 import ctx
 import shape
 from gameplay import Gameplay
@@ -13,7 +12,7 @@ from state import State
 from text import Text
 
 
-class Game(State):
+class Single(State):
     def __init__(self) -> None:
         self.input = Input()
         self.gameplay = Gameplay()
@@ -100,27 +99,29 @@ class Game(State):
                 switch_state("MainMenu")
 
     def draw(self) -> None:
-        board_position = (120, 80)
+        x, y = 490, 80
 
         matrix = self.gameplay.get_matrix()
         piece = self.gameplay.get_piece()
         bag = self.gameplay.get_bag()
         holder = self.gameplay.get_holder()
 
-        matrix.draw(*board_position)
-        matrix.get_ghost(piece).draw(*board_position)
-        piece.draw(*board_position)
+        matrix.draw(x, y)
 
-        bag.draw(460, 150)
+        if piece:
+            matrix.get_ghost(piece).draw(x, y)
+            piece.draw(x, y)
+
+        bag.draw(x + 340, y + 70)
 
         if holder is not None:
-            x = 55 - holder.shape.get_width(0) * config.size * 0.75 / 2
-            holder.shape.draw(0, x, 140, config.size * 0.75, 1.0)
+            holder_x = x - 65 - holder.shape.get_width(0) * 11.25
+            holder.shape.draw(0, holder_x, y + 60, 22.5, 1.0)
         else:
-            shape.SHAPE_HOLD_NONE.draw(0, 45, 140, config.size * 0.75, 1.0)
+            shape.SHAPE_HOLD_NONE.draw(0, x - 75, y + 60, 22.5, 1.0)
 
-        Text.draw("Hold", (10, 100))
-        Text.draw("Next", (435, 100))
+        Text.draw("Hold", (x - 110, y + 20))
+        Text.draw("Next", (x + 315, y + 20))
 
         if self.popup:
-            self.popup.draw()
+            self.popup.draw(120, 80)

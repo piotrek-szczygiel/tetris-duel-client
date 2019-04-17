@@ -105,7 +105,7 @@ class Piece:
         return counter
 
     def draw(self, x: int, y: int) -> None:
-        size = config.size
+        size = 30
         if self.ghost:
             alpha = 0.3
         else:

@@ -1,6 +1,5 @@
-window_size = 550, 700
+window_size = 1300, 700
 
-size = 30
 cols = 10
 rows = 20
 

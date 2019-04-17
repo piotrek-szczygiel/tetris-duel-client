@@ -7,8 +7,9 @@ import _ptext
 import config
 import ctx
 import resources
-from game import Game
+from duel import Duel
 from main_menu import MainMenu
+from single import Single
 from state import State
 from text import Text
 
@@ -20,8 +21,10 @@ class Main:
         self.last_size = config.window_size
 
     def switch_state(self, state: str) -> None:
-        if state == "Game":
-            self.state = Game()
+        if state == "Duel":
+            self.state = Duel()
+        elif state == "Single":
+            self.state = Single()
         elif state == "MainMenu":
             self.state = MainMenu()
 
@@ -44,8 +47,8 @@ class Main:
                 ctx.display = pg.display.set_mode((w, h), pg.RESIZABLE)
                 self.last_size = w, h
             elif event.type == pg.KEYDOWN:
-                if event.key == pg.K_F12:
-                    self.switch_state("Game")
+                if event.key == pg.K_ESCAPE:
+                    self.switch_state("MainMenu")
                 elif event.key == pg.K_q:
                     ctx.running = False
                     return False

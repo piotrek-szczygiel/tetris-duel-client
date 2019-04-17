@@ -14,7 +14,7 @@ class Gameplay:
     def __init__(self) -> None:
         self.matrix = Matrix()
         self.bag = Bag()
-        self.piece: Piece
+        self.piece: Optional[Piece] = None
         self.input = Input()
 
         self.holder: Optional[Piece] = None
