@@ -4,12 +4,10 @@ import pygame as pg
 from pygame.locals import *
 
 import ctx
-import shape
 from gameplay import Gameplay
 from input import Input
 from popup import Popup
 from state import State
-from text import Text
 
 
 class Duel(State):
@@ -85,7 +83,7 @@ class Duel(State):
         self.gameplay1.update(self.clear_rows)
 
         if self.gameplay1.is_over() and not self.ending:
-            self.popup1 = Popup("Game over", duration=3.0, gcolor=pg.Color("darkred"))
+            self.popup1 = Popup("Game over", duration=3.0, gcolor="darkred")
             self.ending = True
 
         if self.clearing and ctx.now - self.clearing_last > 0.02:
@@ -102,35 +100,11 @@ class Duel(State):
                 switch_state("MainMenu")
 
     def draw(self) -> None:
-        self.draw_gameplay(self.gameplay1, 120, 80)
-        self.draw_gameplay(self.gameplay2, 820, 80)
+        self.gameplay1.draw(120, 80)
+        self.gameplay2.draw(880, 80)
 
         if self.popup1:
             self.popup1.draw(120, 80)
 
         if self.popup2:
-            self.popup2.draw(820, 80)
-
-    @staticmethod
-    def draw_gameplay(gameplay: Gameplay, x: int, y: int) -> None:
-        matrix = gameplay.get_matrix()
-        piece = gameplay.get_piece()
-        bag = gameplay.get_bag()
-        holder = gameplay.get_holder()
-
-        matrix.draw(x, y)
-
-        if piece:
-            matrix.get_ghost(piece).draw(x, y)
-            piece.draw(x, y)
-
-        bag.draw(x + 340, y + 70)
-
-        if holder is not None:
-            holder_x = x - 65 - holder.shape.get_width(0) * 11.25
-            holder.shape.draw(0, holder_x, y + 60, 22.5, 1.0)
-        else:
-            shape.SHAPE_HOLD_NONE.draw(0, x - 75, y + 60, 22.5, 1.0)
-
-        Text.draw("Hold", (x - 110, y + 20))
-        Text.draw("Next", (x + 315, y + 20))
+            self.popup2.draw(880, 80)

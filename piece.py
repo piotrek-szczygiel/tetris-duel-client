@@ -1,6 +1,5 @@
 from typing import Callable
 
-import config
 from movement import Movement
 from shape import Shape, ShapeGrid
 
@@ -19,8 +18,8 @@ class Piece:
 
     def reset(self) -> None:
         self.rotation = 0
-        self.x = config.cols // 2 - (self.shape.grid[0].width + 1) // 2
-        self.y = config.rows - self.shape.grid[0].height - self.shape.grid[0].y
+        self.x = 5 - (self.shape.grid[0].width + 1) // 2
+        self.y = 20 - self.shape.grid[0].height - self.shape.grid[0].y
         self.last_movement = Movement.none
 
     def get_height(self) -> int:
@@ -112,9 +111,5 @@ class Piece:
             alpha = 1.0
 
         self.shape.draw(
-            self.rotation,
-            x + self.x * size,
-            y + (self.y - config.rows) * size,
-            size,
-            alpha,
+            self.rotation, x + self.x * size, y + (self.y - 20) * size, size, alpha
         )

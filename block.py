@@ -1,6 +1,7 @@
 from functools import lru_cache
 from typing import Tuple
 
+import pygame as pg
 import pygame.gfxdraw
 
 import config
@@ -28,21 +29,24 @@ def color_get(color: RGB, brightness: float, alpha: float) -> RGB:
     else:
         color = color_shade(color, brightness)
 
-    bg = config.background
+    bg = pg.Color(config.background)
 
     return (
-        (1.0 - alpha) * bg[0] + alpha * color[0],
-        (1.0 - alpha) * bg[1] + alpha * color[1],
-        (1.0 - alpha) * bg[2] + alpha * color[2],
+        (1.0 - alpha) * bg.r + alpha * color[0],
+        (1.0 - alpha) * bg.g + alpha * color[1],
+        (1.0 - alpha) * bg.b + alpha * color[2],
     )
 
 
-def draw_block(color: RGB, x: float, y: float, size: float, alpha: float = 1.0) -> None:
-    color_down = color_get(color, 0.4, alpha)
-    color_right = color_get(color, 0.6, alpha)
-    color_middle = color_get(color, 0.8, alpha)
-    color_left = color_get(color, 1.2, alpha)
-    color_up = color_get(color, 1.7, alpha)
+def draw_block(color: str, x: float, y: float, size: float, alpha: float = 1.0) -> None:
+    color = pg.Color(color)
+
+    color_rgb = color.r, color.g, color.b
+    color_down = color_get(color_rgb, 0.4, alpha)
+    color_right = color_get(color_rgb, 0.6, alpha)
+    color_middle = color_get(color_rgb, 0.8, alpha)
+    color_left = color_get(color_rgb, 1.2, alpha)
+    color_up = color_get(color_rgb, 1.7, alpha)
 
     border = 0.1 * size
 

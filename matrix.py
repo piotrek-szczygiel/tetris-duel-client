@@ -15,10 +15,10 @@ Grid = List[List[int]]
 
 class Matrix:
     def __init__(self) -> None:
-        self.width = config.cols
+        self.width = 10
 
-        self.height = config.rows
-        self.vanish = config.rows
+        self.height = 20
+        self.vanish = 20
         self.grid: Grid
 
         self.clear()

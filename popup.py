@@ -1,5 +1,3 @@
-import pygame as pg
-
 import ctx
 from text import Text
 
@@ -10,8 +8,8 @@ class Popup:
         text: str,
         duration=0.75,
         size=5,
-        color=pg.Color("white"),
-        scolor=pg.Color("black"),
+        color="white",
+        scolor="black",
         gcolor=None,
     ) -> None:
         self.text = text

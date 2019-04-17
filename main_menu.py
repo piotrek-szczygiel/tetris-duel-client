@@ -1,10 +1,8 @@
 from typing import Callable
 
-import pygame as pg
 from pygame.locals import *
 
 import ctx
-import shape
 from input import Input
 from state import State
 from text import Text
@@ -17,7 +15,6 @@ class MainMenu(State):
         self.position = 0
         self.min_position = 0
         self.max_position = 2
-        self.cursor = shape.SHAPE_S
 
         self.entered = False
 
@@ -52,22 +49,17 @@ class MainMenu(State):
                 ctx.running = False
 
     def draw(self) -> None:
-        Text.draw("Tetris", centerx=650, top=30, size=10)
-        Text.draw(
-            "Duel",
-            centerx=650,
-            top=130,
-            size=8,
-            color=pg.Color("red"),
-            gcolor=pg.Color("yellow"),
-        )
+        Text.draw("Tetris", centerx=640, top=30, size=10)
 
-        gcolors = [None, None, None]
-        gcolors[self.position] = pg.Color("green")
+        Text.draw("Duel", centerx=650, top=130, size=8, color="red", gcolor="yellow")
 
-        Text.draw("Duel", centerx=650, top=300, size=4, gcolor=gcolors[0])
-        Text.draw("Single", centerx=650, top=370, size=4, gcolor=gcolors[1])
-        Text.draw("Quit", centerx=650, top=440, size=4, gcolor=gcolors[2])
+        colors = [None, None, None]
+        colors[self.position] = "palegreen"
 
-        y = 300 + self.position * 70
-        self.cursor.draw(0, 460, y, 15, 1.0)
+        Text.draw("Duel", centerx=650, top=300, size=4, color=colors[0])
+        Text.draw("Single", centerx=650, top=370, size=4, color=colors[1])
+        Text.draw("Quit", centerx=650, top=440, size=4, color=colors[2])
+
+        x = 490
+        y = 303 + self.position * 70
+        Text.draw("\u2192", (x, y), color="gold")

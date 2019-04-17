@@ -4,12 +4,10 @@ import pygame as pg
 from pygame.locals import *
 
 import ctx
-import shape
 from gameplay import Gameplay
 from input import Input
 from popup import Popup
 from state import State
-from text import Text
 
 
 class Single(State):
@@ -64,12 +62,12 @@ class Single(State):
         row_count = len(rows)
 
         message = None
-        gcolor = pg.Color("black")
+        gcolor = "black"
         if t_spin:
-            gcolor = pg.Color("purple")
+            gcolor = "purple"
             message = "T-Spin"
         elif row_count == 4:
-            gcolor = pg.Color("cyan")
+            gcolor = "cyan"
             message = "TETRIS"
 
         if message:
@@ -99,29 +97,7 @@ class Single(State):
                 switch_state("MainMenu")
 
     def draw(self) -> None:
-        x, y = 490, 80
-
-        matrix = self.gameplay.get_matrix()
-        piece = self.gameplay.get_piece()
-        bag = self.gameplay.get_bag()
-        holder = self.gameplay.get_holder()
-
-        matrix.draw(x, y)
-
-        if piece:
-            matrix.get_ghost(piece).draw(x, y)
-            piece.draw(x, y)
-
-        bag.draw(x + 340, y + 70)
-
-        if holder is not None:
-            holder_x = x - 65 - holder.shape.get_width(0) * 11.25
-            holder.shape.draw(0, holder_x, y + 60, 22.5, 1.0)
-        else:
-            shape.SHAPE_HOLD_NONE.draw(0, x - 75, y + 60, 22.5, 1.0)
-
-        Text.draw("Hold", (x - 110, y + 20))
-        Text.draw("Next", (x + 315, y + 20))
+        self.gameplay.draw(490, 80)
 
         if self.popup:
             self.popup.draw(120, 80)

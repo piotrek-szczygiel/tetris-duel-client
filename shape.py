@@ -61,14 +61,14 @@ KICKS_I = [
 
 SHAPE_COLORS = [
     None,
-    (0, 255, 255),  # cyan
-    (0, 0, 255),  # blue
-    (255, 165, 0),  # orange
-    (255, 255, 0),  # yellow
-    (0, 255, 0),  # green
-    (128, 0, 128),  # purple
-    (255, 0, 0),  # red
-    (224, 224, 224),  # gray
+    "cyan",
+    "blue",
+    "orange",
+    "yellow",
+    "green",
+    "purple",
+    "red",
+    "gray",
 ]
 
 GARBAGE_COLOR = 8

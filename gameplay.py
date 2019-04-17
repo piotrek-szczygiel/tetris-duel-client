@@ -3,11 +3,13 @@ from typing import Callable, List, Optional
 from pygame.locals import *
 
 import ctx
+import shape
 from bag import Bag
 from input import Input
 from matrix import Matrix
 from piece import Piece
 from t_spin import TSpin
+from text import Text
 
 
 class Gameplay:
@@ -161,9 +163,27 @@ class Gameplay:
             self.last_lock_cancel = ctx.now
 
         if self.piece.check_collision(0, 1, self.matrix.collision):
-            if ctx.now - self.last_lock_cancel > 0.5:
+            if ctx.now - self.last_lock_cancel > 1.0:
                 self.lock_piece()
 
         if ctx.now - self.last_fall > self.fall_interval:
             if self.piece.move(0, 1, self.matrix.collision):
                 self.reset_fall()
+
+    def draw(self, x: int, y: int) -> None:
+        self.matrix.draw(x, y)
+
+        if self.piece:
+            self.matrix.get_ghost(self.piece).draw(x, y)
+            self.piece.draw(x, y)
+
+        self.bag.draw(x + 340, y + 70)
+
+        if self.holder is not None:
+            holder_x = x - 65 - self.holder.shape.get_width(0) * 11.25
+            self.holder.shape.draw(0, holder_x, y + 60, 22.5, 1.0)
+        else:
+            shape.SHAPE_HOLD_NONE.draw(0, x - 75, y + 60, 22.5, 1.0)
+
+        Text.draw("Hold", (x - 110, y + 20))
+        Text.draw("Next", (x + 315, y + 20))

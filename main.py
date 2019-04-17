@@ -74,11 +74,11 @@ class Main:
             ctx.now = time.monotonic()
             self.state.update(self.switch_state)
 
-            ctx.surface.fill(config.background)
+            ctx.surface.fill(pg.Color(config.background))
             self.state.draw()
 
             fps = "FPS: " + "{0:.1f}".format(fps_clock.get_fps())
-            Text.draw(fps, (10, 10), size=2, alpha=0.5, color=pg.Color("gray"))
+            Text.draw(fps, (10, 10), size=2, alpha=0.5, color="gray")
 
             pg.transform.scale(ctx.surface, self.display.get_size(), self.display)
 
