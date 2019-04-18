@@ -54,7 +54,7 @@ class Duel(State):
     def debug_garbage(self) -> None:
         self.gameplay1.get_matrix().add_garbage(5)
 
-    def clear_rows(self, rows: List[int], t_spin: bool) -> None:
+    def clear_rows(self, rows: List[int]) -> None:
         self.clearing = True
         self.clearing_rows = rows
         self.clearing_last = ctx.now + 0.15
@@ -62,25 +62,17 @@ class Duel(State):
         for row in rows:
             self.gameplay1.get_matrix().empty_row(row)
 
-        row_count = len(rows)
-
-        message = None
-        gcolor = pg.Color("black")
-        if t_spin:
-            gcolor = pg.Color("purple")
-            message = "T-Spin"
-        elif row_count == 4:
-            gcolor = pg.Color("cyan")
-            message = "TETRIS"
-
-        if message:
-            self.popup1 = Popup(message, gcolor=gcolor)
-        else:
-            self.popup1 = None
-
     def update(self, switch_state: Callable) -> None:
         self.input.update()
-        self.gameplay1.update(self.clear_rows)
+        message = self.gameplay1.update(self.clear_rows)
+
+        if message:
+            self.popup1 = Popup(message, color="gold", gcolor="green", size=4)
+
+        if self.gameplay1.movement_locked:
+            self.popup1 = Popup(
+                "Locked!", duration=1.0, color="darkred", gcolor="black"
+            )
 
         if self.gameplay1.is_over() and not self.ending:
             self.popup1 = Popup("Game over", duration=3.0, gcolor="darkred")
@@ -104,7 +96,7 @@ class Duel(State):
         self.gameplay2.draw(880, 80)
 
         if self.popup1:
-            self.popup1.draw(120, 80)
+            self.popup1.draw(120 + 155, 80 + 220)
 
         if self.popup2:
-            self.popup2.draw(880, 80)
+            self.popup2.draw(880 + 155, 80 + 220)

@@ -8,6 +8,7 @@ from bag import Bag
 from input import Input
 from matrix import Matrix
 from piece import Piece
+from score import Score
 from t_spin import TSpin
 from text import Text
 
@@ -17,10 +18,13 @@ class Gameplay:
         self.matrix = Matrix()
         self.bag = Bag()
         self.piece: Optional[Piece] = None
+        self.score = Score()
         self.input = Input()
 
         self.holder: Optional[Piece] = None
         self.hold_lock = False
+
+        self.level = 1
 
         self.game_over = False
 
@@ -84,12 +88,16 @@ class Gameplay:
         self.piece.rotate(self.matrix.collision, clockwise=False)
 
     def action_soft_fall(self) -> None:
-        if self.piece.fall(self.matrix.collision) > 0:
+        rows = self.piece.fall(self.matrix.collision)
+        if rows > 0:
             self.reset_fall()
+            self.score.update_soft_drop(rows)
 
     def action_hard_fall(self) -> None:
-        self.piece.fall(self.matrix.collision)
+        rows = self.piece.fall(self.matrix.collision)
         self.lock_piece()
+        if rows > 0:
+            self.score.update_hard_drop(rows)
 
     def action_hold(self) -> None:
         self.hold()
@@ -154,13 +162,19 @@ class Gameplay:
         rows = self.matrix.get_full_rows()
         if rows:
             self.rows_to_clear = rows
+        else:
+            self.score.reset_combo()
 
-    def update(self, clear_rows: Callable) -> None:
+    def update(self, clear_rows: Callable) -> str:
         if not self.movement_locked:
             self.input.update()
 
+        message = ""
         if self.rows_to_clear:
-            clear_rows(self.rows_to_clear, self.t_spin)
+            message = self.score.update_clear(
+                self.level, self.rows_to_clear, self.t_spin
+            )
+            clear_rows(self.rows_to_clear)
             self.rows_to_clear = []
 
         if self.piece.touching_floor and not self.movement_locked:
@@ -186,7 +200,10 @@ class Gameplay:
             if self.piece.move(0, 1, self.matrix.collision):
                 self.reset_fall()
 
+        return message
+
     def draw(self, x: int, y: int) -> None:
+        self.score.draw(x, y - 70)
         self.matrix.draw(x, y)
 
         if self.piece:

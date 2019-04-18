@@ -10,7 +10,7 @@ from popup import Popup
 from state import State
 
 
-class Single(State):
+class Marathon(State):
     def __init__(self) -> None:
         self.input = Input()
         self.gameplay = Gameplay()
@@ -20,6 +20,24 @@ class Single(State):
         self.clearing_last: float
 
         self.ending = False
+
+        self.gravity = [
+            1.00000,
+            0.79300,
+            0.61780,
+            0.47273,
+            0.35520,
+            0.26200,
+            0.18968,
+            0.13473,
+            0.09388,
+            0.06415,
+            0.04298,
+            0.02822,
+            0.01815,
+            0.01144,
+            0.00706,
+        ]
 
         self.text_hold: pg.Surface
         self.text_next: pg.Surface
@@ -51,7 +69,7 @@ class Single(State):
     def debug_garbage(self) -> None:
         self.gameplay.get_matrix().add_garbage(5)
 
-    def clear_rows(self, rows: List[int], t_spin: bool) -> None:
+    def clear_rows(self, rows: List[int]) -> None:
         self.clearing = True
         self.clearing_rows = rows
         self.clearing_last = ctx.now + 0.15
@@ -59,27 +77,14 @@ class Single(State):
         for row in rows:
             self.gameplay.get_matrix().empty_row(row)
 
-        row_count = len(rows)
-
-        message = None
-        gcolor = "black"
-        if t_spin:
-            gcolor = "purple"
-            message = "T-Spin"
-        elif row_count == 4:
-            gcolor = "cyan"
-            message = "TETRIS"
-
-        if message:
-            self.popup = Popup(message, gcolor=gcolor)
-        else:
-            self.popup = None
-
     def update(self, switch_state: Callable) -> None:
         self.input.update()
-        self.gameplay.update(self.clear_rows)
+        message = self.gameplay.update(self.clear_rows)
 
-        if self.gameplay.movement_locked and not self.popup:
+        if message:
+            self.popup = Popup(message, color="gold", gcolor="green", size=4)
+
+        if self.gameplay.movement_locked:
             self.popup = Popup("Locked!", duration=1.0, color="darkred", gcolor="black")
 
         if self.gameplay.is_over() and not self.ending:
@@ -103,4 +108,4 @@ class Single(State):
         self.gameplay.draw(490, 80)
 
         if self.popup:
-            self.popup.draw(120, 80)
+            self.popup.draw(250, 250)

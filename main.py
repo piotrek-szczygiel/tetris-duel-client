@@ -9,7 +9,7 @@ import ctx
 import resources
 from duel import Duel
 from main_menu import MainMenu
-from single import Single
+from marathon import Marathon
 from state import State
 from text import Text
 
@@ -23,8 +23,8 @@ class Main:
     def switch_state(self, state: str) -> None:
         if state == "Duel":
             self.state = Duel()
-        elif state == "Single":
-            self.state = Single()
+        elif state == "Marathon":
+            self.state = Marathon()
         elif state == "MainMenu":
             self.state = MainMenu()
 

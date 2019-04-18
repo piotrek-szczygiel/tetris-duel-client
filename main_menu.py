@@ -42,9 +42,9 @@ class MainMenu(State):
 
         if self.entered:
             if self.position == 0:
-                switch_state("Duel")
+                switch_state("Marathon")
             elif self.position == 1:
-                switch_state("Single")
+                switch_state("Duel")
             elif self.position == 2:
                 ctx.running = False
 
@@ -53,13 +53,13 @@ class MainMenu(State):
 
         Text.draw("Duel", centerx=650, top=130, size=8, color="red", gcolor="yellow")
 
-        colors = [None, None, None]
-        colors[self.position] = "palegreen"
+        colors = ["white" for _ in range(self.max_position + 1)]
+        colors[self.position] = "gold"
 
-        Text.draw("Duel", centerx=650, top=300, size=4, color=colors[0])
-        Text.draw("Single", centerx=650, top=370, size=4, color=colors[1])
-        Text.draw("Quit", centerx=650, top=440, size=4, color=colors[2])
+        Text.draw("Marathon", centerx=650, top=300, color=colors[0])
+        Text.draw("Duel Online", centerx=650, top=350, color=colors[1])
+        Text.draw("Quit", centerx=650, top=400, color=colors[2])
 
-        x = 490
-        y = 303 + self.position * 70
-        Text.draw("\u2192", (x, y), color="gold")
+        x = 460
+        y = 305 + self.position * 50
+        Text.draw("\u2192", (x, y), color="gold", size=2)

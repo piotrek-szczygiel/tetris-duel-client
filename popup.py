@@ -29,7 +29,7 @@ class Popup:
             return False
 
         if self.start + self.duration - self.fade < ctx.now:
-            ratio = (ctx.now - self.start - self.fade) / (self.duration - self.fade)
+            ratio = (ctx.now - self.start - self.duration + self.fade) / self.fade
             self.alpha = 1.0 - ratio ** 2
 
         return True
@@ -37,12 +37,13 @@ class Popup:
     def draw(self, x: int, y: int) -> None:
         Text.draw(
             self.text,
-            centerx=x + 155,
-            top=y + 220,
+            centerx=x,
+            top=y,
             size=self.size,
             color=self.color,
             alpha=self.alpha,
             shadow=(2.0, 2.0),
             scolor=self.scolor,
             gcolor=self.gcolor,
+            lineheight=2,
         )
