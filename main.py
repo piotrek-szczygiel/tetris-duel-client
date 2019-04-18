@@ -10,6 +10,7 @@ import resources
 from duel import Duel
 from main_menu import MainMenu
 from marathon import Marathon
+from mixer import Mixer
 from state import State
 from text import Text
 
@@ -57,6 +58,10 @@ class Main:
 
     def run(self) -> None:
         os.environ["SDL_VIDEO_WINDOW_POS"] = "center"
+
+        ctx.mixer = Mixer()
+        ctx.mixer.initialize()
+
         pg.init()
 
         self.display = pg.display.set_mode(config.window_size, pg.RESIZABLE)

@@ -28,12 +28,21 @@ class MainMenu(State):
         )
 
     def position_down(self) -> None:
-        self.position = min(self.max_position, self.position + 1)
+        self.position += 1
+        if self.position > self.max_position:
+            self.position = self.max_position
+        else:
+            ctx.mixer.play("change")
 
     def position_up(self) -> None:
-        self.position = max(self.min_position, self.position - 1)
+        self.position -= 1
+        if self.position < self.min_position:
+            self.position = self.min_position
+        else:
+            ctx.mixer.play("change")
 
     def position_enter(self) -> None:
+        ctx.mixer.play("choose")
         self.entered = True
 
     def update(self, switch_state: Callable) -> None:

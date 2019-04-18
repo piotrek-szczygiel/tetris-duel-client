@@ -125,7 +125,7 @@ class Matrix:
             for x in range(self.width):
                 self.grid[y][x] = self.grid[y - 1][x]
 
-    def empty_row(self, row: int) -> None:
+    def erase_row(self, row: int) -> None:
         for x in range(self.width):
             self.grid[row][x] = 0
 

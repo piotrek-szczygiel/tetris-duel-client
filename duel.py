@@ -60,7 +60,7 @@ class Duel(State):
         self.clearing_last = ctx.now + 0.15
 
         for row in rows:
-            self.gameplay1.get_matrix().empty_row(row)
+            self.gameplay1.get_matrix().erase_row(row)
 
     def update(self, switch_state: Callable) -> None:
         self.input.update()
@@ -79,6 +79,7 @@ class Duel(State):
             self.ending = True
 
         if self.clearing and ctx.now - self.clearing_last > 0.02:
+            ctx.mixer.play("line_fall")
             self.gameplay1.get_matrix().collapse_row(self.clearing_rows.pop(0))
             self.clearing_last = ctx.now
 

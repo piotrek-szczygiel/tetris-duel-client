@@ -74,22 +74,28 @@ class Gameplay:
     def action_down(self) -> None:
         if self.piece.move(0, 1, self.matrix.collision):
             self.reset_fall()
+            ctx.mixer.play("move")
 
     def action_right(self) -> None:
-        self.piece.move(1, 0, self.matrix.collision)
+        if self.piece.move(1, 0, self.matrix.collision):
+            ctx.mixer.play("move")
 
     def action_left(self) -> None:
-        self.piece.move(-1, 0, self.matrix.collision)
+        if self.piece.move(-1, 0, self.matrix.collision):
+            ctx.mixer.play("move")
 
     def action_rotate_right(self) -> None:
-        self.piece.rotate(self.matrix.collision, clockwise=True)
+        if self.piece.rotate(self.matrix.collision, clockwise=True):
+            ctx.mixer.play("rotate")
 
     def action_rotate_left(self) -> None:
-        self.piece.rotate(self.matrix.collision, clockwise=False)
+        if self.piece.rotate(self.matrix.collision, clockwise=False):
+            ctx.mixer.play("rotate")
 
     def action_soft_fall(self) -> None:
         rows = self.piece.fall(self.matrix.collision)
         if rows > 0:
+            ctx.mixer.play("move")
             self.reset_fall()
             self.score.update_soft_drop(rows)
 
@@ -97,6 +103,7 @@ class Gameplay:
         rows = self.piece.fall(self.matrix.collision)
         self.lock_piece()
         if rows > 0:
+            ctx.mixer.play("hard_fall")
             self.score.update_hard_drop(rows)
 
     def action_hold(self) -> None:
@@ -122,16 +129,9 @@ class Gameplay:
     def reset_fall(self) -> None:
         self.last_fall = ctx.now
 
-    def soft_fall(self) -> None:
-        if self.piece.fall(self.matrix.collision) > 0:
-            self.reset_fall()
-
-    def hard_fall(self) -> None:
-        self.soft_fall()
-        self.lock_piece()
-
     def hold(self) -> None:
         if self.hold_lock:
+            ctx.mixer.play("hold_fail")
             return
 
         self.hold_lock = True
@@ -143,6 +143,8 @@ class Gameplay:
         else:
             self.holder = self.piece
             self.new_piece()
+
+        ctx.mixer.play("hold")
 
     def lock_piece(self) -> None:
         self.hold_lock = False
@@ -174,6 +176,7 @@ class Gameplay:
             message = self.score.update_clear(
                 self.level, self.rows_to_clear, self.t_spin
             )
+            ctx.mixer.play("erase")
             clear_rows(self.rows_to_clear)
             self.rows_to_clear = []
 

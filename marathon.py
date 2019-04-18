@@ -68,6 +68,7 @@ class Marathon(State):
 
     def debug_garbage(self) -> None:
         self.gameplay.get_matrix().add_garbage(5)
+        ctx.mixer.play("garbage")
 
     def clear_rows(self, rows: List[int]) -> None:
         self.clearing = True
@@ -75,7 +76,7 @@ class Marathon(State):
         self.clearing_last = ctx.now + 0.15
 
         for row in rows:
-            self.gameplay.get_matrix().empty_row(row)
+            self.gameplay.get_matrix().erase_row(row)
 
     def update(self, switch_state: Callable) -> None:
         self.input.update()
@@ -94,6 +95,7 @@ class Marathon(State):
         if self.clearing and ctx.now - self.clearing_last > 0.02:
             self.gameplay.get_matrix().collapse_row(self.clearing_rows.pop(0))
             self.clearing_last = ctx.now
+            ctx.mixer.play("line_fall")
 
             if not self.clearing_rows:
                 self.clearing = False
