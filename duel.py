@@ -3,7 +3,6 @@ from typing import Callable, List, Optional
 import pygame as pg
 from pygame.locals import *
 
-import ctx
 from gameplay import Gameplay
 from input import Input
 from popup import Popup
@@ -54,37 +53,17 @@ class Duel(State):
     def debug_garbage(self) -> None:
         self.gameplay1.get_matrix().add_garbage(5)
 
-    def clear_rows(self, rows: List[int]) -> None:
-        self.clearing = True
-        self.clearing_rows = rows
-        self.clearing_last = ctx.now + 0.15
-
-        for row in rows:
-            self.gameplay1.get_matrix().erase_row(row)
-
     def update(self, switch_state: Callable) -> None:
         self.input.update()
-        message = self.gameplay1.update(self.clear_rows)
+        self.gameplay1.update()
 
-        if message:
-            self.popup1 = Popup(message, color="gold", gcolor="green", size=4)
-
-        if self.gameplay1.movement_locked:
-            self.popup1 = Popup(
-                "Locked!", duration=1.0, color="darkred", gcolor="black"
-            )
+        popup = self.gameplay1.get_popup()
+        if popup:
+            self.popup1 = popup
 
         if self.gameplay1.is_over() and not self.ending:
             self.popup1 = Popup("Game over", duration=3.0, gcolor="darkred")
             self.ending = True
-
-        if self.clearing and ctx.now - self.clearing_last > 0.02:
-            ctx.mixer.play("line_fall")
-            self.gameplay1.get_matrix().collapse_row(self.clearing_rows.pop(0))
-            self.clearing_last = ctx.now
-
-            if not self.clearing_rows:
-                self.clearing = False
 
         if self.popup1 and not self.popup1.update():
             self.popup1 = None

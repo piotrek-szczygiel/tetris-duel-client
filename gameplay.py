@@ -1,4 +1,4 @@
-from typing import Callable, List, Optional
+from typing import List, Optional
 
 from pygame.locals import *
 
@@ -8,6 +8,7 @@ from bag import Bag
 from input import Input
 from matrix import Matrix
 from piece import Piece
+from popup import Popup
 from score import Score
 from t_spin import TSpin
 from text import Text
@@ -20,6 +21,7 @@ class Gameplay:
         self.piece: Optional[Piece] = None
         self.score = Score()
         self.input = Input()
+        self.popup: Optional[Popup] = None
 
         self.holder: Optional[Piece] = None
         self.hold_lock = False
@@ -37,7 +39,10 @@ class Gameplay:
         self.movement_locked = False
 
         self.t_spin = False
-        self.rows_to_clear: List[int] = []
+
+        self.clearing = False
+        self.clearing_rows: List[int] = []
+        self.clearing_last: float
 
     def is_over(self) -> bool:
         return self.game_over
@@ -53,6 +58,9 @@ class Gameplay:
 
     def get_holder(self) -> Piece:
         return self.holder
+
+    def get_popup(self) -> Popup:
+        return self.popup
 
     def initialize(self) -> None:
         self.input.subscribe_list(
@@ -163,22 +171,33 @@ class Gameplay:
 
         rows = self.matrix.get_full_rows()
         if rows:
-            self.rows_to_clear = rows
+            message = self.score.update_clear(self.level, rows, self.t_spin)
+            ctx.mixer.play("erase")
+            self.clear_rows(rows)
+            self.popup = Popup(message, color="gold", gcolor="green", size=4)
+
         else:
             self.score.reset_combo()
 
-    def update(self, clear_rows: Callable) -> str:
+    def clear_rows(self, rows: List[int]) -> None:
+        self.clearing = True
+        self.clearing_rows = rows
+        self.clearing_last = ctx.now + 0.15
+
+        for row in rows:
+            self.matrix.erase_row(row)
+
+    def update(self) -> None:
         if not self.movement_locked:
             self.input.update()
 
-        message = ""
-        if self.rows_to_clear:
-            message = self.score.update_clear(
-                self.level, self.rows_to_clear, self.t_spin
-            )
-            ctx.mixer.play("erase")
-            clear_rows(self.rows_to_clear)
-            self.rows_to_clear = []
+        if self.clearing and ctx.now - self.clearing_last > 0.02:
+            self.matrix.collapse_row(self.clearing_rows.pop(0))
+            self.clearing_last = ctx.now
+            ctx.mixer.play("line_fall")
+
+            if not self.clearing_rows:
+                self.clearing = False
 
         if self.piece.touching_floor and not self.movement_locked:
             if not self.touched_floor:
@@ -195,6 +214,9 @@ class Gameplay:
                     if self.piece.movement_counter == 15:
                         self.movement_locked = True
 
+        if self.movement_locked:
+            self.popup = Popup("Locked!", duration=1.0, color="darkred", gcolor="black")
+
         if self.piece.check_collision(0, 1, self.matrix.collision):
             if ctx.now - self.last_lock_cancel > 1.0:
                 self.lock_piece()
@@ -202,8 +224,6 @@ class Gameplay:
         if ctx.now - self.last_fall > self.fall_interval:
             if self.piece.move(0, 1, self.matrix.collision):
                 self.reset_fall()
-
-        return message
 
     def draw(self, x: int, y: int) -> None:
         self.score.draw(x, y - 70)
