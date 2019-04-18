@@ -13,8 +13,10 @@ class Piece:
         self.rotation = rotation
         self.x = x
         self.y = y
+
         self.last_movement = Movement.none
-        self.reset_lock = False
+        self.movement_counter = 0
+        self.touching_floor = False
 
     def reset(self) -> None:
         self.rotation = 0
@@ -32,9 +34,10 @@ class Piece:
         self.x += x
         self.y += y
         self.last_movement = Movement.move
+        self.movement_counter += 1
 
         if self.check_collision(0, 1, collision):
-            self.reset_lock = True
+            self.touching_floor = True
 
         return True
 
@@ -73,18 +76,18 @@ class Piece:
         rotated = False
 
         if not collision(self):
-            self.last_movement = Movement.rotate
             rotated = True
         else:
             for kick in kicks:
                 if self.move(kick[0], kick[1], collision):
-                    self.last_movement = Movement.rotate
                     rotated = True
                     break
 
         if rotated:
+            self.last_movement = Movement.rotate
+            self.movement_counter += 1
             if self.check_collision(0, 1, collision):
-                self.reset_lock = True
+                self.touching_floor = True
             return True
         else:
             self.rotation = last_rotation

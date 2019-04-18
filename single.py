@@ -79,8 +79,11 @@ class Single(State):
         self.input.update()
         self.gameplay.update(self.clear_rows)
 
+        if self.gameplay.movement_locked and not self.popup:
+            self.popup = Popup("Locked!", duration=1.0, color="darkred", gcolor="black")
+
         if self.gameplay.is_over() and not self.ending:
-            self.popup = Popup("Game over", duration=3.0, gcolor=pg.Color("darkred"))
+            self.popup = Popup("Game over", duration=3.0, gcolor="darkred")
             self.ending = True
 
         if self.clearing and ctx.now - self.clearing_last > 0.02:

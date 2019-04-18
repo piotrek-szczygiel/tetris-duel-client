@@ -28,6 +28,9 @@ class Gameplay:
         self.fall_interval = 1.0
 
         self.last_lock_cancel: float
+        self.touched_floor = False
+        self.movement_counter = 0
+        self.movement_locked = False
 
         self.t_spin = False
         self.rows_to_clear: List[int] = []
@@ -94,6 +97,8 @@ class Gameplay:
     def new_piece(self) -> None:
         self.piece = self.bag.take()
         self.reset_piece()
+        self.touched_floor = False
+        self.movement_locked = False
         if self.matrix.collision(self.piece):
             self.game_over = True
 
@@ -151,16 +156,27 @@ class Gameplay:
             self.rows_to_clear = rows
 
     def update(self, clear_rows: Callable) -> None:
-        self.input.update()
+        if not self.movement_locked:
+            self.input.update()
 
         if self.rows_to_clear:
             clear_rows(self.rows_to_clear, self.t_spin)
             self.rows_to_clear = []
 
-        if self.piece.reset_lock:
-            self.piece.reset_lock = False
-            self.reset_fall()
-            self.last_lock_cancel = ctx.now
+        if self.piece.touching_floor and not self.movement_locked:
+            if not self.touched_floor:
+                self.touched_floor = True
+                self.movement_counter = -1
+                self.piece.movement_counter = 0
+
+            if self.movement_counter != self.piece.movement_counter:
+                if self.piece.movement_counter <= 15:
+                    self.movement_counter = self.piece.movement_counter
+                    self.reset_fall()
+                    self.last_lock_cancel = ctx.now
+
+                    if self.piece.movement_counter == 15:
+                        self.movement_locked = True
 
         if self.piece.check_collision(0, 1, self.matrix.collision):
             if ctx.now - self.last_lock_cancel > 1.0:
