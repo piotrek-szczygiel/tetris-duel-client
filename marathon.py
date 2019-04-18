@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from typing import Callable, Optional, List
 
 import pygame as pg
 from pygame.locals import *
@@ -8,6 +8,7 @@ from gameplay import Gameplay
 from input import Input
 from popup import Popup
 from state import State
+from text import Text
 
 
 class Marathon(State):
@@ -35,10 +36,13 @@ class Marathon(State):
             0.00706,
         ]
 
+        self.goal = 5
+
         self.text_hold: pg.Surface
         self.text_next: pg.Surface
 
-        self.popup: Optional[Popup] = None
+        self.popups: List[Popup] = []
+        self.current_popup: Optional[Popup] = None
 
     def initialize(self) -> None:
         self.gameplay.initialize()
@@ -67,28 +71,47 @@ class Marathon(State):
         ctx.mixer.play("garbage")
 
     def update(self, switch_state: Callable) -> None:
+        if self.gameplay.is_over():
+            return
+
         self.input.update()
         self.gameplay.update()
 
-        popup = self.gameplay.get_popup()
-        if popup:
-            self.popup = popup
+        self.popups.extend(self.gameplay.get_popups())
+        self.gameplay.clear_popups()
 
-        if self.gameplay.movement_locked:
-            self.popup = Popup("Locked!", duration=1.0, color="darkred", gcolor="black")
+        if self.gameplay.score.lines_cleared > 0:
+            self.goal -= self.gameplay.score.lines_cleared
+            self.goal = max(0, self.goal)
+            self.gameplay.score.lines_cleared = 0
 
-        if self.gameplay.is_over() and not self.ending:
-            self.popup = Popup("Game over", duration=3.0, gcolor="darkred")
-            self.ending = True
+            if self.goal == 0:
+                if self.gameplay.level == 15:
+                    self.popups.append(Popup("You won!", duration=3.0, color="green"))
+                    self.gameplay.game_over = True
+                    self.ending = True
+                else:
+                    self.gameplay.score.lines_cleared = 0
+                    self.gameplay.level += 1
+                    self.goal = 5 * self.gameplay.level
+                    self.gameplay.fall_interval = self.gravity[self.gameplay.level - 1]
 
-        if self.popup and not self.popup.update():
-            self.popup = None
-
-            if self.gameplay.is_over() and self.ending:
-                switch_state("MainMenu")
+        if not self.current_popup and self.popups:
+            self.current_popup = self.popups.pop(0)
+        elif self.current_popup:
+            if not self.current_popup.update():
+                self.current_popup = None
 
     def draw(self) -> None:
-        self.gameplay.draw(490, 80)
+        self.gameplay.draw(200, 80)
 
-        if self.popup:
-            self.popup.draw(250, 250)
+        Text().draw("Level", centerx=125, top=300)
+        Text().draw(
+            str(self.gameplay.level), centerx=125, top=340, size=4, color="gold"
+        )
+
+        Text().draw("Goal", centerx=125, top=450)
+        Text().draw(str(self.goal), centerx=125, top=490, size=4, color="gold")
+
+        if self.current_popup:
+            self.current_popup.draw(750, 550)

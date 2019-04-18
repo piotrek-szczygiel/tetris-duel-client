@@ -21,7 +21,7 @@ class Gameplay:
         self.piece: Optional[Piece] = None
         self.score = Score()
         self.input = Input()
-        self.popup: Optional[Popup] = None
+        self.popups: List[Popup] = []
 
         self.holder: Optional[Piece] = None
         self.hold_lock = False
@@ -59,8 +59,11 @@ class Gameplay:
     def get_holder(self) -> Piece:
         return self.holder
 
-    def get_popup(self) -> Popup:
-        return self.popup
+    def get_popups(self) -> List[Popup]:
+        return self.popups
+
+    def clear_popups(self) -> None:
+        self.popups = []
 
     def initialize(self) -> None:
         self.input.subscribe_list(
@@ -174,7 +177,7 @@ class Gameplay:
             message = self.score.update_clear(self.level, rows, self.t_spin)
             ctx.mixer.play("erase")
             self.clear_rows(rows)
-            self.popup = Popup(message, color="gold", gcolor="green", size=4)
+            self.popups.append(Popup(message, color="gold", gcolor="green", size=4))
 
         else:
             self.score.reset_combo()
@@ -188,6 +191,9 @@ class Gameplay:
             self.matrix.erase_row(row)
 
     def update(self) -> None:
+        if self.game_over:
+            return
+
         if not self.movement_locked:
             self.input.update()
 
@@ -215,7 +221,9 @@ class Gameplay:
                         self.movement_locked = True
 
         if self.movement_locked:
-            self.popup = Popup("Locked!", duration=1.0, color="darkred", gcolor="black")
+            self.popups.append(
+                Popup("Locked!", duration=1.0, color="darkred", gcolor="black")
+            )
 
         if self.piece.check_collision(0, 1, self.matrix.collision):
             if ctx.now - self.last_lock_cancel > 1.0:
@@ -225,21 +233,24 @@ class Gameplay:
             if self.piece.move(0, 1, self.matrix.collision):
                 self.reset_fall()
 
+        if self.game_over:
+            self.popups.append(Popup("Game over", duration=3.0, gcolor="darkred"))
+
     def draw(self, x: int, y: int) -> None:
-        self.score.draw(x, y - 70)
         self.matrix.draw(x, y)
 
         if self.piece:
             self.matrix.get_ghost(self.piece).draw(x, y)
             self.piece.draw(x, y)
 
+        self.score.draw(x, y - 70)
         self.bag.draw(x + 340, y + 70)
 
         if self.holder is not None:
             holder_x = x - 65 - self.holder.shape.get_width(0) * 11.25
             self.holder.shape.draw(0, holder_x, y + 60, 22.5, 1.0)
         else:
-            shape.SHAPE_HOLD_NONE.draw(0, x - 75, y + 60, 22.5, 1.0)
+            shape.SHAPE_HOLD_NONE.draw(0, x - 85, y + 60, 22.5, 1.0)
 
-        Text.draw("Hold", (x - 110, y + 20))
-        Text.draw("Next", (x + 315, y + 20))
+        Text.draw("Hold", centerx=x - 75, top=y + 20)
+        Text.draw("Next", centerx=x + 370, top=y + 20)

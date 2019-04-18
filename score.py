@@ -8,47 +8,50 @@ class Score:
         self.score = 0
         self.combo = -1
         self.last_clear_was_hard = False
+        self.lines_cleared = 0
 
     def update_clear(self, level: int, rows_cleared: List[int], t_spin: bool) -> str:
         rows = len(rows_cleared)
-        points = 0
         message = ""
+
+        lines = 0
 
         if rows == 1:
             if t_spin:
                 message = "T-Spin Single"
                 if self.last_clear_was_hard:
-                    points = 1200
+                    lines = 12
                 else:
-                    points = 800
+                    lines = 8
             else:
-                points = 100
+                lines = 1
         elif rows == 2:
             if t_spin:
                 message = "T-Spin Double"
                 if self.last_clear_was_hard:
-                    points = 1800
+                    lines = 18
                 else:
-                    points = 1200
+                    lines = 12
             else:
-                points = 300
+                lines = 3
         elif rows == 3:
             if t_spin:
                 message = "T-Spin Triple"
                 if self.last_clear_was_hard:
-                    points = 2400
+                    lines = 24
                 else:
-                    points = 1600
+                    lines = 16
             else:
-                points = 500
+                lines = 5
         elif rows == 4:
             message = "Tetris"
             if self.last_clear_was_hard:
-                points = 1200
+                lines = 12
             else:
-                points = 800
+                lines = 8
 
-        self.score += points * level
+        self.lines_cleared = lines
+        self.score += lines * 100 * level
 
         if t_spin or rows == 4:
             if self.last_clear_was_hard:

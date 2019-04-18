@@ -25,8 +25,10 @@ class Duel(State):
         self.text_hold: pg.Surface
         self.text_next: pg.Surface
 
-        self.popup1: Optional[Popup] = None
-        self.popup2: Optional[Popup] = None
+        self.popups1: List[Popup] = []
+        self.popups2: List[Popup] = []
+        self.current_popup1: Optional[Popup] = None
+        self.current_popup2: Optional[Popup] = None
 
     def initialize(self) -> None:
         self.gameplay1.initialize()
@@ -54,29 +56,36 @@ class Duel(State):
         self.gameplay1.get_matrix().add_garbage(5)
 
     def update(self, switch_state: Callable) -> None:
+        if self.gameplay1.is_over():
+            return
+
         self.input.update()
         self.gameplay1.update()
 
-        popup = self.gameplay1.get_popup()
-        if popup:
-            self.popup1 = popup
+        self.popups1.extend(self.gameplay1.get_popups())
+        self.gameplay1.clear_popups()
 
-        if self.gameplay1.is_over() and not self.ending:
-            self.popup1 = Popup("Game over", duration=3.0, gcolor="darkred")
-            self.ending = True
+        self.popups2.extend(self.gameplay2.get_popups())
+        self.gameplay2.clear_popups()
 
-        if self.popup1 and not self.popup1.update():
-            self.popup1 = None
+        if not self.current_popup1 and self.popups1:
+            self.current_popup1 = self.popups1.pop(0)
+        elif self.current_popup1:
+            if not self.current_popup1.update():
+                self.current_popup1 = None
 
-            if self.gameplay1.is_over() and self.ending:
-                switch_state("MainMenu")
+        if not self.current_popup2 and self.popups2:
+            self.current_popup2 = self.popups2.pop(0)
+        elif self.current_popup2:
+            if not self.current_popup2.update():
+                self.current_popup2 = None
 
     def draw(self) -> None:
         self.gameplay1.draw(120, 80)
         self.gameplay2.draw(880, 80)
 
-        if self.popup1:
-            self.popup1.draw(120 + 155, 80 + 220)
+        if self.current_popup1:
+            self.current_popup1.draw(120 + 155, 80 + 220)
 
-        if self.popup2:
-            self.popup2.draw(880 + 155, 80 + 220)
+        if self.current_popup2:
+            self.current_popup2.draw(880 + 155, 80 + 220)
