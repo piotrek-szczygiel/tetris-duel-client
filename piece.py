@@ -23,6 +23,8 @@ class Piece:
         self.x = 5 - (self.shape.grid[0].width + 1) // 2
         self.y = 20 - self.shape.grid[0].height - self.shape.grid[0].y
         self.last_movement = Movement.none
+        self.movement_counter = 0
+        self.touching_floor = False
 
     def get_height(self) -> int:
         return self.shape.get_height(self.rotation)

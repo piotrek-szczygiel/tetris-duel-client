@@ -81,11 +81,11 @@ class Duel(State):
                 self.current_popup2 = None
 
     def draw(self) -> None:
-        self.gameplay1.draw(120, 80)
+        self.gameplay1.draw(130, 80)
         self.gameplay2.draw(880, 80)
 
         if self.current_popup1:
-            self.current_popup1.draw(120 + 155, 80 + 220)
+            self.current_popup1.draw(130 + 155, 80 + 220)
 
         if self.current_popup2:
             self.current_popup2.draw(880 + 155, 80 + 220)

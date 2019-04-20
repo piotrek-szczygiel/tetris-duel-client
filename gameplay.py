@@ -126,6 +126,7 @@ class Gameplay:
         self.touched_floor = False
         self.movement_locked = False
         if self.matrix.collision(self.piece):
+            print(1)
             self.game_over = True
 
     def reset_piece(self) -> None:
@@ -136,6 +137,7 @@ class Gameplay:
                 break
 
         self.reset_fall()
+        self.last_lock_cancel = ctx.now
 
     def reset_fall(self) -> None:
         self.last_fall = ctx.now
@@ -174,10 +176,10 @@ class Gameplay:
 
         rows = self.matrix.get_full_rows()
         if rows:
-            message = self.score.update_clear(self.level, rows, self.t_spin)
-            ctx.mixer.play("erase")
+            popup = self.score.update_clear(self.level, rows, self.t_spin)
+            ctx.mixer.play("erase" + str(len(rows)))
             self.clear_rows(rows)
-            self.popups.append(Popup(message, color="gold", gcolor="green", size=4))
+            self.popups.append(popup)
 
         else:
             self.score.reset_combo()
@@ -212,18 +214,30 @@ class Gameplay:
                 self.piece.movement_counter = 0
 
             if self.movement_counter != self.piece.movement_counter:
-                if self.piece.movement_counter <= 15:
+                if self.piece.movement_counter <= 30:
                     self.movement_counter = self.piece.movement_counter
                     self.reset_fall()
                     self.last_lock_cancel = ctx.now
 
-                    if self.piece.movement_counter == 15:
-                        self.movement_locked = True
+                    print(self.piece.movement_counter)
 
-        if self.movement_locked:
-            self.popups.append(
-                Popup("Locked!", duration=1.0, color="darkred", gcolor="black")
-            )
+                    if self.piece.movement_counter == 15:
+                        self.popups.append(
+                            Popup(
+                                "Lock warning!",
+                                duration=0.5,
+                                size=4,
+                                color="orange",
+                                gcolor="darkred",
+                            )
+                        )
+                    elif self.piece.movement_counter == 30:
+                        self.movement_locked = True
+                        self.popups.append(
+                            Popup(
+                                "Locked!", duration=1.0, color="darkred", gcolor="black"
+                            )
+                        )
 
         if self.piece.check_collision(0, 1, self.matrix.collision):
             if ctx.now - self.last_lock_cancel > 1.0:

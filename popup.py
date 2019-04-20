@@ -34,16 +34,30 @@ class Popup:
 
         return True
 
-    def draw(self, x: int, y: int) -> None:
-        Text.draw(
-            self.text,
-            centerx=x,
-            top=y,
-            size=self.size,
-            color=self.color,
-            alpha=self.alpha,
-            shadow=(2.0, 2.0),
-            scolor=self.scolor,
-            gcolor=self.gcolor,
-            lineheight=2,
-        )
+    def draw(self, x: int, y: int, center=True) -> None:
+        if center:
+            Text.draw(
+                self.text,
+                centerx=x,
+                top=y,
+                size=self.size,
+                color=self.color,
+                alpha=self.alpha,
+                shadow=(2.0, 2.0),
+                scolor=self.scolor,
+                gcolor=self.gcolor,
+                lineheight=2,
+            )
+        else:
+            Text.draw(
+                self.text,
+                left=x,
+                top=y,
+                size=self.size,
+                color=self.color,
+                alpha=self.alpha,
+                shadow=(2.0, 2.0),
+                scolor=self.scolor,
+                gcolor=self.gcolor,
+                lineheight=2,
+            )

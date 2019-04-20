@@ -80,10 +80,10 @@ class Marathon(State):
         self.popups.extend(self.gameplay.get_popups())
         self.gameplay.clear_popups()
 
-        if self.gameplay.score.lines_cleared > 0:
-            self.goal -= self.gameplay.score.lines_cleared
+        if self.gameplay.score.lines > 0:
+            self.goal -= self.gameplay.score.lines
             self.goal = max(0, self.goal)
-            self.gameplay.score.lines_cleared = 0
+            self.gameplay.score.lines = 0
 
             if self.goal == 0:
                 if self.gameplay.level == 15:
@@ -98,6 +98,7 @@ class Marathon(State):
 
         if not self.current_popup and self.popups:
             self.current_popup = self.popups.pop(0)
+            self.current_popup.duration *= 2
         elif self.current_popup:
             if not self.current_popup.update():
                 self.current_popup = None
@@ -111,7 +112,7 @@ class Marathon(State):
         )
 
         Text().draw("Goal", centerx=125, top=450)
-        Text().draw(str(self.goal), centerx=125, top=490, size=4, color="gold")
+        Text().draw(str(self.goal), centerx=125, top=490, size=4, color="green")
 
         if self.current_popup:
-            self.current_popup.draw(750, 550)
+            self.current_popup.draw(650, 250, center=False)

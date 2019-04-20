@@ -15,7 +15,10 @@ class Mixer:
         for name in [
             "move",
             "rotate",
-            "erase",
+            "erase1",
+            "erase2",
+            "erase3",
+            "erase4",
             "hold",
             "hold_fail",
             "line_fall",
@@ -26,9 +29,6 @@ class Mixer:
         ]:
             self.load_sound(name, name + ".wav")
             self.sounds[name].set_volume(0.1)
-
-        self.sounds["move"].set_volume(0.03)
-        self.sounds["erase"].set_volume(0.05)
 
     def load_sound(self, name: str, filename: str):
         self.sounds[name] = pg.mixer.Sound(path(filename))

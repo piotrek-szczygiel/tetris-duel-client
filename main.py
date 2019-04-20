@@ -86,9 +86,7 @@ class Main:
             Text.draw(fps, (10, 10), size=2, alpha=0.5, color="gray")
 
             pg.transform.scale(ctx.surface, self.display.get_size(), self.display)
-
             pg.display.flip()
-
             fps_clock.tick(60)
 
 
