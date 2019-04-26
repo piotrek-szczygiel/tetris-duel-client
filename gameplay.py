@@ -1,11 +1,8 @@
-from typing import List, Optional
-
 from pygame.locals import *
 
-import ctx
 import shape
 from bag import Bag
-from input import Input
+from input import *
 from matrix import Matrix
 from piece import Piece
 from popup import Popup
@@ -15,12 +12,14 @@ from text import Text
 
 
 class Gameplay:
-    def __init__(self) -> None:
+    def __init__(self, device) -> None:
+        self.device = device
+
         self.matrix = Matrix()
         self.bag = Bag()
         self.piece: Optional[Piece] = None
         self.score = Score()
-        self.input = Input()
+        self.input = Input(device)
         self.popups: List[Popup] = []
 
         self.holder: Optional[Piece] = None
@@ -28,6 +27,8 @@ class Gameplay:
 
         self.level = 1
 
+        self.countdown = 3
+        self.countdown_last = ctx.now - 1.0
         self.game_over = False
 
         self.last_fall: float
@@ -37,12 +38,18 @@ class Gameplay:
         self.touched_floor = False
         self.movement_counter = 0
         self.movement_locked = False
+        self.movement_locked_warning = False
 
         self.t_spin = False
 
         self.clearing = False
         self.clearing_rows: List[int] = []
         self.clearing_last: float
+
+        self.garbage_adding = False
+        self.garbage_hole = 0
+        self.garbage_left = 0
+        self.garbage_last: float
 
     def is_over(self) -> bool:
         return self.game_over
@@ -66,19 +73,34 @@ class Gameplay:
         self.popups = []
 
     def initialize(self) -> None:
-        self.input.subscribe_list(
-            [
-                (K_DOWN, self.action_down, True),
-                (K_RIGHT, self.action_right, True),
-                (K_LEFT, self.action_left, True),
-                (K_UP, self.action_rotate_right),
-                (K_x, self.action_rotate_right),
-                (K_z, self.action_rotate_left),
-                (K_LSHIFT, self.action_soft_fall),
-                (K_SPACE, self.action_hard_fall),
-                (K_c, self.action_hold),
-            ]
-        )
+        if self.device == Input.KEYBOARD:
+            self.input.subscribe_list(
+                [
+                    (K_DOWN, self.action_down, True),
+                    (K_RIGHT, self.action_right, True),
+                    (K_LEFT, self.action_left, True),
+                    (K_UP, self.action_rotate_right),
+                    (K_x, self.action_rotate_right),
+                    (K_z, self.action_rotate_left),
+                    (K_LSHIFT, self.action_soft_fall),
+                    (K_SPACE, self.action_hard_fall),
+                    (K_c, self.action_hold),
+                ]
+            )
+        elif self.device in (Input.JOYSTICK1, Input.JOYSTICK2):
+            self.input.subscribe_list(
+                [
+                    (DPAD_DOWN, self.action_down, True),
+                    (DPAD_RIGHT, self.action_right, True),
+                    (DPAD_LEFT, self.action_left, True),
+                    (TRIGGER_RIGHT, self.action_rotate_right),
+                    (DPAD_UP, self.action_rotate_right),
+                    (TRIGGER_LEFT, self.action_rotate_left),
+                    (BUTTON_RIGHT, self.action_soft_fall),
+                    (BUTTON_DOWN, self.action_hard_fall),
+                    (BUTTON_LEFT, self.action_hold),
+                ]
+            )
 
         self.new_piece()
 
@@ -125,9 +147,13 @@ class Gameplay:
         self.reset_piece()
         self.touched_floor = False
         self.movement_locked = False
+        self.movement_locked_warning = False
         if self.matrix.collision(self.piece):
-            print(1)
             self.game_over = True
+
+        if self.garbage_left > 0:
+            self.garbage_adding = True
+            self.garbage_last = ctx.now
 
     def reset_piece(self) -> None:
         self.piece.reset()
@@ -192,8 +218,25 @@ class Gameplay:
         for row in rows:
             self.matrix.erase_row(row)
 
+    def add_garbage(self, hole: int, count: int) -> None:
+        self.garbage_hole = hole
+        self.garbage_left = count
+
     def update(self) -> None:
         if self.game_over:
+            return
+
+        if self.countdown >= 0:
+            if ctx.now - self.countdown_last > 1.0:
+                self.countdown_last = ctx.now
+
+                if self.countdown == 0:
+                    self.popups.append(
+                        Popup("GO!", size=6, color="green", duration=0.4)
+                    )
+                else:
+                    self.popups.append(Popup(str(self.countdown), size=6, duration=0.4))
+                self.countdown -= 1
             return
 
         if not self.movement_locked:
@@ -207,6 +250,15 @@ class Gameplay:
             if not self.clearing_rows:
                 self.clearing = False
 
+        elif self.garbage_adding and ctx.now - self.garbage_last > 0.03:
+            self.matrix.add_garbage(self.garbage_hole)
+            self.garbage_last = ctx.now
+            ctx.mixer.play("garbage")
+            self.garbage_left -= 1
+
+            if self.garbage_left == 0:
+                self.garbage_adding = False
+
         if self.piece.touching_floor and not self.movement_locked:
             if not self.touched_floor:
                 self.touched_floor = True
@@ -214,30 +266,29 @@ class Gameplay:
                 self.piece.movement_counter = 0
 
             if self.movement_counter != self.piece.movement_counter:
-                if self.piece.movement_counter <= 30:
-                    self.movement_counter = self.piece.movement_counter
-                    self.reset_fall()
-                    self.last_lock_cancel = ctx.now
+                self.movement_counter = self.piece.movement_counter
+                self.reset_fall()
+                self.last_lock_cancel = ctx.now
 
-                    print(self.piece.movement_counter)
-
-                    if self.piece.movement_counter == 15:
-                        self.popups.append(
-                            Popup(
-                                "Lock warning!",
-                                duration=0.5,
-                                size=4,
-                                color="orange",
-                                gcolor="darkred",
-                            )
+                if (
+                    self.piece.movement_counter >= 15
+                    and not self.movement_locked_warning
+                ):
+                    self.movement_locked_warning = True
+                    self.popups.append(
+                        Popup(
+                            "Lock warning!",
+                            duration=0.5,
+                            size=4,
+                            color="orange",
+                            gcolor="darkred",
                         )
-                    elif self.piece.movement_counter == 30:
-                        self.movement_locked = True
-                        self.popups.append(
-                            Popup(
-                                "Locked!", duration=1.0, color="darkred", gcolor="black"
-                            )
-                        )
+                    )
+                elif self.piece.movement_counter >= 30:
+                    self.movement_locked = True
+                    self.popups.append(
+                        Popup("Locked!", duration=1.0, color="darkred", gcolor="black")
+                    )
 
         if self.piece.check_collision(0, 1, self.matrix.collision):
             if ctx.now - self.last_lock_cancel > 1.0:

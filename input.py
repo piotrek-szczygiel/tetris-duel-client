@@ -1,15 +1,51 @@
-from typing import Callable, Dict, List, Tuple
+from typing import Callable, Dict, List, Tuple, Optional
 
-import pygame
+import pygame as pg
 
 import config
 import ctx
 
 Key = int
 
+DPAD_RIGHT = 0
+DPAD_LEFT = 1
+DPAD_DOWN = 2
+DPAD_UP = 3
+
+BUTTON_UP = 4
+BUTTON_RIGHT = 5
+BUTTON_DOWN = 6
+BUTTON_LEFT = 7
+
+TRIGGER_LEFT = 8
+TRIGGER_RIGHT = 9
+
+BUTTON_SELECT = 12
+BUTTON_START = 13
+
 
 class Input:
-    def __init__(self) -> None:
+    KEYBOARD = 0
+    JOYSTICK1 = 1
+    JOYSTICK2 = 2
+
+    def __init__(self, device) -> None:
+        self.device = device
+        self.joystick: Optional[pg.joystick.Joystick] = None
+
+        joystick_count = pg.joystick.get_count()
+        if self.device == Input.JOYSTICK1:
+            if joystick_count < 1:
+                raise Exception("Joystick 1 is not available")
+            self.joystick = pg.joystick.Joystick(0)
+            self.joystick.init()
+
+        elif self.device == Input.JOYSTICK2:
+            if joystick_count < 2:
+                raise Exception("Joystick 2 is not available")
+            self.joystick = pg.joystick.Joystick(1)
+            self.joystick.init()
+
         self.pressed_keys: List[Key] = list()
         self.last_press: Dict[Key, float] = dict()
         self.last_repeat: Dict[Key, float] = dict()
@@ -24,7 +60,29 @@ class Input:
             self.subscribe(*bind)
 
     def update(self) -> None:
-        self.pressed_keys = pygame.key.get_pressed()
+        if self.device == Input.KEYBOARD:
+            self.pressed_keys = pg.key.get_pressed()
+        elif self.device == Input.JOYSTICK1 or self.device == Input.JOYSTICK2:
+            buttons = self.joystick.get_numbuttons()
+            self.pressed_keys = [False for _ in range(buttons + 4)]
+
+            for button in range(self.joystick.get_numbuttons()):
+                if self.joystick.get_button(button) == 1:
+                    self.pressed_keys[button + 4] = True
+
+            if self.joystick.get_numaxes() >= 1:
+                value = self.joystick.get_axis(0)
+                if value > 0.5:
+                    self.pressed_keys[DPAD_RIGHT] = True
+                if value < -0.5:
+                    self.pressed_keys[DPAD_LEFT] = True
+
+            if self.joystick.get_numaxes() >= 2:
+                value = self.joystick.get_axis(1)
+                if value > 0.5:
+                    self.pressed_keys[DPAD_DOWN] = True
+                if value < -0.5:
+                    self.pressed_keys[DPAD_UP] = True
 
         for key, (repeat, callback) in self.subscriptions.items():
             if self.key_pressed(key, repeat):

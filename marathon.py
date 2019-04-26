@@ -13,8 +13,8 @@ from text import Text
 
 class Marathon(State):
     def __init__(self) -> None:
-        self.input = Input()
-        self.gameplay = Gameplay()
+        self.input = Input(Input.KEYBOARD)
+        self.gameplay = Gameplay(Input.JOYSTICK1)
 
         self.ending = False
 
@@ -71,6 +71,13 @@ class Marathon(State):
         ctx.mixer.play("garbage")
 
     def update(self, switch_state: Callable) -> None:
+        if not self.current_popup and self.popups:
+            self.current_popup = self.popups.pop(0)
+            self.current_popup.duration *= 2
+        elif self.current_popup:
+            if not self.current_popup.update():
+                self.current_popup = None
+
         if self.gameplay.is_over():
             return
 
@@ -95,13 +102,6 @@ class Marathon(State):
                     self.gameplay.level += 1
                     self.goal = 5 * self.gameplay.level
                     self.gameplay.fall_interval = self.gravity[self.gameplay.level - 1]
-
-        if not self.current_popup and self.popups:
-            self.current_popup = self.popups.pop(0)
-            self.current_popup.duration *= 2
-        elif self.current_popup:
-            if not self.current_popup.update():
-                self.current_popup = None
 
     def draw(self) -> None:
         self.gameplay.draw(200, 80)

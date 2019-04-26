@@ -1,16 +1,13 @@
-from typing import Callable
-
 from pygame.locals import *
 
-import ctx
-from input import Input
+from input import *
 from state import State
 from text import Text
 
 
 class MainMenu(State):
     def __init__(self) -> None:
-        self.input = Input()
+        self.input = Input(config.input_player1)
 
         self.position = 0
         self.min_position = 0
@@ -19,13 +16,23 @@ class MainMenu(State):
         self.entered = False
 
     def initialize(self) -> None:
-        self.input.subscribe_list(
-            [
-                (K_DOWN, self.position_down),
-                (K_UP, self.position_up),
-                (K_RETURN, self.position_enter),
-            ]
-        )
+        if config.input_player1 == Input.KEYBOARD:
+            self.input.subscribe_list(
+                [
+                    (K_DOWN, self.position_down),
+                    (K_UP, self.position_up),
+                    (K_RETURN, self.position_enter),
+                ]
+            )
+        else:
+            self.input.subscribe_list(
+                [
+                    (DPAD_DOWN, self.position_down),
+                    (DPAD_UP, self.position_up),
+                    (BUTTON_DOWN, self.position_enter),
+                    (BUTTON_START, self.position_enter),
+                ]
+            )
 
     def position_down(self) -> None:
         self.position += 1
@@ -66,7 +73,7 @@ class MainMenu(State):
         colors[self.position] = "gold"
 
         Text.draw("Marathon", centerx=650, top=300, color=colors[0])
-        Text.draw("Duel Online", centerx=650, top=350, color=colors[1])
+        Text.draw("Split Screen", centerx=650, top=350, color=colors[1])
         Text.draw("Quit", centerx=650, top=400, color=colors[2])
 
         x = 460

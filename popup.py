@@ -17,7 +17,7 @@ class Popup:
         self.size = size
         self.color = color
         self.scolor = scolor
-        self.gcolor = gcolor
+        self.gcolor = gcolor or color
 
         self.fade = self.duration / 3
         self.alpha = 1.0

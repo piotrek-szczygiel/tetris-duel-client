@@ -2,8 +2,8 @@ from typing import Tuple
 
 import pygame as pg
 
-import _ptext
 import ctx
+import ptext
 
 Position = Tuple[int, int]
 
@@ -13,7 +13,7 @@ class Text:
     def draw(
         *args, size=3, color="white", gcolor="white", scolor="black", **kwargs
     ) -> Tuple[pg.Surface, Position]:
-        return _ptext.draw(
+        return ptext.draw(
             *args,
             fontname="tetris",
             fontsize=8 * size,

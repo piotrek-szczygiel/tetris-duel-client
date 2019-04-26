@@ -3,14 +3,14 @@ import time
 
 import pygame as pg
 
-import _ptext
 import config
 import ctx
+import ptext
 import resources
-from duel import Duel
 from main_menu import MainMenu
 from marathon import Marathon
 from mixer import Mixer
+from split_screen import SplitScreen
 from state import State
 from text import Text
 
@@ -23,7 +23,7 @@ class Main:
 
     def switch_state(self, state: str) -> None:
         if state == "Duel":
-            self.state = Duel()
+            self.state = SplitScreen()
         elif state == "Marathon":
             self.state = Marathon()
         elif state == "MainMenu":
@@ -66,7 +66,7 @@ class Main:
 
         self.display = pg.display.set_mode(config.window_size, pg.RESIZABLE)
         ctx.surface = pg.Surface(config.window_size)
-        _ptext.FONT_NAME_TEMPLATE = resources.path("%s.ttf")
+        ptext.FONT_NAME_TEMPLATE = resources.path("%s.ttf")
 
         pg.display.set_caption("Tetris Duel")
         self.switch_state("MainMenu")
