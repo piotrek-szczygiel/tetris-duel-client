@@ -54,6 +54,9 @@ class Gameplay:
     def is_over(self) -> bool:
         return self.game_over
 
+    def set_over(self) -> None:
+        self.game_over = True
+
     def get_matrix(self) -> Matrix:
         return self.matrix
 
@@ -145,9 +148,7 @@ class Gameplay:
     def new_piece(self) -> None:
         self.piece = self.bag.take()
         self.reset_piece()
-        self.touched_floor = False
-        self.movement_locked = False
-        self.movement_locked_warning = False
+
         if self.matrix.collision(self.piece):
             self.game_over = True
 
@@ -165,6 +166,10 @@ class Gameplay:
         self.reset_fall()
         self.last_lock_cancel = ctx.now
 
+        self.touched_floor = False
+        self.movement_locked = False
+        self.movement_locked_warning = False
+
     def reset_fall(self) -> None:
         self.last_fall = ctx.now
 
@@ -174,11 +179,10 @@ class Gameplay:
             return
 
         self.hold_lock = True
-        self.reset_piece()
 
         if self.holder is not None:
             self.holder, self.piece = self.piece, self.holder
-            self.reset_fall()
+            self.reset_piece()
         else:
             self.holder = self.piece
             self.new_piece()
@@ -223,6 +227,24 @@ class Gameplay:
         self.garbage_left = count
 
     def update(self) -> None:
+        if self.clearing:
+            if ctx.now - self.clearing_last > 0.02:
+                self.matrix.collapse_row(self.clearing_rows.pop(0))
+                self.clearing_last = ctx.now
+                ctx.mixer.play("line_fall")
+
+                if not self.clearing_rows:
+                    self.clearing = False
+        elif self.garbage_adding:
+            if ctx.now - self.garbage_last > 0.03:
+                self.matrix.add_garbage(self.garbage_hole)
+                self.garbage_last = ctx.now
+                ctx.mixer.play("garbage")
+                self.garbage_left -= 1
+
+                if self.garbage_left == 0:
+                    self.garbage_adding = False
+
         if self.game_over:
             return
 
@@ -241,23 +263,6 @@ class Gameplay:
 
         if not self.movement_locked:
             self.input.update()
-
-        if self.clearing and ctx.now - self.clearing_last > 0.02:
-            self.matrix.collapse_row(self.clearing_rows.pop(0))
-            self.clearing_last = ctx.now
-            ctx.mixer.play("line_fall")
-
-            if not self.clearing_rows:
-                self.clearing = False
-
-        elif self.garbage_adding and ctx.now - self.garbage_last > 0.03:
-            self.matrix.add_garbage(self.garbage_hole)
-            self.garbage_last = ctx.now
-            ctx.mixer.play("garbage")
-            self.garbage_left -= 1
-
-            if self.garbage_left == 0:
-                self.garbage_adding = False
 
         if self.piece.touching_floor and not self.movement_locked:
             if not self.touched_floor:
@@ -297,9 +302,6 @@ class Gameplay:
         if ctx.now - self.last_fall > self.fall_interval:
             if self.piece.move(0, 1, self.matrix.collision):
                 self.reset_fall()
-
-        if self.game_over:
-            self.popups.append(Popup("Game over", duration=3.0, gcolor="darkred"))
 
     def draw(self, x: int, y: int) -> None:
         self.matrix.draw(x, y)

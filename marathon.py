@@ -3,6 +3,7 @@ from typing import Callable, Optional, List
 import pygame as pg
 from pygame.locals import *
 
+import config
 import ctx
 from gameplay import Gameplay
 from input import Input
@@ -14,9 +15,7 @@ from text import Text
 class Marathon(State):
     def __init__(self) -> None:
         self.input = Input(Input.KEYBOARD)
-        self.gameplay = Gameplay(Input.JOYSTICK1)
-
-        self.ending = False
+        self.gameplay = Gameplay(config.input_player1)
 
         self.gravity = [
             1.00000,
@@ -43,6 +42,8 @@ class Marathon(State):
 
         self.popups: List[Popup] = []
         self.current_popup: Optional[Popup] = None
+
+        self.popup_game_over = False
 
     def initialize(self) -> None:
         self.gameplay.initialize()
@@ -78,10 +79,12 @@ class Marathon(State):
             if not self.current_popup.update():
                 self.current_popup = None
 
-        if self.gameplay.is_over():
-            return
+        if not self.gameplay.is_over():
+            self.input.update()
+        elif not self.popup_game_over:
+            self.popup_game_over = True
+            self.popups.append(Popup("Game over!", duration=3.0, color="red"))
 
-        self.input.update()
         self.gameplay.update()
 
         self.popups.extend(self.gameplay.get_popups())
@@ -93,10 +96,12 @@ class Marathon(State):
             self.gameplay.score.lines = 0
 
             if self.goal == 0:
-                if self.gameplay.level == 15:
-                    self.popups.append(Popup("You won!", duration=3.0, color="green"))
-                    self.gameplay.game_over = True
-                    self.ending = True
+                if self.gameplay.level == 15 and not self.popup_game_over:
+                    self.popup_game_over = True
+                    self.popups.append(
+                        Popup("You won!", duration=3.0, color="green", gcolor="yellow")
+                    )
+                    self.gameplay.set_over()
                 else:
                     self.gameplay.score.lines_cleared = 0
                     self.gameplay.level += 1
