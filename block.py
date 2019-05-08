@@ -2,7 +2,6 @@ from functools import lru_cache
 from typing import Tuple
 
 import pygame as pg
-import pygame.gfxdraw
 
 import config
 from ctx import ctx
@@ -41,9 +40,9 @@ def color_get(color: RGB, brightness: float, alpha: float) -> RGB:
 def draw_block(
     color: str, x: float, y: float, size: float, alpha: float = 1.0
 ) -> None:
-    color = pg.Color(color)
 
-    color_rgb = color.r, color.g, color.b
+    color_pg = pg.Color(color)
+    color_rgb = color_pg.r, color_pg.g, color_pg.b
     color_down = color_get(color_rgb, 0.4, alpha)
     color_right = color_get(color_rgb, 0.6, alpha)
     color_middle = color_get(color_rgb, 0.8, alpha)
@@ -53,10 +52,10 @@ def draw_block(
     border = 0.1 * size
 
     # middle rect
-    pygame.draw.rect(ctx.surface, color_middle, pygame.Rect(x, y, size, size))
+    pg.draw.rect(ctx.surface, color_middle, pg.Rect(x, y, size, size))
 
     # upper trapezoid
-    pygame.draw.polygon(
+    pg.draw.polygon(
         ctx.surface,
         color_up,
         [
@@ -68,7 +67,7 @@ def draw_block(
     )
 
     # left trapezoid
-    pygame.draw.polygon(
+    pg.draw.polygon(
         ctx.surface,
         color_left,
         [
@@ -80,7 +79,7 @@ def draw_block(
     )
 
     # right trapezoid
-    pygame.draw.polygon(
+    pg.draw.polygon(
         ctx.surface,
         color_right,
         [
@@ -92,7 +91,7 @@ def draw_block(
     )
 
     # lower trapezoid
-    pygame.draw.polygon(
+    pg.draw.polygon(
         ctx.surface,
         color_down,
         [

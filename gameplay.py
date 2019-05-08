@@ -42,7 +42,7 @@ class Gameplay:
 
         self.matrix = Matrix()
         self.bag = Bag()
-        self.piece: Optional[Piece] = None
+        self.piece: Piece
         self.score = Score()
         self.input = Input(device)
         self.popups: List[Popup] = []
@@ -90,9 +90,6 @@ class Gameplay:
 
     def get_bag(self) -> Bag:
         return self.bag
-
-    def get_holder(self) -> Piece:
-        return self.holder
 
     def get_popups(self) -> List[Popup]:
         return self.popups
@@ -348,10 +345,10 @@ class Gameplay:
         self.bag.draw(x + 340, y + 70)
 
         if self.holder is not None:
-            holder_x = x - 65 - self.holder.shape.get_width(0) * 11.25
-            self.holder.shape.draw(0, holder_x, y + 60, 22.5, 1.0)
+            holder_x = int(x - 65 - self.holder.shape.get_width(0) * 11.25)
+            self.holder.shape.draw(0, holder_x, y + 60, 22, 1.0)
         else:
-            shape.SHAPE_HOLD_NONE.draw(0, x - 85, y + 60, 22.5, 1.0)
+            shape.SHAPE_HOLD_NONE.draw(0, x - 85, y + 60, 22, 1.0)
 
         Text.draw("Hold", centerx=x - 75, top=y + 20)
         Text.draw("Next", centerx=x + 370, top=y + 20)

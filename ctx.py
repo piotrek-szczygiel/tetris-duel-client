@@ -1,16 +1,14 @@
-from dataclasses import dataclass
+import pygame as pg
+from mixer import Mixer
 
 
-@dataclass
 class Ctx:
-    running = True
-    now = 0.0
+    def __init__(self) -> None:
+        self.running = True
+        self.now: float
 
-    surface = None
-    font = None
-    debug_font = None
-
-    mixer = None
+        self.surface: pg.surface.Surface
+        self.mixer: Mixer
 
 
 ctx = Ctx()

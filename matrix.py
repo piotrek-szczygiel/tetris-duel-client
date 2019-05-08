@@ -142,7 +142,9 @@ class Matrix:
                 self.grid[self.height + self.vanish - 1][x] = 0
 
     def get_ghost(self, piece: Piece) -> Piece:
-        ghost = Piece(piece.shape, piece.rotation, piece.x, piece.y, ghost=True)
+        ghost = Piece(
+            piece.shape, piece.rotation, piece.x, piece.y, ghost=True
+        )
         ghost.fall(self.collision)
         return ghost
 

@@ -1,4 +1,4 @@
-from typing import Callable, Dict, List, Tuple, Optional
+from typing import Callable, Dict, List, Tuple
 
 import pygame as pg
 
@@ -31,7 +31,6 @@ class Input:
 
     def __init__(self, device) -> None:
         self.device = device
-        self.joystick: Optional[pg.joystick.Joystick] = None
 
         joystick_count = pg.joystick.get_count()
         if self.device == Input.JOYSTICK1:

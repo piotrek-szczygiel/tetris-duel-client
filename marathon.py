@@ -45,6 +45,8 @@ class Marathon(State):
 
         self.popup_game_over = False
 
+        self.pause = False
+
     def initialize(self) -> None:
         self.gameplay.initialize()
 
@@ -108,7 +110,6 @@ class Marathon(State):
                     )
                     self.gameplay.set_over()
                 else:
-                    self.gameplay.score.lines_cleared = 0
                     self.gameplay.level += 1
                     self.goal = 5 * self.gameplay.level
                     self.gameplay.fall_interval = self.gravity[
@@ -120,11 +121,17 @@ class Marathon(State):
 
         Text().draw("Level", centerx=125, top=300)
         Text().draw(
-            str(self.gameplay.level), centerx=125, top=340, size=4, color="gold"
+            str(self.gameplay.level),
+            centerx=125,
+            top=340,
+            size=4,
+            color="gold",
         )
 
         Text().draw("Goal", centerx=125, top=450)
-        Text().draw(str(self.goal), centerx=125, top=490, size=4, color="green")
+        Text().draw(
+            str(self.goal), centerx=125, top=490, size=4, color="green"
+        )
 
         if self.current_popup:
             self.current_popup.draw(650, 250, center=False)

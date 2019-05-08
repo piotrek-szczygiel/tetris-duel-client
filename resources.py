@@ -4,7 +4,7 @@ import sys
 
 def path(filename: str) -> str:
     if getattr(sys, "frozen", False):
-        application_path = sys._MEIPASS
+        application_path = sys._MEIPASS  # type: ignore
     else:
         application_path = os.path.dirname(os.path.abspath(__file__))
 

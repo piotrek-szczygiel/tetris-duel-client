@@ -45,7 +45,7 @@ class Main:
                 else:
                     h = int(config.window_size[1] / config.window_size[0] * w)
 
-                ctx.display = pg.display.set_mode((w, h), pg.RESIZABLE)
+                self.display = pg.display.set_mode((w, h), pg.RESIZABLE)
                 self.last_size = w, h
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
