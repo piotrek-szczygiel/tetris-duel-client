@@ -38,7 +38,9 @@ def color_get(color: RGB, brightness: float, alpha: float) -> RGB:
     )
 
 
-def draw_block(color: str, x: float, y: float, size: float, alpha: float = 1.0) -> None:
+def draw_block(
+    color: str, x: float, y: float, size: float, alpha: float = 1.0
+) -> None:
     color = pg.Color(color)
 
     color_rgb = color.r, color.g, color.b

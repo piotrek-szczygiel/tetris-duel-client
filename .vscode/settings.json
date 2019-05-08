@@ -1,0 +1,7 @@
+{
+    "python.pythonPath": "C:\\Users\\Piotr\\.virtualenvs\\tetris-duel-client-NiFht6CS\\Scripts\\python.exe",
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "python.linting.enabled": true,
+    "python.formatting.provider": "black"
+}

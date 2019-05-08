@@ -1,15 +1,39 @@
-from pygame.locals import *
+from typing import List, Optional
+
+from pygame.locals import (
+    K_DOWN,
+    K_RIGHT,
+    K_LEFT,
+    K_UP,
+    K_x,
+    K_z,
+    K_LSHIFT,
+    K_SPACE,
+    K_c,
+)
 
 import shape
 from bag import Bag
 from ctx import ctx
-from input import *
 from matrix import Matrix
 from piece import Piece
 from popup import Popup
 from score import Score
 from t_spin import TSpin
 from text import Text
+
+from input import (
+    Input,
+    DPAD_RIGHT,
+    DPAD_LEFT,
+    DPAD_DOWN,
+    DPAD_UP,
+    BUTTON_RIGHT,
+    BUTTON_DOWN,
+    BUTTON_LEFT,
+    TRIGGER_LEFT,
+    TRIGGER_RIGHT,
+)
 
 
 class Gameplay:
@@ -194,7 +218,9 @@ class Gameplay:
         self.hold_lock = False
         self.t_spin = False
 
-        if self.matrix.collision(self.piece) or not self.matrix.lock(self.piece):
+        if self.matrix.collision(self.piece) or not self.matrix.lock(
+            self.piece
+        ):
             self.game_over = True
         else:
             if TSpin.detect(self.matrix, self.piece):
@@ -258,7 +284,9 @@ class Gameplay:
                         Popup("GO!", size=6, color="green", duration=0.4)
                     )
                 else:
-                    self.popups.append(Popup(str(self.countdown), size=6, duration=0.4))
+                    self.popups.append(
+                        Popup(str(self.countdown), size=6, duration=0.4)
+                    )
                 self.countdown -= 1
             return
 
@@ -293,7 +321,12 @@ class Gameplay:
                 elif self.piece.movement_counter >= 30:
                     self.movement_locked = True
                     self.popups.append(
-                        Popup("Locked!", duration=1.0, color="darkred", gcolor="black")
+                        Popup(
+                            "Locked!",
+                            duration=1.0,
+                            color="darkred",
+                            gcolor="black",
+                        )
                     )
 
         if self.piece.check_collision(0, 1, self.matrix.collision):

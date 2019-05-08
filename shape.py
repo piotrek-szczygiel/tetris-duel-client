@@ -7,7 +7,9 @@ Kicks = Tuple[List[Tuple[int, int]], List[Tuple[int, int]]]
 
 
 class ShapeGrid:
-    def __init__(self, x: int, y: int, width: int, height: int, grid: Grid) -> None:
+    def __init__(
+        self, x: int, y: int, width: int, height: int, grid: Grid
+    ) -> None:
         self.x = x
         self.y = y
         self.width = width
@@ -16,7 +18,9 @@ class ShapeGrid:
 
 
 class Shape:
-    def __init__(self, name: str, grid: List[ShapeGrid], kicks: List[Kicks]) -> None:
+    def __init__(
+        self, name: str, grid: List[ShapeGrid], kicks: List[Kicks]
+    ) -> None:
         self.name = name
         self.grid = grid
         self.kicks = kicks
@@ -30,7 +34,9 @@ class Shape:
     def get_rotations(self) -> int:
         return len(self.grid)
 
-    def draw(self, rotation: int, x: int, y: int, size: int, ratio: float) -> None:
+    def draw(
+        self, rotation: int, x: int, y: int, size: int, ratio: float
+    ) -> None:
         grid = self.grid[rotation]
         width, height = self.get_width(rotation), self.get_height(rotation)
 
@@ -40,7 +46,9 @@ class Shape:
                 if c == 0:
                     continue
 
-                draw_block(SHAPE_COLORS[c], x + mx * size, y + my * size, size, ratio)
+                draw_block(
+                    SHAPE_COLORS[c], x + mx * size, y + my * size, size, ratio
+                )
 
 
 # https://harddrop.com/wiki/SRS
@@ -49,7 +57,10 @@ KICKS_JLSTZ = [
     ([(-1, 0), (-1, -1), (0, 2), (-1, 2)], [(1, 0), (1, -1), (0, 2), (1, 2)]),
     ([(1, 0), (1, 1), (0, -2), (1, -2)], [(1, 0), (1, 1), (0, -2), (1, -2)]),
     ([(1, 0), (1, -1), (0, 2), (1, 2)], [(-1, 0), (-1, -1), (0, 2), (-1, 2)]),
-    ([(-1, 0), (-1, 1), (0, -2), (-1, -2)], [(-1, 0), (-1, 1), (0, -2), (-1, -2)]),
+    (
+        [(-1, 0), (-1, 1), (0, -2), (-1, -2)],
+        [(-1, 0), (-1, 1), (0, -2), (-1, -2)],
+    ),
 ]
 
 KICKS_I = [
@@ -80,10 +91,18 @@ GARBAGE_COLOR = 8
 SHAPE_I = Shape(
     "I",
     [
-        ShapeGrid(0, 1, 4, 1, [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]]),
-        ShapeGrid(2, 0, 1, 4, [[0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0]]),
-        ShapeGrid(0, 2, 4, 1, [[0, 0, 0, 0], [0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0]]),
-        ShapeGrid(1, 0, 1, 4, [[0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0]]),
+        ShapeGrid(
+            0, 1, 4, 1, [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]]
+        ),
+        ShapeGrid(
+            2, 0, 1, 4, [[0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0]]
+        ),
+        ShapeGrid(
+            0, 2, 4, 1, [[0, 0, 0, 0], [0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0]]
+        ),
+        ShapeGrid(
+            1, 0, 1, 4, [[0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0]]
+        ),
     ],
     KICKS_I,
 )

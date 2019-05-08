@@ -1,7 +1,7 @@
 from typing import Callable, Optional, List
 
 import pygame as pg
-from pygame.locals import *
+from pygame.locals import K_r, K_p, K_t, K_g
 
 import config
 from ctx import ctx
@@ -99,14 +99,21 @@ class Marathon(State):
                 if self.gameplay.level == 15 and not self.popup_game_over:
                     self.popup_game_over = True
                     self.popups.append(
-                        Popup("You won!", duration=3.0, color="green", gcolor="yellow")
+                        Popup(
+                            "You won!",
+                            duration=3.0,
+                            color="green",
+                            gcolor="yellow",
+                        )
                     )
                     self.gameplay.set_over()
                 else:
                     self.gameplay.score.lines_cleared = 0
                     self.gameplay.level += 1
                     self.goal = 5 * self.gameplay.level
-                    self.gameplay.fall_interval = self.gravity[self.gameplay.level - 1]
+                    self.gameplay.fall_interval = self.gravity[
+                        self.gameplay.level - 1
+                    ]
 
     def draw(self) -> None:
         self.gameplay.draw(200, 80)

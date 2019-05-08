@@ -12,7 +12,9 @@ class Score:
         self.lines = 0
         self.duel_lines = 0
 
-    def update_clear(self, level: int, rows_cleared: List[int], t_spin: bool) -> Popup:
+    def update_clear(
+        self, level: int, rows_cleared: List[int], t_spin: bool
+    ) -> Popup:
         rows = len(rows_cleared)
         lines = 0
         duel_lines = 0

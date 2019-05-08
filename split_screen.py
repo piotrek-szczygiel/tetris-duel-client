@@ -55,19 +55,27 @@ class SplitScreen(State):
                 self.gameplay2.set_over()
                 self.over = True
                 self.popups1.append(
-                    Popup("You lost!", duration=5.0, color="red", gcolor="orange")
+                    Popup(
+                        "You lost!", duration=5.0, color="red", gcolor="orange"
+                    )
                 )
                 self.popups2.append(
-                    Popup("You won!", duration=5.0, color="green", gcolor="yellow")
+                    Popup(
+                        "You won!", duration=5.0, color="green", gcolor="yellow"
+                    )
                 )
             elif self.gameplay2.is_over() and not self.gameplay1.is_over():
                 self.gameplay1.set_over()
                 self.over = True
                 self.popups1.append(
-                    Popup("You won!", duration=5.0, color="green", gcolor="yellow")
+                    Popup(
+                        "You won!", duration=5.0, color="green", gcolor="yellow"
+                    )
                 )
                 self.popups2.append(
-                    Popup("You lost!", duration=5.0, color="red", gcolor="orange")
+                    Popup(
+                        "You lost!", duration=5.0, color="red", gcolor="orange"
+                    )
                 )
             elif self.gameplay1.is_over() and self.gameplay2.is_over():
                 self.over = True

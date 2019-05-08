@@ -29,7 +29,9 @@ class Popup:
             return False
 
         if self.start + self.duration - self.fade < ctx.now:
-            ratio = (ctx.now - self.start - self.duration + self.fade) / self.fade
+            ratio = (
+                ctx.now - self.start - self.duration + self.fade
+            ) / self.fade
             self.alpha = 1.0 - ratio ** 2
 
         return True

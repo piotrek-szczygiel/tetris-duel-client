@@ -1,7 +1,10 @@
-from pygame.locals import *
+from pygame.locals import K_DOWN, K_UP, K_RETURN
 
+from typing import Callable
+
+import config
 from ctx import ctx
-from input import *
+from input import Input, DPAD_DOWN, DPAD_UP, BUTTON_DOWN, BUTTON_START
 from state import State
 from text import Text
 
@@ -68,7 +71,9 @@ class MainMenu(State):
     def draw(self) -> None:
         Text.draw("Tetris", centerx=640, top=30, size=10)
 
-        Text.draw("Duel", centerx=650, top=130, size=8, color="red", gcolor="yellow")
+        Text.draw(
+            "Duel", centerx=650, top=130, size=8, color="red", gcolor="yellow"
+        )
 
         colors = ["white" for _ in range(self.max_position + 1)]
         colors[self.position] = "gold"
