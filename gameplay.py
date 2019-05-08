@@ -2,6 +2,7 @@ from pygame.locals import *
 
 import shape
 from bag import Bag
+from ctx import ctx
 from input import *
 from matrix import Matrix
 from piece import Piece

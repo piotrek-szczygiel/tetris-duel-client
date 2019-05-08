@@ -2,7 +2,7 @@ from typing import Tuple
 
 import pygame as pg
 
-import ctx
+from ctx import ctx
 import ptext
 
 Position = Tuple[int, int]

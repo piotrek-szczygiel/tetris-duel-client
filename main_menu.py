@@ -1,5 +1,6 @@
 from pygame.locals import *
 
+from ctx import ctx
 from input import *
 from state import State
 from text import Text

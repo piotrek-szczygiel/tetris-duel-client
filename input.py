@@ -3,7 +3,7 @@ from typing import Callable, Dict, List, Tuple, Optional
 import pygame as pg
 
 import config
-import ctx
+from ctx import ctx
 
 Key = int
 

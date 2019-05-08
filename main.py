@@ -4,7 +4,7 @@ import time
 import pygame as pg
 
 import config
-import ctx
+from ctx import ctx
 import ptext
 import resources
 from main_menu import MainMenu

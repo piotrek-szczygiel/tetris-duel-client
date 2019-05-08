@@ -1,4 +1,4 @@
-import ctx
+from ctx import ctx
 from text import Text
 
 

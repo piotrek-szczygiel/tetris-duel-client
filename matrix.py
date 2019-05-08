@@ -5,7 +5,7 @@ from typing import List, Tuple
 import pygame as pg
 
 import config
-import ctx
+from ctx import ctx
 from block import draw_block
 from piece import Piece
 from shape import GARBAGE_COLOR, SHAPE_COLORS

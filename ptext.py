@@ -8,7 +8,7 @@
 from __future__ import division, print_function
 
 from math import ceil, sin, cos, radians, exp
-
+from collections import namedtuple
 import pygame
 
 DEFAULT_FONT_SIZE = 24
@@ -76,11 +76,7 @@ class _Options(object):
         return tuple(getattr(self, field) for field in sorted(self._allfields()))
 
     def getsuboptions(self, optclass):
-        return {
-            field: getattr(self, field)
-            for field in optclass._allfields()
-            if hasattr(self, field)
-        }
+        return {field: getattr(self, field) for field in optclass._allfields() if hasattr(self, field)}
 
 
 _default_surf_sentinel = ()
@@ -89,59 +85,20 @@ _default_underline_tag_sentinel = ()
 
 # Options argument for the draw function. Specifies both text styling and positioning.
 class _DrawOptions(_Options):
-    _fields = (
-        "pos",
-        "fontname",
-        "fontsize",
-        "sysfontname",
-        "antialias",
-        "bold",
-        "italic",
-        "underline",
-        "color",
-        "background",
-        "top",
-        "left",
-        "bottom",
-        "right",
-        "topleft",
-        "bottomleft",
-        "topright",
-        "bottomright",
-        "midtop",
-        "midleft",
-        "midbottom",
-        "midright",
-        "center",
-        "centerx",
-        "centery",
-        "width",
-        "widthem",
-        "lineheight",
-        "pspace",
-        "strip",
-        "align",
-        "owidth",
-        "ocolor",
-        "shadow",
-        "scolor",
-        "gcolor",
-        "shade",
-        "alpha",
-        "anchor",
-        "angle",
-        "underlinetag",
-        "surf",
-        "cache",
-    )
+    _fields = ("pos",
+               "fontname", "fontsize", "sysfontname", "antialias", "bold", "italic", "underline",
+               "color", "background",
+               "top", "left", "bottom", "right", "topleft", "bottomleft", "topright", "bottomright",
+               "midtop", "midleft", "midbottom", "midright", "center", "centerx", "centery",
+               "width", "widthem", "lineheight", "pspace", "strip", "align",
+               "owidth", "ocolor", "shadow", "scolor", "gcolor", "shade",
+               "alpha", "anchor", "angle",
+               "underlinetag",
+               "surf", "cache")
     _defaults = {
-        "antialias": True,
-        "alpha": 1.0,
-        "angle": 0,
+        "antialias": True, "alpha": 1.0, "angle": 0,
         "underlinetag": _default_underline_tag_sentinel,
-        "surf": _default_surf_sentinel,
-        "cache": True,
-    }
+        "surf": _default_surf_sentinel, "cache": True}
 
     def __init__(self, **kwargs):
         _Options.__init__(self, **kwargs)
@@ -152,54 +109,36 @@ class _DrawOptions(_Options):
     # Expand each 2-element position specifier and overwrite the corresponding 1-element
     # position specifiers.
     def expandposition(self):
-        if self.topleft:
-            self.left, self.top = self.topleft
-        if self.bottomleft:
-            self.left, self.bottom = self.bottomleft
-        if self.topright:
-            self.right, self.top = self.topright
-        if self.bottomright:
-            self.right, self.bottom = self.bottomright
-        if self.midtop:
-            self.centerx, self.top = self.midtop
-        if self.midleft:
-            self.left, self.centery = self.midleft
-        if self.midbottom:
-            self.centerx, self.bottom = self.midbottom
-        if self.midright:
-            self.right, self.centery = self.midright
-        if self.center:
-            self.centerx, self.centery = self.center
+        if self.topleft: self.left, self.top = self.topleft
+        if self.bottomleft: self.left, self.bottom = self.bottomleft
+        if self.topright: self.right, self.top = self.topright
+        if self.bottomright: self.right, self.bottom = self.bottomright
+        if self.midtop: self.centerx, self.top = self.midtop
+        if self.midleft: self.left, self.centery = self.midleft
+        if self.midbottom: self.centerx, self.bottom = self.midbottom
+        if self.midright: self.right, self.centery = self.midright
+        if self.center: self.centerx, self.centery = self.center
 
     # Update the pos and anchor fields, if unspecified, to be specified by the positional
     # keyword arguments.
     def expandanchor(self):
         x, y = self.pos or (None, None)
         hanchor, vanchor = self.anchor or (None, None)
-        if self.left is not None:
-            x, hanchor = self.left, 0
-        if self.centerx is not None:
-            x, hanchor = self.centerx, 0.5
-        if self.right is not None:
-            x, hanchor = self.right, 1
-        if self.top is not None:
-            y, vanchor = self.top, 0
-        if self.centery is not None:
-            y, vanchor = self.centery, 0.5
-        if self.bottom is not None:
-            y, vanchor = self.bottom, 1
+        if self.left is not None: x, hanchor = self.left, 0
+        if self.centerx is not None: x, hanchor = self.centerx, 0.5
+        if self.right is not None: x, hanchor = self.right, 1
+        if self.top is not None: y, vanchor = self.top, 0
+        if self.centery is not None: y, vanchor = self.centery, 0.5
+        if self.bottom is not None: y, vanchor = self.bottom, 1
         if x is None:
             raise ValueError("Unable to determine horizontal position")
         if y is None:
             raise ValueError("Unable to determine vertical position")
         self.pos = x, y
 
-        if self.align is None:
-            self.align = hanchor
-        if hanchor is None:
-            hanchor = DEFAULT_ANCHOR[0]
-        if vanchor is None:
-            vanchor = DEFAULT_ANCHOR[1]
+        if self.align is None: self.align = hanchor
+        if hanchor is None: hanchor = DEFAULT_ANCHOR[0]
+        if vanchor is None: vanchor = DEFAULT_ANCHOR[1]
         self.anchor = hanchor, vanchor
 
     # Unspecified surf values default to the display surface.
@@ -218,10 +157,8 @@ class _LayoutOptions(_DrawOptions):
         _Options.__init__(self, **kwargs)
         self.expandposition()
         self.expandanchor()
-        if self.lineheight is None:
-            self.lineheight = DEFAULT_LINE_HEIGHT
-        if self.pspace is None:
-            self.pspace = DEFAULT_PARAGRAPH_SPACE
+        if self.lineheight is None: self.lineheight = DEFAULT_LINE_HEIGHT
+        if self.pspace is None: self.pspace = DEFAULT_PARAGRAPH_SPACE
 
     def towrapoptions(self):
         return self.getsuboptions(_WrapOptions)
@@ -232,47 +169,20 @@ class _LayoutOptions(_DrawOptions):
 
 class _DrawboxOptions(_Options):
     _fields = (
-        "fontname",
-        "sysfontname",
-        "antialias",
-        "bold",
-        "italic",
-        "underline",
-        "color",
-        "background",
-        "lineheight",
-        "pspace",
-        "strip",
-        "align",
-        "owidth",
-        "ocolor",
-        "shadow",
-        "scolor",
-        "gcolor",
-        "shade",
-        "alpha",
-        "anchor",
-        "angle",
-        "surf",
-        "cache",
-    )
+        "fontname", "sysfontname", "antialias", "bold", "italic", "underline",
+        "color", "background",
+        "lineheight", "pspace", "strip", "align",
+        "owidth", "ocolor", "shadow", "scolor", "gcolor", "shade",
+        "alpha", "anchor", "angle", "surf", "cache")
     _defaults = {
-        "antialias": True,
-        "alpha": 1.0,
-        "angle": 0,
-        "anchor": (0.5, 0.5),
-        "surf": _default_surf_sentinel,
-        "cache": True,
-    }
+        "antialias": True, "alpha": 1.0, "angle": 0, "anchor": (0.5, 0.5),
+        "surf": _default_surf_sentinel, "cache": True}
 
     def __init__(self, **kwargs):
         _Options.__init__(self, **kwargs)
-        if self.fontname is None:
-            self.fontname = DEFAULT_FONT_NAME
-        if self.lineheight is None:
-            self.lineheight = DEFAULT_LINE_HEIGHT
-        if self.pspace is None:
-            self.pspace = DEFAULT_PARAGRAPH_SPACE
+        if self.fontname is None: self.fontname = DEFAULT_FONT_NAME
+        if self.lineheight is None: self.lineheight = DEFAULT_LINE_HEIGHT
+        if self.pspace is None: self.pspace = DEFAULT_PARAGRAPH_SPACE
 
     def todrawoptions(self):
         return self.getsuboptions(_DrawOptions)
@@ -282,85 +192,37 @@ class _DrawboxOptions(_Options):
 
 
 class _GetsurfOptions(_Options):
-    _fields = (
-        "fontname",
-        "fontsize",
-        "sysfontname",
-        "bold",
-        "italic",
-        "underline",
-        "width",
-        "widthem",
-        "strip",
-        "color",
-        "background",
-        "antialias",
-        "ocolor",
-        "owidth",
-        "scolor",
-        "shadow",
-        "gcolor",
-        "shade",
-        "alpha",
-        "align",
-        "lineheight",
-        "pspace",
-        "angle",
-        "underlinetag",
-        "cache",
-    )
+    _fields = ("fontname", "fontsize", "sysfontname", "bold", "italic", "underline", "width",
+               "widthem", "strip", "color", "background", "antialias", "ocolor", "owidth", "scolor",
+               "shadow", "gcolor", "shade", "alpha", "align", "lineheight", "pspace", "angle",
+               "underlinetag", "cache")
     _defaults = {
-        "antialias": True,
-        "alpha": 1.0,
-        "angle": 0,
+        "antialias": True, "alpha": 1.0, "angle": 0,
         "underlinetag": _default_underline_tag_sentinel,
-        "cache": True,
-    }
+        "cache": True}
 
     def __init__(self, **kwargs):
         _Options.__init__(self, **kwargs)
-        if self.fontname is None:
-            self.fontname = DEFAULT_FONT_NAME
-        if self.fontsize is None:
-            self.fontsize = DEFAULT_FONT_SIZE
+        if self.fontname is None: self.fontname = DEFAULT_FONT_NAME
+        if self.fontsize is None: self.fontsize = DEFAULT_FONT_SIZE
         self.fontsize = int(round(self.fontsize))
-        if self.align is None:
-            self.align = DEFAULT_ALIGN
+        if self.align is None: self.align = DEFAULT_ALIGN
         if self.align in ["left", "center", "right"]:
             self.align = [0, 0.5, 1][["left", "center", "right"].index(self.align)]
-        if self.lineheight is None:
-            self.lineheight = DEFAULT_LINE_HEIGHT
-        if self.pspace is None:
-            self.pspace = DEFAULT_PARAGRAPH_SPACE
+        if self.lineheight is None: self.lineheight = DEFAULT_LINE_HEIGHT
+        if self.pspace is None: self.pspace = DEFAULT_PARAGRAPH_SPACE
         self.color = _resolvecolor(self.color, DEFAULT_COLOR)
         self.background = _resolvecolor(self.background, DEFAULT_BACKGROUND)
         self.gcolor = _resolvecolor(self.gcolor, None)
-        if self.shade is None:
-            self.shade = DEFAULT_SHADE
+        if self.shade is None: self.shade = DEFAULT_SHADE
         if self.shade:
             self.gcolor = _applyshade(self.gcolor or self.color, self.shade)
             self.shade = 0
-        self.ocolor = (
-            None
-            if self.owidth is None
-            else _resolvecolor(self.ocolor, DEFAULT_OUTLINE_COLOR)
-        )
-        self.scolor = (
-            None
-            if self.shadow is None
-            else _resolvecolor(self.scolor, DEFAULT_SHADOW_COLOR)
-        )
+        self.ocolor = None if self.owidth is None else _resolvecolor(self.ocolor, DEFAULT_OUTLINE_COLOR)
+        self.scolor = None if self.shadow is None else _resolvecolor(self.scolor, DEFAULT_SHADOW_COLOR)
 
-        self._opx = (
-            None
-            if self.owidth is None
-            else ceil(self.owidth * self.fontsize * OUTLINE_UNIT)
-        )
-        self._spx = (
-            None
-            if self.shadow is None
-            else tuple(ceil(s * self.fontsize * SHADOW_UNIT) for s in self.shadow)
-        )
+        self._opx = None if self.owidth is None else ceil(self.owidth * self.fontsize * OUTLINE_UNIT)
+        self._spx = None if self.shadow is None else tuple(ceil(s * self.fontsize * SHADOW_UNIT) for s in self.shadow)
         self.alpha = _resolvealpha(self.alpha)
         self.angle = _resolveangle(self.angle)
         self.strip = DEFAULT_STRIP if self.strip is None else self.strip
@@ -369,17 +231,9 @@ class _GetsurfOptions(_Options):
             self.underlinetag = DEFAULT_UNDERLINE_TAG
 
     def checkinline(self):
-        if (
-            self.angle is None
-            or self._opx is not None
-            or self._spx is not None
-            or self.align != 0
-            or self.gcolor
-            or self.shade
-        ):
+        if self.angle is None or self._opx is not None or self._spx is not None or self.align != 0 or self.gcolor or self.shade:
             raise ValueError(
-                "Inline style not compatible with rotation, outline, drop shadow, gradient, or non-left-aligned text."
-            )
+                "Inline style not compatible with rotation, outline, drop shadow, gradient, or non-left-aligned text.")
 
     def towrapoptions(self):
         return self.getsuboptions(_WrapOptions)
@@ -389,18 +243,8 @@ class _GetsurfOptions(_Options):
 
 
 class _WrapOptions(_Options):
-    _fields = (
-        "fontname",
-        "fontsize",
-        "sysfontname",
-        "bold",
-        "italic",
-        "underline",
-        "width",
-        "widthem",
-        "firstline",
-        "strip",
-    )
+    _fields = ("fontname", "fontsize", "sysfontname",
+               "bold", "italic", "underline", "width", "widthem", "firstline", "strip")
     _defaults = {"firstline": 0}
 
     def __init__(self, **kwargs):
@@ -433,24 +277,12 @@ class _GetfontOptions(_Options):
             self.fontsize = DEFAULT_FONT_SIZE
 
     def getfontpath(self):
-        return (
-            self.fontname
-            if self.fontname is None
-            else FONT_NAME_TEMPLATE % self.fontname
-        )
+        return self.fontname if self.fontname is None else FONT_NAME_TEMPLATE % self.fontname
 
 
 class _FitsizeOptions(_Options):
-    _fields = (
-        "fontname",
-        "sysfontname",
-        "bold",
-        "italic",
-        "underline",
-        "lineheight",
-        "pspace",
-        "strip",
-    )
+    _fields = ("fontname", "sysfontname", "bold", "italic", "underline",
+               "lineheight", "pspace", "strip")
 
     def togetfontoptions(self):
         return self.getsuboptions(_GetfontOptions)
@@ -465,15 +297,10 @@ _font_cache = {}
 def getfont(**kwargs):
     options = _GetfontOptions(**kwargs)
     key = options.key()
-    if key in _font_cache:
-        return _font_cache[key]
+    if key in _font_cache: return _font_cache[key]
     if options.sysfontname is not None:
-        font = pygame.font.SysFont(
-            options.sysfontname,
-            options.fontsize,
-            options.bold or False,
-            options.italic or False,
-        )
+        font = pygame.font.SysFont(options.sysfontname, options.fontsize, options.bold or False,
+                                   options.italic or False)
     else:
         try:
             font = pygame.font.Font(options.getfontpath(), options.fontsize)
@@ -495,8 +322,7 @@ def wrap(text, **kwargs):
     getwidth = lambda line: font.size(line)[0]
     # Apparently Font.render accepts None for the text argument, in which case it's treated as the
     # empty string. We match that behavior here.
-    if text is None:
-        text = ""
+    if text is None: text = ""
     paras = text.replace("\t", "    ").split("\n")
     lines = []
     width = None if options.width is None else options.width - options.firstline
@@ -528,14 +354,14 @@ def wrap(text, **kwargs):
         line = para[:a]
         while a + 1 < len(para):
             # b is the next break point, with bline the corresponding line to add.
-            if " " not in para[a + 1 :]:
+            if " " not in para[a + 1:]:
                 b = len(para)
                 bline = para
             else:
                 # Find a space character that immediately follows a non-space character.
                 b = para.index(" ", a + 1)
                 while para[b - 1] == " ":
-                    if " " in para[b + 1 :]:
+                    if " " in para[b + 1:]:
                         b = para.index(" ", b + 1)
                     else:
                         b = len(para)
@@ -570,10 +396,8 @@ def wrap(text, **kwargs):
 
 # Return the largest integer in the range [xmin, xmax] such that f(x) is True.
 def _binarysearch(f, xmin=1, xmax=256):
-    if not f(xmin):
-        return xmin
-    if f(xmax):
-        return xmax
+    if not f(xmin): return xmin
+    if f(xmax): return xmax
     # xmin is the largest known value for which f(x) is True
     # xmax is the smallest known value for which f(x) is False
     while xmax - xmin > 1:
@@ -591,8 +415,7 @@ _fit_cache = {}
 def _fitsize(text, size, **kwargs):
     options = _FitsizeOptions(**kwargs)
     key = text, size, options.key()
-    if key in _fit_cache:
-        return _fit_cache[key]
+    if key in _fit_cache: return _fit_cache[key]
     width, height = size
 
     def fits(fontsize):
@@ -601,10 +424,7 @@ def _fitsize(text, size, **kwargs):
         w = max(font.size(line)[0] for line, jpara in texts)
         linesize = font.get_linesize() * options.lineheight
         paraspace = font.get_linesize() * options.pspace
-        h = (
-            int(round((len(texts) - 1) * linesize + texts[-1][1] * paraspace))
-            + font.get_height()
-        )
+        h = int(round((len(texts) - 1) * linesize + texts[-1][1] * paraspace)) + font.get_height()
         return w <= width and h <= height
 
     fontsize = _binarysearch(fits)
@@ -617,10 +437,8 @@ def _fitsize(text, size, **kwargs):
 # Both color and default can be a list, tuple, a color name, an HTML color format string, a hex
 # number string, or an integer pixel value. See pygame.Color constructor for specification.
 def _resolvecolor(color, default):
-    if color is None:
-        color = default
-    if color is None:
-        return None
+    if color is None: color = default
+    if color is None: return None
     try:
         return tuple(pygame.Color(color))
     except ValueError:
@@ -629,7 +447,10 @@ def _resolvecolor(color, default):
 
 def _applyshade(color, shade):
     f = exp(-0.4 * shade)
-    r, g, b = [min(max(int(round((c + 50) * f - 50)), 0), 255) for c in color[:3]]
+    r, g, b = [
+        min(max(int(round((c + 50) * f - 50)), 0), 255)
+        for c in color[:3]
+    ]
     return (r, g, b) + tuple(color[3:])
 
 
@@ -708,15 +529,12 @@ def _gradsurf(h, y0, y1, color0, color1):
     for y in range(h):
         f = min(max((y - y0) / (y1 - y0), 0), 1)
         g = 1 - f
-        surf.set_at(
-            (0, y),
-            (
-                int(round(g * r0 + f * r1)),
-                int(round(g * g0 + f * g1)),
-                int(round(g * b0 + f * b1)),
-                0,
-            ),
-        )
+        surf.set_at((0, y), (
+            int(round(g * r0 + f * r1)),
+            int(round(g * g0 + f * g1)),
+            int(round(g * b0 + f * b1)),
+            0
+        ))
     _grad_cache[key] = surf
     return surf
 
@@ -733,7 +551,7 @@ def _splitbytags(text, underline, underlinetag):
         a, tag = min((text.index(tag), tag) for tag in tagsin)
         if a > 0:
             yield text[:a], underline
-        text = text[a + len(tag) :]
+        text = text[a + len(tag):]
         if tag == underlinetag:
             underline = not underline
     if text:
@@ -767,22 +585,9 @@ def getsurf(text, **kwargs):
         surf = _fadesurf(getsurf(text, **options.update(alpha=1.0)), options.alpha)
     elif options._spx is not None:
         color = (0, 0, 0) if _istransparent(options.color) else options.color
-        surf0 = getsurf(
-            text,
-            **options.update(
-                background=(0, 0, 0, 0), color=color, shadow=None, scolor=None
-            )
-        )
-        ssurf = getsurf(
-            text,
-            **options.update(
-                background=(0, 0, 0, 0),
-                color=options.scolor,
-                shadow=None,
-                scolor=None,
-                gcolor=None,
-            )
-        )
+        surf0 = getsurf(text, **options.update(background=(0, 0, 0, 0), color=color, shadow=None, scolor=None))
+        ssurf = getsurf(text, **options.update(background=(0, 0, 0, 0), color=options.scolor, shadow=None, scolor=None,
+                                               gcolor=None))
         w0, h0 = surf0.get_size()
         sx, sy = options._spx
         surf = pygame.Surface((w0 + abs(sx), h0 + abs(sy))).convert_alpha()
@@ -797,16 +602,8 @@ def getsurf(text, **kwargs):
     elif options._opx is not None:
         color = (0, 0, 0) if _istransparent(options.color) else options.color
         surf0 = getsurf(text, **options.update(color=color, ocolor=None, owidth=None))
-        osurf = getsurf(
-            text,
-            **options.update(
-                color=options.ocolor,
-                ocolor=None,
-                owidth=None,
-                background=(0, 0, 0, 0),
-                gcolor=None,
-            )
-        )
+        osurf = getsurf(text, **options.update(color=options.ocolor, ocolor=None, owidth=None, background=(0, 0, 0, 0),
+                                               gcolor=None))
         w0, h0 = surf0.get_size()
         opx = options._opx
         surf = pygame.Surface((w0 + 2 * opx, h0 + 2 * opx)).convert_alpha()
@@ -826,16 +623,11 @@ def getsurf(text, **kwargs):
         tsplits = list(_splitbytags(text, options.underline, options.underlinetag))
         for jsplit, (text, options.underline) in enumerate(tsplits):
             strip = options.strip if jsplit == len(tsplits) - 1 else False
-            texts = wrap(
-                text, firstline=px, **options.update(strip=strip).towrapoptions()
-            )
+            texts = wrap(text, firstline=px, **options.update(strip=strip).towrapoptions())
             font = getfont(**options.togetfontoptions())
             linesize = font.get_linesize() * options.lineheight
             parasize = font.get_linesize() * options.pspace
-            lsurfs += [
-                font.render(line, options.antialias, options.color).convert_alpha()
-                for line, jpara in texts
-            ]
+            lsurfs += [font.render(line, options.antialias, options.color).convert_alpha() for line, jpara in texts]
             for k, (_, jpara) in enumerate(texts):
                 if k:
                     px = 0
@@ -856,30 +648,15 @@ def getsurf(text, **kwargs):
         if options.gcolor is not None:
             color = 0, 0, 0
         # pygame.Font.render does not allow passing None as an argument value for background.
-        if (
-            options.background is None
-            or (len(options.background) > 3 and options.background[3] == 0)
-            or options.gcolor is not None
-        ):
-            lsurfs = [
-                font.render(text, options.antialias, color).convert_alpha()
-                for text, jpara in texts
-            ]
+        if options.background is None or (
+                len(options.background) > 3 and options.background[3] == 0) or options.gcolor is not None:
+            lsurfs = [font.render(text, options.antialias, color).convert_alpha() for text, jpara in texts]
         else:
-            lsurfs = [
-                font.render(
-                    text, options.antialias, color, options.background
-                ).convert_alpha()
-                for text, jpara in texts
-            ]
+            lsurfs = [font.render(text, options.antialias, color, options.background).convert_alpha() for text, jpara in
+                      texts]
         if options.gcolor is not None:
-            gsurf0 = _gradsurf(
-                lsurfs[0].get_height(),
-                0.5 * font.get_ascent(),
-                font.get_ascent(),
-                options.color,
-                options.gcolor,
-            )
+            gsurf0 = _gradsurf(lsurfs[0].get_height(), 0.5 * font.get_ascent(), font.get_ascent(), options.color,
+                               options.gcolor)
             for lsurf in lsurfs:
                 gsurf = pygame.transform.scale(gsurf0, lsurf.get_size())
                 lsurf.blit(gsurf, (0, 0), None, pygame.BLEND_RGBA_ADD)
@@ -889,10 +666,7 @@ def getsurf(text, **kwargs):
             w = max(lsurf.get_width() for lsurf in lsurfs)
             linesize = font.get_linesize() * options.lineheight
             parasize = font.get_linesize() * options.pspace
-            ys = [
-                int(round(k * linesize + jpara * parasize))
-                for k, (text, jpara) in enumerate(texts)
-            ]
+            ys = [int(round(k * linesize + jpara * parasize)) for k, (text, jpara) in enumerate(texts)]
             h = ys[-1] + font.get_height()
             surf = pygame.Surface((w, h)).convert_alpha()
             surf.fill(options.background or (0, 0, 0, 0))
@@ -943,10 +717,7 @@ def layout(text, **kwargs):
     sw = max(rect.w for rect in rects)
     linesize = fl * options.lineheight
     parasize = fl * options.pspace
-    ys = [
-        int(round(k * linesize + jpara * parasize))
-        for k, (text, jpara) in enumerate(texts)
-    ]
+    ys = [int(round(k * linesize + jpara * parasize)) for k, (text, jpara) in enumerate(texts)]
     sh = ys[-1] + fl
     for y, rect in zip(ys, rects):
         rect.x = int(round(options.align * (sw - rect.w)))
@@ -986,9 +757,7 @@ def drawbox(text, rect, **kwargs):
     x = rect.x + hanchor * rect.width
     y = rect.y + vanchor * rect.height
     fontsize = _fitsize(text, rect.size, **options.tofitsizeoptions())
-    return draw(
-        text, pos=(x, y), width=rect.width, fontsize=fontsize, **options.todrawoptions()
-    )
+    return draw(text, pos=(x, y), width=rect.width, fontsize=fontsize, **options.todrawoptions())
 
 
 def clean():

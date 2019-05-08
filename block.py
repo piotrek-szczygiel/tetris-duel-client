@@ -5,7 +5,7 @@ import pygame as pg
 import pygame.gfxdraw
 
 import config
-import ctx
+from ctx import ctx
 
 RGB = Tuple[float, float, float]
 

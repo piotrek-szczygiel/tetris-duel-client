@@ -4,7 +4,7 @@ import pygame as pg
 from pygame.locals import *
 
 import config
-import ctx
+from ctx import ctx
 from gameplay import Gameplay
 from input import Input
 from popup import Popup
