@@ -76,10 +76,13 @@ class Main:
             if not self.handle_events():
                 return
 
+            if self.state.is_done():
+                self.switch_state("MainMenu")
+
             ctx.now = time.monotonic()
             self.state.update(self.switch_state)
 
-            ctx.surface.fill(pg.Color(config.background))
+            ctx.surface.fill(pg.Color(*config.background))
             self.state.draw()
 
             fps = "FPS: " + "{0:.1f}".format(fps_clock.get_fps())

@@ -19,6 +19,9 @@ class MainMenu(State):
 
         self.entered = False
 
+    def is_done(self) -> bool:
+        return False
+
     def initialize(self) -> None:
         if config.input_player1 == Input.KEYBOARD:
             self.input.subscribe_list(

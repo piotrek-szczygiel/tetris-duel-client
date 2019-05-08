@@ -4,6 +4,10 @@ from typing import Callable
 
 class State(ABC):
     @abstractmethod
+    def is_done(self) -> bool:
+        pass
+
+    @abstractmethod
     def initialize(self) -> None:
         pass
 

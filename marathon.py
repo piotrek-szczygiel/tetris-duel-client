@@ -45,7 +45,11 @@ class Marathon(State):
 
         self.popup_game_over = False
 
+        self.done = False
         self.pause = False
+
+    def is_done(self) -> bool:
+        return self.done
 
     def initialize(self) -> None:
         self.gameplay.initialize()
@@ -86,6 +90,8 @@ class Marathon(State):
         elif not self.popup_game_over:
             self.popup_game_over = True
             self.popups.append(Popup("Game over!", duration=3.0, color="red"))
+        elif self.gameplay.is_over() and not self.current_popup:
+            self.done = True
 
         self.gameplay.update()
 
