@@ -27,7 +27,6 @@ from input import (
     DPAD_RIGHT,
     DPAD_LEFT,
     DPAD_DOWN,
-    DPAD_UP,
     BUTTON_RIGHT,
     BUTTON_DOWN,
     BUTTON_LEFT,
@@ -119,7 +118,6 @@ class Gameplay:
                     (DPAD_RIGHT, self.action_right, True),
                     (DPAD_LEFT, self.action_left, True),
                     (TRIGGER_RIGHT, self.action_rotate_right),
-                    (DPAD_UP, self.action_rotate_right),
                     (TRIGGER_LEFT, self.action_rotate_left),
                     (BUTTON_RIGHT, self.action_soft_fall),
                     (BUTTON_DOWN, self.action_hard_fall),
@@ -216,7 +214,7 @@ class Gameplay:
         self.t_spin = False
 
         if self.matrix.collision(self.piece) or not self.matrix.lock(
-            self.piece
+                self.piece
         ):
             self.game_over = True
         else:
@@ -280,6 +278,7 @@ class Gameplay:
                     self.popups.append(
                         Popup("GO!", size=6, color="green", duration=0.4)
                     )
+                    ctx.mixer.play("go")
                 else:
                     self.popups.append(
                         Popup(str(self.countdown), size=6, duration=0.4)
@@ -302,8 +301,8 @@ class Gameplay:
                 self.last_lock_cancel = ctx.now
 
                 if (
-                    self.piece.movement_counter >= 15
-                    and not self.movement_locked_warning
+                        self.piece.movement_counter >= 15
+                        and not self.movement_locked_warning
                 ):
                     self.movement_locked_warning = True
                     self.popups.append(

@@ -23,6 +23,7 @@ class Mixer:
             "hold_fail",
             "line_fall",
             "garbage",
+            "go",
             "hard_fall",
             "change",
             "choose",
