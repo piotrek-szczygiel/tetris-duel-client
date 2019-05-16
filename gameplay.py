@@ -214,7 +214,7 @@ class Gameplay:
         self.t_spin = False
 
         if self.matrix.collision(self.piece) or not self.matrix.lock(
-                self.piece
+            self.piece
         ):
             self.game_over = True
         else:
@@ -301,8 +301,8 @@ class Gameplay:
                 self.last_lock_cancel = ctx.now
 
                 if (
-                        self.piece.movement_counter >= 15
-                        and not self.movement_locked_warning
+                    self.piece.movement_counter >= 15
+                    and not self.movement_locked_warning
                 ):
                     self.movement_locked_warning = True
                     self.popups.append(
