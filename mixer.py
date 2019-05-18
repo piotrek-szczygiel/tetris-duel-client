@@ -13,20 +13,25 @@ class Mixer:
         pg.mixer.init(44100, -16, 2, 1024)
 
         for name in [
-            "move",
-            "rotate",
+            "change",
+            "choose",
+            "countdown",
             "erase1",
             "erase2",
             "erase3",
             "erase4",
-            "hold",
-            "hold_fail",
-            "line_fall",
+            "gameover",
             "garbage",
             "go",
             "hard_fall",
-            "change",
-            "choose",
+            "hold",
+            "hold_fail",
+            "line_fall",
+            "lock_warning",
+            "main_theme",
+            "move",
+            "rotate",
+            "soft_fall",
         ]:
             self.load_sound(name, name + ".wav")
             self.sounds[name].set_volume(0.1)

@@ -151,7 +151,7 @@ class Gameplay:
     def action_soft_fall(self) -> None:
         rows = self.piece.fall(self.matrix.collision)
         if rows > 0:
-            ctx.mixer.play("move")
+            ctx.mixer.play("soft_fall")
             self.reset_fall()
             self.score.update_soft_drop(rows)
 
@@ -273,6 +273,7 @@ class Gameplay:
         if self.countdown >= 0:
             if ctx.now - self.countdown_last > 1.0:
                 self.countdown_last = ctx.now
+                ctx.mixer.play("countdown")
 
                 if self.countdown == 0:
                     self.popups.append(
@@ -314,6 +315,8 @@ class Gameplay:
                             gcolor="darkred",
                         )
                     )
+                    ctx.mixer.play("lock_warning")
+
                 elif self.piece.movement_counter >= 30:
                     self.movement_locked = True
                     self.popups.append(
