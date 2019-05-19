@@ -10,6 +10,7 @@ import resources
 from main_menu import MainMenu
 from marathon import Marathon
 from mixer import Mixer
+from online import Online
 from split_screen import SplitScreen
 from state import State
 from text import Text
@@ -19,10 +20,13 @@ class Main:
     def __init__(self) -> None:
         self.display: pg.Surface
         self.state: State
-        self.last_size = config.window_size
 
     def switch_state(self, state: str) -> None:
-        if state == "Duel":
+        ctx.mixer.stop_music()
+
+        if state == "Online":
+            self.state = Online()
+        elif state == "Duel":
             self.state = SplitScreen()
         elif state == "Marathon":
             self.state = Marathon()
@@ -36,23 +40,22 @@ class Main:
             if event.type == pg.QUIT:
                 ctx.running = False
                 return False
-            elif event.type == pg.VIDEORESIZE:
-                w, h = event.dict["size"]
-                old_w, old_h = self.last_size
-
-                if h != old_h:
-                    w = int(config.window_size[0] / config.window_size[1] * h)
-                else:
-                    h = int(config.window_size[1] / config.window_size[0] * w)
-
-                self.display = pg.display.set_mode((w, h), pg.RESIZABLE)
-                self.last_size = w, h
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
                     self.switch_state("MainMenu")
                 elif event.key == pg.K_q:
                     ctx.running = False
                     return False
+                elif event.key in (pg.K_EQUALS, pg.K_PLUS):
+                    w, h = self.display.get_size()
+                    w = int(w * 1.1)
+                    h = int(h * 1.1)
+                    self.display = pg.display.set_mode((w, h))
+                elif event.key in (pg.K_MINUS, pg.K_UNDERSCORE):
+                    w, h = self.display.get_size()
+                    w = int(w * 0.9)
+                    h = int(h * 0.9)
+                    self.display = pg.display.set_mode((w, h))
 
         return True
 
@@ -64,7 +67,7 @@ class Main:
 
         pg.init()
 
-        self.display = pg.display.set_mode(config.window_size, pg.RESIZABLE)
+        self.display = pg.display.set_mode(config.window_size)
         ctx.surface = pg.Surface(config.window_size)
         ptext.FONT_NAME_TEMPLATE = resources.path("%s.ttf")
 
