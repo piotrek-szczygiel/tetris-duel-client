@@ -15,7 +15,7 @@ class MainMenu(State):
 
         self.position = 0
         self.min_position = 0
-        self.max_position = 2
+        self.max_position = 3
 
         self.entered = False
 
@@ -69,6 +69,8 @@ class MainMenu(State):
             elif self.position == 1:
                 switch_state("Duel")
             elif self.position == 2:
+                switch_state("Online")
+            elif self.position == 3:
                 ctx.running = False
 
     def draw(self) -> None:
@@ -83,7 +85,8 @@ class MainMenu(State):
 
         Text.draw("Marathon", centerx=650, top=300, color=colors[0])
         Text.draw("Split Screen", centerx=650, top=350, color=colors[1])
-        Text.draw("Quit", centerx=650, top=400, color=colors[2])
+        Text.draw("Duel Online", centerx=650, top=400, color=colors[2])
+        Text.draw("Quit", centerx=650, top=450, color=colors[3])
 
         x = 460
         y = 305 + self.position * 50

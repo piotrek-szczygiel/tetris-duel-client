@@ -8,5 +8,5 @@ ui_text = "white"
 key_repeat_delay = 0.15
 key_repeat_interval = 0.05
 
-input_player1 = Input.JOYSTICK1
-input_player2 = Input.KEYBOARD
+input_player1 = Input.KEYBOARD
+input_player2 = Input.JOYSTICK1
