@@ -101,10 +101,6 @@ class Gameplay:
         self.popups = []
 
     def initialize(self) -> None:
-        pg.mixer.music.load(path("main_theme.ogg"))
-        pg.mixer.music.set_volume(0.25)
-        pg.mixer.music.play(-1)
-
         if self.device == Input.KEYBOARD:
             self.input.subscribe_list(
                 [
@@ -290,6 +286,9 @@ class Gameplay:
                         Popup("GO!", size=6, color="green", duration=0.4)
                     )
                     ctx.mixer.play("go")
+                    pg.mixer.music.load(path("main_theme.ogg"))
+                    pg.mixer.music.set_volume(0.25)
+                    pg.mixer.music.play(-1)
                 else:
                     self.popups.append(
                         Popup(str(self.countdown), size=6, duration=0.4)
