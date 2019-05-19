@@ -41,3 +41,11 @@ class Mixer:
     def play(self, sound: str) -> None:
         if sound in self.sounds:
             self.sounds[sound].play()
+
+    def play_music(self, music: str) -> None:
+        pg.mixer.music.load(path(music + ".ogg"))
+        pg.mixer.music.set_volume(0.2)
+        pg.mixer.music.play(-1)
+
+    def stop_music(self) -> None:
+        pg.mixer.music.fadeout(100)
