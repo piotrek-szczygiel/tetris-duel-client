@@ -28,7 +28,6 @@ class Mixer:
             "hold_fail",
             "line_fall",
             "lock_warning",
-            "main_theme",
             "move",
             "rotate",
             "soft_fall",

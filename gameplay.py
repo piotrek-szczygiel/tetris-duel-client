@@ -1,5 +1,9 @@
 from typing import List, Optional
 
+import pygame as pg
+
+from resources import path
+
 from pygame.locals import (
     K_DOWN,
     K_RIGHT,
@@ -97,6 +101,10 @@ class Gameplay:
         self.popups = []
 
     def initialize(self) -> None:
+        pg.mixer.music.load(path("main_theme.ogg"))
+        pg.mixer.music.set_volume(0.25)
+        pg.mixer.music.play(-1)
+
         if self.device == Input.KEYBOARD:
             self.input.subscribe_list(
                 [
@@ -224,6 +232,7 @@ class Gameplay:
             self.new_piece()
 
         if self.game_over:
+            pg.mixer.music.stop()
             return
 
         rows = self.matrix.get_full_rows()
@@ -268,6 +277,7 @@ class Gameplay:
                     self.garbage_adding = False
 
         if self.game_over:
+            pg.mixer.music.stop()
             return
 
         if self.countdown >= 0:
