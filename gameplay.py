@@ -280,6 +280,7 @@ class Gameplay:
                     self.garbage_adding = False
 
         if self.game_over:
+            self.send = True
             return
 
         if self.countdown >= 0:

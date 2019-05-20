@@ -33,6 +33,7 @@ class Online(State):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.settimeout(2.0)
 
+        self.cancel = False
         self.done = False
         self.game_over = False
 
@@ -55,6 +56,8 @@ class Online(State):
         if self.waiting:
             self.done = True
             self.socket.close()
+        else:
+            self.cancel = True
 
     def update(self, switch_state: Callable) -> None:
         if not self.current_popup1 and self.popups1:
@@ -156,7 +159,7 @@ class Online(State):
             self.game_over
             and not self.current_popup1
             and not self.current_popup2
-        ):
+        ) or (self.game_over and self.cancel):
             self.socket.close()
             self.done = True
             return
