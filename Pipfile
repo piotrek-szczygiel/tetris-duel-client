@@ -11,6 +11,8 @@ rope = "*"
 
 [packages]
 pygame = "==1.*"
+jsonpickle = "*"
+lz4 = "*"
 
 [requires]
 python_version = "3.7"

@@ -10,3 +10,5 @@ key_repeat_interval = 0.05
 
 input_player1 = Input.KEYBOARD
 input_player2 = Input.JOYSTICK1
+
+server = ("localhost", 7777)

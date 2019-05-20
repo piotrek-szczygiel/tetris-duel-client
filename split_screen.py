@@ -1,8 +1,6 @@
 from random import randint
 from typing import Callable, List, Optional
 
-import pygame as pg
-
 import config
 from gameplay import Gameplay
 from popup import Popup
@@ -14,14 +12,7 @@ class SplitScreen(State):
         self.gameplay1 = Gameplay(config.input_player1)
         self.gameplay2 = Gameplay(config.input_player2)
 
-        self.clearing = False
-        self.clearing_rows: List[int] = []
-        self.clearing_last: float
-
         self.ending = False
-
-        self.text_hold: pg.Surface
-        self.text_next: pg.Surface
 
         self.popups1: List[Popup] = []
         self.popups2: List[Popup] = []

@@ -57,6 +57,8 @@ class Gameplay:
         self.last_fall: float
         self.fall_interval = 1.0
 
+        self.last_piece_movement_counter = 0
+
         self.last_lock_cancel: float
         self.touched_floor = False
         self.movement_counter = 0
@@ -73,6 +75,8 @@ class Gameplay:
         self.garbage_hole = 0
         self.garbage_left = 0
         self.garbage_last: float
+
+        self.send = False
 
     def is_over(self) -> bool:
         return self.game_over
@@ -250,6 +254,7 @@ class Gameplay:
     def update(self) -> None:
         if self.clearing:
             if ctx.now - self.clearing_last > 0.02:
+                self.send = True
                 self.matrix.collapse_row(self.clearing_rows.pop(0))
                 self.clearing_last = ctx.now
                 ctx.mixer.play("line_fall")
@@ -258,6 +263,7 @@ class Gameplay:
                     self.clearing = False
         elif self.garbage_adding:
             if ctx.now - self.garbage_last > 0.03:
+                self.send = True
                 self.matrix.add_garbage(self.garbage_hole)
                 self.garbage_last = ctx.now
                 ctx.mixer.play("garbage")
@@ -291,6 +297,11 @@ class Gameplay:
 
         if not self.movement_locked:
             self.input.update()
+
+            if self.piece.movement_counter != self.last_piece_movement_counter:
+                self.send = True
+
+            self.last_piece_movement_counter = self.piece.movement_counter
 
         if self.piece.touching_floor and not self.movement_locked:
             if not self.touched_floor:
@@ -332,16 +343,18 @@ class Gameplay:
 
         if self.piece.check_collision(0, 1, self.matrix.collision):
             if ctx.now - self.last_lock_cancel > 1.0:
+                self.send = True
                 self.lock_piece()
 
         if ctx.now - self.last_fall > self.fall_interval:
             if self.piece.move(0, 1, self.matrix.collision):
+                self.send = True
                 self.reset_fall()
 
-    def draw(self, x: int, y: int) -> None:
+    def draw(self, x: int, y: int, draw_piece=True) -> None:
         self.matrix.draw(x, y)
 
-        if self.piece:
+        if draw_piece and self.piece:
             self.matrix.get_ghost(self.piece).draw(x, y)
             self.piece.draw(x, y)
 

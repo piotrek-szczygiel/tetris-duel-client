@@ -1,6 +1,5 @@
 from typing import Callable, Optional, List
 
-import pygame as pg
 from pygame.locals import K_r, K_p, K_t, K_g
 
 import config
@@ -36,9 +35,6 @@ class Marathon(State):
         ]
 
         self.goal = 5
-
-        self.text_hold: pg.Surface
-        self.text_next: pg.Surface
 
         self.popups: List[Popup] = []
         self.current_popup: Optional[Popup] = None
