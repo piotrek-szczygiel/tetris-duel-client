@@ -135,7 +135,9 @@ class Online(State):
             and not self.current_popup1
             and not self.current_popup2
         ):
+            self.socket.close()
             self.done = True
+            return
 
         self.popups1.extend(self.gameplay1.get_popups())
         self.gameplay1.clear_popups()

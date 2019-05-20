@@ -40,12 +40,7 @@ class Main:
                 ctx.running = False
                 return False
             elif event.type == pg.KEYDOWN:
-                if event.key == pg.K_ESCAPE:
-                    self.switch_state("MainMenu")
-                elif event.key == pg.K_q:
-                    ctx.running = False
-                    return False
-                elif event.key in (pg.K_EQUALS, pg.K_PLUS):
+                if event.key in (pg.K_EQUALS, pg.K_PLUS):
                     w, h = self.display.get_size()
                     w = int(w * 1.1)
                     h = int(h * 1.1)

@@ -1,5 +1,6 @@
 from typing import List, Optional
 from pygame.locals import (
+    K_ESCAPE,
     K_DOWN,
     K_RIGHT,
     K_LEFT,
@@ -31,6 +32,7 @@ from input import (
     BUTTON_LEFT,
     TRIGGER_LEFT,
     TRIGGER_RIGHT,
+    BUTTON_SELECT,
 )
 
 
@@ -103,6 +105,7 @@ class Gameplay:
         if self.device == Input.KEYBOARD:
             self.input.subscribe_list(
                 [
+                    (K_ESCAPE, self.action_quit),
                     (K_DOWN, self.action_down, True),
                     (K_RIGHT, self.action_right, True),
                     (K_LEFT, self.action_left, True),
@@ -117,6 +120,7 @@ class Gameplay:
         elif self.device in (Input.JOYSTICK1, Input.JOYSTICK2):
             self.input.subscribe_list(
                 [
+                    (BUTTON_SELECT, self.action_quit),
                     (DPAD_DOWN, self.action_down, True),
                     (DPAD_RIGHT, self.action_right, True),
                     (DPAD_LEFT, self.action_left, True),
@@ -129,6 +133,10 @@ class Gameplay:
             )
 
         self.new_piece()
+
+    def action_quit(self) -> None:
+        self.game_over = True
+        self.send = True
 
     def action_down(self) -> None:
         if self.piece.move(0, 1, self.matrix.collision):
@@ -276,6 +284,7 @@ class Gameplay:
 
         if self.countdown >= 0:
             if ctx.now - self.countdown_last > 1.0:
+                self.send = True
                 self.countdown_last = ctx.now
                 ctx.mixer.play("countdown")
 
@@ -286,11 +295,11 @@ class Gameplay:
 
                     ctx.mixer.play("go")
                     ctx.mixer.play_music("main_theme")
-
                 else:
                     self.popups.append(
                         Popup(str(self.countdown), size=6, duration=0.4)
                     )
+
                 self.countdown -= 1
             return
 
@@ -317,6 +326,7 @@ class Gameplay:
                     self.piece.movement_counter >= 15
                     and not self.movement_locked_warning
                 ):
+                    self.send = True
                     self.movement_locked_warning = True
                     self.popups.append(
                         Popup(
@@ -330,6 +340,8 @@ class Gameplay:
                     ctx.mixer.play("lock_warning")
 
                 elif self.piece.movement_counter >= 30:
+                    self.send = True
+
                     self.movement_locked = True
                     self.popups.append(
                         Popup(
