@@ -2,7 +2,7 @@ from input import Input
 
 window_size = 1300, 700
 
-background = (0, 0, 20)
+background = (0, 0, 16)
 ui_text = "white"
 
 key_repeat_delay = 0.15

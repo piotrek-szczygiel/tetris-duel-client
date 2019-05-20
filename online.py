@@ -1,4 +1,5 @@
 import socket
+from pygame.locals import K_ESCAPE
 from random import randint
 from typing import Optional, Callable, List
 import jsonpickle
@@ -7,6 +8,7 @@ import select
 import config
 from gameplay import Gameplay
 from popup import Popup
+from input import Input
 from state import State
 
 BUFFER_SIZE = 1024
@@ -14,6 +16,8 @@ BUFFER_SIZE = 1024
 
 class Online(State):
     def __init__(self) -> None:
+        self.input = Input(Input.KEYBOARD)
+
         self.gameplay1 = Gameplay(config.input_player1)
         self.gameplay2 = Gameplay(config.input_player1)
 
@@ -32,9 +36,6 @@ class Online(State):
         self.done = False
         self.game_over = False
 
-    def __del__(self) -> None:
-        self.socket.close()
-
     def is_done(self) -> bool:
         return self.done
 
@@ -42,11 +43,18 @@ class Online(State):
         self.gameplay1.initialize()
         self.gameplay2.initialize()
 
+        self.input.subscribe_list([(K_ESCAPE, self.waiting_cancel)])
+
         try:
             self.socket.connect(config.server)
         except (ConnectionRefusedError, socket.timeout):
             print("unable to connect to server")
             self.done = True
+
+    def waiting_cancel(self) -> None:
+        if self.waiting:
+            self.done = True
+            self.socket.close()
 
     def update(self, switch_state: Callable) -> None:
         if not self.current_popup1 and self.popups1:
@@ -61,6 +69,10 @@ class Online(State):
             if not self.current_popup2.update():
                 self.current_popup2 = None
 
+        self.input.update()
+        if self.done:
+            return
+
         if not self.waiting:
             self.gameplay1.update()
 
@@ -70,8 +82,15 @@ class Online(State):
 
         if self.waiting:
             if self.socket in read:
-                if self.socket.recv(BUFFER_SIZE) == b"go!":
+                buffer = self.socket.recv(BUFFER_SIZE)
+                if buffer == b"go":
                     self.waiting = False
+                    self.currnet_popup2 = None
+                elif buffer == b"ping":
+                    self.socket.sendall(b"pong")
+                elif buffer == b"":
+                    print("server disconnected")
+                    self.done = True
 
             return
 
@@ -80,14 +99,17 @@ class Online(State):
                 self.gameplay2 = jsonpickle.decode(
                     protocol.recv(self.socket).decode()
                 )
-            except RuntimeError:
+            except (RuntimeError, ConnectionResetError):
                 error = [self.socket]
 
         if self.socket in write and self.gameplay1.send:
             self.gameplay1.send = False
-            protocol.send(
-                self.socket, jsonpickle.encode(self.gameplay1).encode()
-            )
+            try:
+                protocol.send(
+                    self.socket, jsonpickle.encode(self.gameplay1).encode()
+                )
+            except ConnectionResetError:
+                error = [self.socket]
 
         if self.socket in error:
             print("socket error")
