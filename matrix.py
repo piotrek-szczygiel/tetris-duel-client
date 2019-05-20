@@ -178,7 +178,7 @@ class Matrix:
         width = math.ceil(starting_w / display_w)
 
         size = 30
-        grid_color = (64, 64, 64)
+        grid_color = (32, 32, 32)
 
         for row in range(self.height + 1):
             pg.draw.line(

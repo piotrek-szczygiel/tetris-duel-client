@@ -2,6 +2,8 @@ import socket
 from pygame.locals import K_ESCAPE
 from random import randint
 from typing import Optional, Callable, List
+from text import Text
+from ctx import ctx
 import jsonpickle
 import protocol
 import select
@@ -27,6 +29,8 @@ class Online(State):
         self.current_popup2: Optional[Popup] = None
 
         self.waiting = True
+        self.waiting_cycle = 0
+        self.last_waiting_cycle = ctx.now
         self.ending = False
 
         self.buffer = b""
@@ -182,9 +186,20 @@ class Online(State):
         self.gameplay2.draw(880, 80, draw_piece=not self.waiting)
 
         if self.waiting:
-            self.current_popup2 = Popup(
-                "waiting\nfor\nopponent\n...", size=4, duration=0.25
+            Text.draw("Awaiting", size=4, centerx=880 + 155, top=220)
+            Text.draw(
+                "opponent", size=4, gcolor="red", centerx=880 + 155, top=280
             )
+
+            string = "." * self.waiting_cycle
+
+            Text.draw(
+                string, size=8, gcolor="black", centerx=880 + 155, top=350
+            )
+
+            if ctx.now - self.last_waiting_cycle > 0.5:
+                self.last_waiting_cycle = ctx.now
+                self.waiting_cycle = (self.waiting_cycle + 1) % 4
 
         if self.current_popup1:
             self.current_popup1.draw(130 + 155, 80 + 220)
