@@ -23,6 +23,8 @@ class MainMenu(State):
         return False
 
     def initialize(self) -> None:
+        ctx.mixer.play_music("menu_theme")
+
         if config.input_player1 == Input.KEYBOARD:
             self.input.subscribe_list(
                 [
