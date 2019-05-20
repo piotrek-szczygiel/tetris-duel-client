@@ -1,4 +1,5 @@
 import socket
+from random import randint
 from typing import Optional, Callable, List
 import jsonpickle
 import protocol
@@ -22,12 +23,14 @@ class Online(State):
         self.current_popup2: Optional[Popup] = None
 
         self.waiting = True
+        self.ending = False
 
         self.buffer = b""
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.settimeout(2.0)
 
         self.done = False
+        self.game_over = False
 
     def __del__(self) -> None:
         self.socket.close()
@@ -90,11 +93,62 @@ class Online(State):
             print("socket error")
             self.done = True
 
+        if not self.game_over:
+            if self.gameplay1.is_over() and not self.gameplay2.is_over():
+                self.gameplay2.set_over()
+                self.game_over = True
+                self.popups1.append(
+                    Popup(
+                        "You lost!", duration=5.0, color="red", gcolor="orange"
+                    )
+                )
+                self.popups2.append(
+                    Popup(
+                        "You won!",
+                        duration=5.0,
+                        color="green",
+                        gcolor="yellow",
+                    )
+                )
+            elif self.gameplay2.is_over() and not self.gameplay1.is_over():
+                self.gameplay1.set_over()
+                self.game_over = True
+                self.popups1.append(
+                    Popup(
+                        "You won!",
+                        duration=5.0,
+                        color="green",
+                        gcolor="yellow",
+                    )
+                )
+                self.popups2.append(
+                    Popup(
+                        "You lost!", duration=5.0, color="red", gcolor="orange"
+                    )
+                )
+            elif self.gameplay1.is_over() and self.gameplay2.is_over():
+                self.game_over = True
+                self.popups1.append(Popup("Draw!", duration=5.0, color="cyan"))
+                self.popups2.append(Popup("Draw!", duration=5.0, color="cyan"))
+        elif (
+            self.game_over
+            and not self.current_popup1
+            and not self.current_popup2
+        ):
+            self.done = True
+
         self.popups1.extend(self.gameplay1.get_popups())
         self.gameplay1.clear_popups()
 
         self.popups2.extend(self.gameplay2.get_popups())
         self.gameplay2.clear_popups()
+
+        self.gameplay1.score.duel_lines = 0
+
+        if self.gameplay2.score.duel_lines > 0:
+            hole = randint(0, 9)
+            self.gameplay1.add_garbage(hole, self.gameplay2.score.duel_lines)
+            self.gameplay2.score.duel_lines = 0
 
     def draw(self) -> None:
         self.gameplay1.draw(130, 80)

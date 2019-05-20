@@ -1,4 +1,3 @@
-import os
 import time
 
 import pygame as pg
@@ -60,8 +59,6 @@ class Main:
         return True
 
     def run(self) -> None:
-        os.environ["SDL_VIDEO_WINDOW_POS"] = "center"
-
         ctx.mixer = Mixer()
         ctx.mixer.initialize()
 

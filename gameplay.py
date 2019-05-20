@@ -166,9 +166,24 @@ class Gameplay:
             self.score.update_hard_drop(rows)
 
     def action_hold(self) -> None:
-        self.hold()
+        if self.hold_lock:
+            ctx.mixer.play("hold_fail")
+            return
+
+        self.hold_lock = True
+
+        if self.holder is not None:
+            self.holder, self.piece = self.piece, self.holder
+            self.reset_piece()
+        else:
+            self.holder = self.piece
+            self.new_piece()
+
+        self.send = True
+        ctx.mixer.play("hold")
 
     def new_piece(self) -> None:
+        self.send = True
         self.piece = self.bag.take()
         self.reset_piece()
 
@@ -195,22 +210,6 @@ class Gameplay:
 
     def reset_fall(self) -> None:
         self.last_fall = ctx.now
-
-    def hold(self) -> None:
-        if self.hold_lock:
-            ctx.mixer.play("hold_fail")
-            return
-
-        self.hold_lock = True
-
-        if self.holder is not None:
-            self.holder, self.piece = self.piece, self.holder
-            self.reset_piece()
-        else:
-            self.holder = self.piece
-            self.new_piece()
-
-        ctx.mixer.play("hold")
 
     def lock_piece(self) -> None:
         self.hold_lock = False
