@@ -6,7 +6,7 @@ class Popup:
     def __init__(
         self,
         text: str,
-        duration=0.75,
+        duration=0.0,
         size=5,
         color="white",
         scolor="black",
@@ -25,6 +25,9 @@ class Popup:
         self.start = ctx.now
 
     def update(self) -> bool:
+        if self.duration == 0.0:
+            return True
+
         if self.start + self.duration < ctx.now:
             return False
 

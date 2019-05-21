@@ -93,7 +93,9 @@ class Score:
         if self.combo > 0:
             self.score += 50 * self.combo * level
 
-        return Popup(message, size=4, color=color, gcolor="white")
+        return Popup(
+            message, size=4, duration=0.75, color=color, gcolor="white"
+        )
 
     def reset_combo(self) -> None:
         self.combo = -1

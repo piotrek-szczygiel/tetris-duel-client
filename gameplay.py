@@ -61,12 +61,6 @@ class Gameplay:
 
         self.last_piece_movement_counter = 0
 
-        self.last_lock_cancel: float
-        self.touched_floor = False
-        self.movement_counter = 0
-        self.movement_locked = False
-        self.movement_locked_warning = False
-
         self.t_spin = False
 
         self.clearing = False
@@ -79,6 +73,7 @@ class Gameplay:
         self.garbage_last: float
 
         self.send = False
+        self.cancel = True
 
     def is_over(self) -> bool:
         return self.game_over
@@ -105,7 +100,7 @@ class Gameplay:
         if self.device == Input.KEYBOARD:
             self.input.subscribe_list(
                 [
-                    (K_ESCAPE, self.action_quit),
+                    (K_ESCAPE, self.action_cancel),
                     (K_DOWN, self.action_down, True),
                     (K_RIGHT, self.action_right, True),
                     (K_LEFT, self.action_left, True),
@@ -120,7 +115,7 @@ class Gameplay:
         elif self.device in (Input.JOYSTICK1, Input.JOYSTICK2):
             self.input.subscribe_list(
                 [
-                    (BUTTON_SELECT, self.action_quit),
+                    (BUTTON_SELECT, self.action_cancel),
                     (DPAD_DOWN, self.action_down, True),
                     (DPAD_RIGHT, self.action_right, True),
                     (DPAD_LEFT, self.action_left, True),
@@ -134,9 +129,8 @@ class Gameplay:
 
         self.new_piece()
 
-    def action_quit(self) -> None:
-        self.game_over = True
-        self.send = True
+    def action_cancel(self) -> None:
+        self.cancel = True
 
     def action_down(self) -> None:
         if self.piece.move(0, 1, self.matrix.collision):
@@ -146,18 +140,26 @@ class Gameplay:
     def action_right(self) -> None:
         if self.piece.move(1, 0, self.matrix.collision):
             ctx.mixer.play("move")
+            if self.piece.touching_floor:
+                self.reset_fall()
 
     def action_left(self) -> None:
         if self.piece.move(-1, 0, self.matrix.collision):
             ctx.mixer.play("move")
+            if self.piece.touching_floor:
+                self.reset_fall()
 
     def action_rotate_right(self) -> None:
         if self.piece.rotate(self.matrix.collision, clockwise=True):
             ctx.mixer.play("rotate")
+            if self.piece.touching_floor:
+                self.reset_fall()
 
     def action_rotate_left(self) -> None:
         if self.piece.rotate(self.matrix.collision, clockwise=False):
             ctx.mixer.play("rotate")
+            if self.piece.touching_floor:
+                self.reset_fall()
 
     def action_soft_fall(self) -> None:
         rows = self.piece.fall(self.matrix.collision)
@@ -210,11 +212,6 @@ class Gameplay:
                 break
 
         self.reset_fall()
-        self.last_lock_cancel = ctx.now
-
-        self.touched_floor = False
-        self.movement_locked = False
-        self.movement_locked_warning = False
 
     def reset_fall(self) -> None:
         self.last_fall = ctx.now
@@ -304,64 +301,19 @@ class Gameplay:
                 self.countdown -= 1
             return
 
-        if not self.movement_locked:
-            self.input.update()
+        self.input.update()
 
-            if self.piece.movement_counter != self.last_piece_movement_counter:
-                self.send = True
+        if self.piece.movement_counter != self.last_piece_movement_counter:
+            self.send = True
 
-            self.last_piece_movement_counter = self.piece.movement_counter
-
-        if self.piece.touching_floor and not self.movement_locked:
-            if not self.touched_floor:
-                self.touched_floor = True
-                self.movement_counter = -1
-                self.piece.movement_counter = 0
-
-            if self.movement_counter != self.piece.movement_counter:
-                self.movement_counter = self.piece.movement_counter
-                self.reset_fall()
-                self.last_lock_cancel = ctx.now
-
-                if (
-                    self.piece.movement_counter >= 15
-                    and not self.movement_locked_warning
-                ):
-                    self.send = True
-                    self.movement_locked_warning = True
-                    self.popups.append(
-                        Popup(
-                            "Lock warning!",
-                            duration=0.5,
-                            size=4,
-                            color="orange",
-                            gcolor="darkred",
-                        )
-                    )
-                    ctx.mixer.play("lock_warning")
-
-                elif self.piece.movement_counter >= 30:
-                    self.send = True
-
-                    self.movement_locked = True
-                    self.popups.append(
-                        Popup(
-                            "Locked!",
-                            duration=1.0,
-                            color="darkred",
-                            gcolor="black",
-                        )
-                    )
-
-        if self.piece.check_collision(0, 1, self.matrix.collision):
-            if ctx.now - self.last_lock_cancel > 1.0:
-                self.send = True
-                self.lock_piece()
+        self.last_piece_movement_counter = self.piece.movement_counter
 
         if ctx.now - self.last_fall > self.fall_interval:
+            self.send = True
             if self.piece.move(0, 1, self.matrix.collision):
-                self.send = True
                 self.reset_fall()
+            else:
+                self.lock_piece()
 
     def draw(self, x: int, y: int, draw_piece=True) -> None:
         self.matrix.draw(x, y)
