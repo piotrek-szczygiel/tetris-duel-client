@@ -13,6 +13,7 @@ from online import Online
 from split_screen import SplitScreen
 from state import State
 from text import Text
+from device import Device
 
 
 class Main:
@@ -20,17 +21,20 @@ class Main:
         self.display: pg.Surface
         self.state: State
 
+        self.device1: Device
+        self.device2: Device
+
     def switch_state(self, state: str) -> None:
         ctx.mixer.stop_music()
 
         if state == "Online":
-            self.state = Online()
+            self.state = Online(self.device1)
         elif state == "Duel":
-            self.state = SplitScreen()
+            self.state = SplitScreen(self.device1, self.device2)
         elif state == "Marathon":
-            self.state = Marathon()
+            self.state = Marathon(self.device1)
         elif state == "MainMenu":
-            self.state = MainMenu()
+            self.state = MainMenu(self.device1)
 
         self.state.initialize()
 
@@ -58,6 +62,13 @@ class Main:
         ctx.mixer.initialize()
 
         pg.init()
+
+        self.device1 = Device(config.device1)
+
+        try:
+            self.device2 = Device(config.device2)
+        except:
+            print("device2 unavailable")
 
         self.display = pg.display.set_mode(config.window_size)
         ctx.surface = pg.Surface(config.window_size)

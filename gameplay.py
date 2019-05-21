@@ -1,17 +1,4 @@
 from typing import List, Optional
-from pygame.locals import (
-    K_ESCAPE,
-    K_DOWN,
-    K_RIGHT,
-    K_LEFT,
-    K_UP,
-    K_x,
-    K_z,
-    K_LSHIFT,
-    K_SPACE,
-    K_c,
-)
-
 import shape
 from bag import Bag
 from ctx import ctx
@@ -21,25 +8,12 @@ from popup import Popup
 from score import Score
 from t_spin import TSpin
 from text import Text
-
-from input import (
-    Input,
-    DPAD_RIGHT,
-    DPAD_LEFT,
-    DPAD_DOWN,
-    BUTTON_RIGHT,
-    BUTTON_DOWN,
-    BUTTON_LEFT,
-    TRIGGER_LEFT,
-    TRIGGER_RIGHT,
-    BUTTON_SELECT,
-)
+from input import Input
+from device import Device
 
 
 class Gameplay:
-    def __init__(self, device) -> None:
-        self.device = device
-
+    def __init__(self, device: Device) -> None:
         self.matrix = Matrix()
         self.bag = Bag()
         self.piece: Piece
@@ -93,37 +67,20 @@ class Gameplay:
         self.popups = []
 
     def initialize(self) -> None:
-        if self.device == Input.KEYBOARD:
-            self.input.subscribe_list(
-                [
-                    (K_DOWN, self.action_down, True),
-                    (K_RIGHT, self.action_right, True),
-                    (K_LEFT, self.action_left, True),
-                    (K_UP, self.action_rotate_right),
-                    (K_x, self.action_rotate_right),
-                    (K_z, self.action_rotate_left),
-                    (K_LSHIFT, self.action_soft_fall),
-                    (K_SPACE, self.action_hard_fall),
-                    (K_c, self.action_hold),
-                ]
-            )
-            self.cancel_input.subscribe_list([(K_ESCAPE, self.action_cancel)])
-        elif self.device in (Input.JOYSTICK1, Input.JOYSTICK2):
-            self.input.subscribe_list(
-                [
-                    (DPAD_DOWN, self.action_down, True),
-                    (DPAD_RIGHT, self.action_right, True),
-                    (DPAD_LEFT, self.action_left, True),
-                    (TRIGGER_RIGHT, self.action_rotate_right),
-                    (TRIGGER_LEFT, self.action_rotate_left),
-                    (BUTTON_RIGHT, self.action_soft_fall),
-                    (BUTTON_DOWN, self.action_hard_fall),
-                    (BUTTON_LEFT, self.action_hold),
-                ]
-            )
-            self.cancel_input.subscribe_list(
-                [(BUTTON_SELECT, self.action_cancel)]
-            )
+        self.input.bind(
+            {
+                "down": self.action_down,
+                "right": self.action_right,
+                "left": self.action_left,
+                "rotate_right": self.action_rotate_right,
+                "rotate_left": self.action_rotate_left,
+                "soft_fall": self.action_soft_fall,
+                "hard_fall": self.action_hard_fall,
+                "hold": self.action_hold,
+            }
+        )
+
+        self.cancel_input.bind({"cancel": self.action_cancel})
 
         self.new_piece()
 

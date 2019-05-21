@@ -51,7 +51,7 @@ class Joystick:
 
             if value > 0.5:
                 self.pressed_axes[axis] = 1
-            elif value < 0.5:
+            elif value < -0.5:
                 self.pressed_axes[axis] = -1
             else:
                 self.pressed_axes[axis] = 0

@@ -1,17 +1,15 @@
-from pygame.locals import K_DOWN, K_UP, K_RETURN
-
 from typing import Callable
 
-import config
 from ctx import ctx
-from input import Input, DPAD_DOWN, DPAD_UP, BUTTON_DOWN, BUTTON_START
+from input import Input
+from device import Device
 from state import State
 from text import Text
 
 
 class MainMenu(State):
-    def __init__(self) -> None:
-        self.input = Input(config.input_player1)
+    def __init__(self, device: Device) -> None:
+        self.input = Input(device)
 
         self.position = 0
         self.min_position = 0
@@ -25,23 +23,13 @@ class MainMenu(State):
     def initialize(self) -> None:
         ctx.mixer.play_music("menu_theme")
 
-        if config.input_player1 == Input.KEYBOARD:
-            self.input.subscribe_list(
-                [
-                    (K_DOWN, self.position_down),
-                    (K_UP, self.position_up),
-                    (K_RETURN, self.position_enter),
-                ]
-            )
-        else:
-            self.input.subscribe_list(
-                [
-                    (DPAD_DOWN, self.position_down),
-                    (DPAD_UP, self.position_up),
-                    (BUTTON_DOWN, self.position_enter),
-                    (BUTTON_START, self.position_enter),
-                ]
-            )
+        self.input.bind(
+            {
+                "down": self.position_down,
+                "up": self.position_up,
+                "select": self.position_enter,
+            }
+        )
 
     def position_down(self) -> None:
         self.position += 1

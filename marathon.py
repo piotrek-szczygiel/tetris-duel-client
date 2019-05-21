@@ -1,15 +1,15 @@
 from typing import Callable, Optional, List
 
-import config
 from gameplay import Gameplay
 from popup import Popup
 from state import State
 from text import Text
+from device import Device
 
 
 class Marathon(State):
-    def __init__(self) -> None:
-        self.gameplay = Gameplay(config.input_player1)
+    def __init__(self, device: Device) -> None:
+        self.gameplay = Gameplay(device)
 
         self.gravity = [
             1.00000,

@@ -13,6 +13,7 @@ rope = "*"
 pygame = "==1.*"
 jsonpickle = "*"
 lz4 = "*"
+toml = "*"
 
 [requires]
 python_version = "3.7"

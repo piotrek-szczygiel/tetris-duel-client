@@ -10,14 +10,15 @@ import config
 from gameplay import Gameplay
 from popup import Popup
 from state import State
+from device import Device
 
 BUFFER_SIZE = 1024
 
 
 class Online(State):
-    def __init__(self) -> None:
-        self.gameplay1 = Gameplay(config.input_player1)
-        self.gameplay2 = Gameplay(config.input_player1)
+    def __init__(self, device: Device) -> None:
+        self.gameplay1 = Gameplay(device)
+        self.gameplay2 = Gameplay(Device("dummy"))
 
         self.popups1: List[Popup] = []
         self.popups2: List[Popup] = []

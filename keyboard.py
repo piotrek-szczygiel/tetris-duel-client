@@ -8,7 +8,7 @@ from ctx import ctx
 Key = int
 
 
-class Input:
+class Keyboard:
     def __init__(self) -> None:
         self.pressed_keys: List[bool] = list()
         self.last_press: Dict[Key, float] = dict()
