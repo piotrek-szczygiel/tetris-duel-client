@@ -22,5 +22,8 @@ class Device:
         del self.actions["type"]
 
         if self.type == "joystick":
-            self.joystick = pg.joystick.Joystick(joystick_num)
-            self.joystick.init()
+            try:
+                self.joystick = pg.joystick.Joystick(joystick_num)
+                self.joystick.init()
+            except pg.error:
+                self.type = "dummy"

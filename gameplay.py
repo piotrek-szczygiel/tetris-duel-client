@@ -13,13 +13,13 @@ from device import Device
 
 
 class Gameplay:
-    def __init__(self, device: Device) -> None:
+    def __init__(self) -> None:
         self.matrix = Matrix()
         self.bag = Bag()
         self.piece: Piece
         self.score = Score()
-        self.input = Input(device)
-        self.cancel_input = Input(device)
+        self.input: Input
+        self.cancel_input: Input
 
         self.popups: List[Popup] = []
 
@@ -65,6 +65,10 @@ class Gameplay:
 
     def clear_popups(self) -> None:
         self.popups = []
+
+    def set_device(self, device: Device) -> None:
+        self.input = Input(device)
+        self.cancel_input = Input(device)
 
     def initialize(self) -> None:
         self.input.bind(

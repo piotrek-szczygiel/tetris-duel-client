@@ -16,9 +16,9 @@ BUFFER_SIZE = 1024
 
 
 class Online(State):
-    def __init__(self, device: Device) -> None:
-        self.gameplay1 = Gameplay(device)
-        self.gameplay2 = Gameplay(Device("dummy"))
+    def __init__(self) -> None:
+        self.gameplay1 = Gameplay()
+        self.gameplay2 = Gameplay()
 
         self.popups1: List[Popup] = []
         self.popups2: List[Popup] = []
@@ -40,7 +40,10 @@ class Online(State):
         return self.finished
 
     def initialize(self) -> None:
+        self.gameplay1.set_device(ctx.device1)
         self.gameplay1.initialize()
+
+        self.gameplay2.set_device(Device("dummy"))
         self.gameplay2.initialize()
 
         try:

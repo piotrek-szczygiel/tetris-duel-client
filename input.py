@@ -7,9 +7,12 @@ from typing import Dict, Callable, List
 
 class Input:
     def __init__(self, device: Device) -> None:
+        self.device = device
+        self.type = device.type
+
         self.binds: Dict[str, Callable] = dict()
+
         if device.type == "keyboard":
-            self.type = "keyboard"
             self.keyboard = Keyboard()
 
             for action, how in device.actions.items():
@@ -21,7 +24,6 @@ class Input:
                     raise Exception("invalid binding: {}".format(how))
 
         elif device.type == "joystick":
-            self.type = "joystick"
             self.joystick = Joystick(device.joystick)
 
             for action, how in device.actions.items():
@@ -56,9 +58,9 @@ class Input:
     def bind(self, binds: Dict[str, Callable]) -> None:
         self.binds = binds
 
-    def update(self) -> None:
+    def update(self) -> List[str]:
         if self.type == "dummy":
-            return
+            return []
 
         actions: List[str] = list()
         if self.type == "keyboard":
@@ -69,6 +71,8 @@ class Input:
         for action in actions:
             if action in self.binds:
                 self.binds[action]()
+
+        return actions
 
     @staticmethod
     def str_to_key(key: str) -> int:

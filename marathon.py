@@ -4,12 +4,12 @@ from gameplay import Gameplay
 from popup import Popup
 from state import State
 from text import Text
-from device import Device
+from ctx import ctx
 
 
 class Marathon(State):
-    def __init__(self, device: Device) -> None:
-        self.gameplay = Gameplay(device)
+    def __init__(self) -> None:
+        self.gameplay = Gameplay()
 
         self.gravity = [
             1.00000,
@@ -43,6 +43,7 @@ class Marathon(State):
         return self.finished
 
     def initialize(self) -> None:
+        self.gameplay.set_device(ctx.device1)
         self.gameplay.initialize()
 
     def update(self, switch_state: Callable) -> None:

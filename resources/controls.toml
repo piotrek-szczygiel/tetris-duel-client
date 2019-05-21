@@ -4,7 +4,7 @@ type = "keyboard"
 cancel = "esc"
 select = "enter"
 
-up = "up"
+up = ["up", "repeat"]
 down = ["down", "repeat"]
 right = ["right", "repeat"]
 left = ["left", "repeat"]
@@ -14,13 +14,14 @@ soft_fall = "lshift"
 hard_fall = "space"
 hold = "c"
 
+
 [snes]
 type = "joystick"
 
 cancel = 8
 select = 9
 
-up = ["axis", "1", "-"]
+up = ["axis", "1", "-", "repeat"]
 down = ["axis", "1", "+", "repeat"]
 right = ["axis", "0", "+", "repeat"]
 left = ["axis", "0", "-", "repeat"]

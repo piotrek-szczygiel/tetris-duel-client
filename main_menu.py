@@ -2,14 +2,20 @@ from typing import Callable
 
 from ctx import ctx
 from input import Input
-from device import Device
 from state import State
 from text import Text
+from device import Device
+import config
+from device_prompter import DevicePrompter
+from marathon import Marathon
+from split_screen import SplitScreen
+from online import Online
 
 
 class MainMenu(State):
-    def __init__(self, device: Device) -> None:
-        self.input = Input(device)
+    def __init__(self) -> None:
+        self.input1 = Input(Device(config.device1))
+        self.input2 = Input(Device(config.device2))
 
         self.position = 0
         self.min_position = 0
@@ -22,14 +28,14 @@ class MainMenu(State):
 
     def initialize(self) -> None:
         ctx.mixer.play_music("menu_theme")
-
-        self.input.bind(
-            {
-                "down": self.position_down,
-                "up": self.position_up,
-                "select": self.position_enter,
-            }
-        )
+        binds = {
+            "down": self.position_down,
+            "up": self.position_up,
+            "select": self.position_enter,
+            "hard_fall": self.position_enter,
+        }
+        self.input1.bind(binds)
+        self.input2.bind(binds)
 
     def position_down(self) -> None:
         self.position += 1
@@ -50,16 +56,16 @@ class MainMenu(State):
         self.entered = True
 
     def update(self, switch_state: Callable) -> None:
-        self.entered = False
-        self.input.update()
+        self.input1.update()
+        self.input2.update()
 
         if self.entered:
             if self.position == 0:
-                switch_state("Marathon")
+                switch_state(DevicePrompter(Marathon(), 1))
             elif self.position == 1:
-                switch_state("Duel")
+                switch_state(DevicePrompter(SplitScreen(), 2))
             elif self.position == 2:
-                switch_state("Online")
+                switch_state(DevicePrompter(Online(), 1))
             elif self.position == 3:
                 ctx.running = False
 

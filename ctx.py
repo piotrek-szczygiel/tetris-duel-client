@@ -1,5 +1,6 @@
 import pygame as pg
 from mixer import Mixer
+from device import Device
 
 
 class Ctx:
@@ -9,6 +10,9 @@ class Ctx:
 
         self.surface: pg.surface.Surface
         self.mixer: Mixer
+
+        self.device1 = Device("dummy")
+        self.device2 = Device("dummy")
 
 
 ctx = Ctx()

@@ -1,16 +1,16 @@
 from random import randint
 from typing import Callable, List, Optional
 
-from device import Device
 from gameplay import Gameplay
 from popup import Popup
 from state import State
+from ctx import ctx
 
 
 class SplitScreen(State):
-    def __init__(self, device1: Device, device2: Device) -> None:
-        self.gameplay1 = Gameplay(device1)
-        self.gameplay2 = Gameplay(device2)
+    def __init__(self) -> None:
+        self.gameplay1 = Gameplay()
+        self.gameplay2 = Gameplay()
 
         self.popups1: List[Popup] = []
         self.popups2: List[Popup] = []
@@ -24,7 +24,10 @@ class SplitScreen(State):
         return self.finished
 
     def initialize(self) -> None:
+        self.gameplay1.set_device(ctx.device1)
         self.gameplay1.initialize()
+
+        self.gameplay2.set_device(ctx.device2)
         self.gameplay2.initialize()
 
     def update(self, switch_state: Callable) -> None:

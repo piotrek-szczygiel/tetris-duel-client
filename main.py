@@ -7,10 +7,7 @@ from ctx import ctx
 import ptext
 import resources
 from main_menu import MainMenu
-from marathon import Marathon
 from mixer import Mixer
-from online import Online
-from split_screen import SplitScreen
 from state import State
 from text import Text
 from device import Device
@@ -20,22 +17,12 @@ class Main:
     def __init__(self) -> None:
         self.display: pg.Surface
         self.state: State
+        self.device1 = Device("dummy")
+        self.device2 = Device("dummy")
 
-        self.device1: Device
-        self.device2: Device
-
-    def switch_state(self, state: str) -> None:
+    def switch_state(self, state: State) -> None:
         ctx.mixer.stop_music()
-
-        if state == "Online":
-            self.state = Online(self.device1)
-        elif state == "Duel":
-            self.state = SplitScreen(self.device1, self.device2)
-        elif state == "Marathon":
-            self.state = Marathon(self.device1)
-        elif state == "MainMenu":
-            self.state = MainMenu(self.device1)
-
+        self.state = state
         self.state.initialize()
 
     def handle_events(self) -> bool:
@@ -63,19 +50,12 @@ class Main:
 
         pg.init()
 
-        self.device1 = Device(config.device1)
-
-        try:
-            self.device2 = Device(config.device2)
-        except:
-            print("device2 unavailable")
-
         self.display = pg.display.set_mode(config.window_size)
         ctx.surface = pg.Surface(config.window_size)
         ptext.FONT_NAME_TEMPLATE = resources.path("%s.ttf")
 
         pg.display.set_caption("Tetris Duel")
-        self.switch_state("MainMenu")
+        self.switch_state(MainMenu())
 
         fps_clock = pg.time.Clock()
         while ctx.running:
@@ -86,7 +66,7 @@ class Main:
             self.state.update(self.switch_state)
 
             if self.state.is_finished():
-                self.switch_state("MainMenu")
+                self.switch_state(MainMenu())
 
             ctx.surface.fill(pg.Color(*config.background))
             self.state.draw()
