@@ -32,18 +32,18 @@ class Mixer:
             "rotate",
             "soft_fall",
         ]:
-            self.load_sound(name, name + ".wav")
+            self.load_sound(name, name)
             self.sounds[name].set_volume(0.1)
 
     def load_sound(self, name: str, filename: str):
-        self.sounds[name] = pg.mixer.Sound(path(filename))
+        self.sounds[name] = pg.mixer.Sound(path("sounds/" + filename + ".wav"))
 
     def play(self, sound: str) -> None:
         if sound in self.sounds:
             self.sounds[sound].play()
 
     def play_music(self, music: str) -> None:
-        pg.mixer.music.load(path(music + ".ogg"))
+        pg.mixer.music.load(path("music/" + music + ".ogg"))
         pg.mixer.music.set_volume(0.2)
         pg.mixer.music.play(-1)
 
