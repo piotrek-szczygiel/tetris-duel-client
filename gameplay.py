@@ -193,7 +193,8 @@ class Gameplay:
     def new_piece(self) -> None:
         self.send = True
         self.piece = self.bag.take()
-        self.reset_piece()
+        self.piece.reset()
+        self.reset_fall()
 
         if self.matrix.collision(self.piece):
             self.game_over = True
@@ -265,6 +266,7 @@ class Gameplay:
 
                 if not self.clearing_rows:
                     self.clearing = False
+                    self.reset_piece()
         elif self.garbage_adding:
             if ctx.now - self.garbage_last > 0.03:
                 self.send = True
@@ -275,6 +277,7 @@ class Gameplay:
 
                 if self.garbage_left == 0:
                     self.garbage_adding = False
+                    self.reset_piece()
 
         if self.game_over:
             return
