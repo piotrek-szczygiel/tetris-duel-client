@@ -19,7 +19,7 @@ class MainMenu(State):
 
         self.entered = False
 
-    def is_done(self) -> bool:
+    def is_finished(self) -> bool:
         return False
 
     def initialize(self) -> None:

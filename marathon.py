@@ -1,11 +1,7 @@
 from typing import Callable, Optional, List
 
-from pygame.locals import K_r, K_p, K_t, K_g
-
 import config
-from ctx import ctx
 from gameplay import Gameplay
-from input import Input
 from popup import Popup
 from state import State
 from text import Text
@@ -13,7 +9,6 @@ from text import Text
 
 class Marathon(State):
     def __init__(self) -> None:
-        self.input = Input(Input.KEYBOARD)
         self.gameplay = Gameplay(config.input_player1)
 
         self.gravity = [
@@ -39,60 +34,35 @@ class Marathon(State):
         self.popups: List[Popup] = []
         self.current_popup: Optional[Popup] = None
 
-        self.popup_game_over = False
+        self.end_screen = False
 
-        self.done = False
+        self.finished = False
         self.pause = False
 
-    def is_done(self) -> bool:
-        return self.done
+    def is_finished(self) -> bool:
+        return self.finished
 
     def initialize(self) -> None:
         self.gameplay.initialize()
 
-        self.input.subscribe_list(
-            [
-                (K_r, self.debug_new_piece),
-                (K_p, self.debug_pause),
-                (K_t, self.debug_t_spin_tower),
-                (K_g, self.debug_garbage),
-            ]
-        )
-
-    def debug_pause(self) -> None:
-        self.pause = not self.pause
-
-    def debug_new_piece(self) -> None:
-        self.gameplay.new_piece()
-
-    def debug_t_spin_tower(self) -> None:
-        self.gameplay.get_matrix().debug_tower()
-        self.gameplay.new_piece()
-
-    def debug_garbage(self) -> None:
-        self.gameplay.get_matrix().add_garbage(5)
-        ctx.mixer.play("garbage")
-
     def update(self, switch_state: Callable) -> None:
-        if not self.current_popup and self.popups:
-            self.current_popup = self.popups.pop(0)
-            self.current_popup.duration *= 2
-        elif self.current_popup:
-            if not self.current_popup.update():
-                self.current_popup = None
+        if self.gameplay.game_over and not self.end_screen:
+            self.end_screen = True
+            self.popups.append(Popup("Game over!", color="red"))
 
-        if not self.gameplay.is_over():
-            self.input.update()
-        elif not self.popup_game_over:
-            self.popup_game_over = True
-            self.popups.append(Popup("Game over!", duration=3.0, color="red"))
-        elif self.gameplay.is_over() and not self.current_popup:
-            self.done = True
+        if self.gameplay.game_over and self.gameplay.cancel:
+            self.finished = True
+            return
+
+        if self.gameplay.cancel:
+            if self.gameplay.countdown > 0:
+                self.finished = True
+                return
+            else:
+                self.gameplay.game_over = True
+                self.gameplay.cancel = False
 
         self.gameplay.update()
-
-        self.popups.extend(self.gameplay.get_popups())
-        self.gameplay.clear_popups()
 
         if self.gameplay.score.lines > 0:
             self.goal -= self.gameplay.score.lines
@@ -100,23 +70,28 @@ class Marathon(State):
             self.gameplay.score.lines = 0
 
             if self.goal == 0:
-                if self.gameplay.level == 15 and not self.popup_game_over:
-                    self.popup_game_over = True
+                if self.gameplay.level == 15 and not self.end_screen:
+                    self.end_screen = True
+                    self.gameplay.game_over = True
                     self.popups.append(
-                        Popup(
-                            "You won!",
-                            duration=3.0,
-                            color="green",
-                            gcolor="yellow",
-                        )
+                        Popup("You won!", color="green", gcolor="yellow")
                     )
-                    self.gameplay.set_over()
                 else:
                     self.gameplay.level += 1
                     self.goal = 5 * self.gameplay.level
                     self.gameplay.fall_interval = self.gravity[
                         self.gameplay.level - 1
                     ]
+
+        self.popups.extend(self.gameplay.get_popups())
+        self.gameplay.clear_popups()
+
+        if not self.current_popup and self.popups:
+            self.current_popup = self.popups.pop(0)
+            self.current_popup.duration *= 2
+        elif self.current_popup:
+            if not self.current_popup.update():
+                self.current_popup = None
 
     def draw(self) -> None:
         self.gameplay.draw(200, 80)

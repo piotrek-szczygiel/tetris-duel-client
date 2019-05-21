@@ -12,24 +12,75 @@ class SplitScreen(State):
         self.gameplay1 = Gameplay(config.input_player1)
         self.gameplay2 = Gameplay(config.input_player2)
 
-        self.ending = False
-
         self.popups1: List[Popup] = []
         self.popups2: List[Popup] = []
         self.current_popup1: Optional[Popup] = None
         self.current_popup2: Optional[Popup] = None
 
-        self.done = False
-        self.game_over = False
+        self.finished = False
+        self.end_screen = False
 
-    def is_done(self) -> bool:
-        return self.done
+    def is_finished(self) -> bool:
+        return self.finished
 
     def initialize(self) -> None:
         self.gameplay1.initialize()
         self.gameplay2.initialize()
 
     def update(self, switch_state: Callable) -> None:
+        if not self.end_screen:
+            if self.gameplay1.game_over and not self.gameplay2.game_over:
+                self.gameplay2.game_over = True
+                self.end_screen = True
+                self.popups1.append(
+                    Popup("You lost!", color="red", gcolor="orange")
+                )
+                self.popups2.append(
+                    Popup("You won!", color="green", gcolor="yellow")
+                )
+            elif self.gameplay2.game_over and not self.gameplay1.game_over:
+                self.gameplay1.game_over = True
+                self.end_screen = True
+                self.popups1.append(
+                    Popup("You won!", color="green", gcolor="yellow")
+                )
+                self.popups2.append(
+                    Popup("You lost!", color="red", gcolor="orange")
+                )
+            elif self.gameplay1.game_over and self.gameplay2.game_over:
+                self.end_screen = True
+                self.popups1.append(Popup("Draw!", color="cyan"))
+                self.popups2.append(Popup("Draw!", color="cyan"))
+
+        if self.gameplay1.cancel or self.gameplay2.cancel:
+            if self.end_screen or self.gameplay1.countdown > 0:
+                self.finished = True
+                return
+            else:
+                self.gameplay1.game_over = self.gameplay1.cancel
+                self.gameplay2.game_over = self.gameplay2.cancel
+                self.gameplay1.cancel = False
+                self.gameplay2.cancel = False
+
+        self.gameplay1.update()
+        self.gameplay2.update()
+
+        if self.gameplay1.score.duel_lines > 0:
+            hole = randint(0, 9)
+            self.gameplay2.add_garbage(hole, self.gameplay1.score.duel_lines)
+            self.gameplay1.score.duel_lines = 0
+
+        if self.gameplay2.score.duel_lines > 0:
+            hole = randint(0, 9)
+            self.gameplay1.add_garbage(hole, self.gameplay2.score.duel_lines)
+            self.gameplay2.score.duel_lines = 0
+
+        self.popups1.extend(self.gameplay1.get_popups())
+        self.gameplay1.clear_popups()
+
+        self.popups2.extend(self.gameplay2.get_popups())
+        self.gameplay2.clear_popups()
+
         if not self.current_popup1 and self.popups1:
             self.current_popup1 = self.popups1.pop(0)
         elif self.current_popup1:
@@ -41,69 +92,6 @@ class SplitScreen(State):
         elif self.current_popup2:
             if not self.current_popup2.update():
                 self.current_popup2 = None
-
-        self.gameplay1.update()
-        self.gameplay2.update()
-
-        if not self.game_over:
-            if self.gameplay1.is_over() and not self.gameplay2.is_over():
-                self.gameplay2.set_over()
-                self.game_over = True
-                self.popups1.append(
-                    Popup(
-                        "You lost!", duration=5.0, color="red", gcolor="orange"
-                    )
-                )
-                self.popups2.append(
-                    Popup(
-                        "You won!",
-                        duration=5.0,
-                        color="green",
-                        gcolor="yellow",
-                    )
-                )
-            elif self.gameplay2.is_over() and not self.gameplay1.is_over():
-                self.gameplay1.set_over()
-                self.game_over = True
-                self.popups1.append(
-                    Popup(
-                        "You won!",
-                        duration=5.0,
-                        color="green",
-                        gcolor="yellow",
-                    )
-                )
-                self.popups2.append(
-                    Popup(
-                        "You lost!", duration=5.0, color="red", gcolor="orange"
-                    )
-                )
-            elif self.gameplay1.is_over() and self.gameplay2.is_over():
-                self.game_over = True
-                self.popups1.append(Popup("Draw!", duration=5.0, color="cyan"))
-                self.popups2.append(Popup("Draw!", duration=5.0, color="cyan"))
-        elif (
-            self.game_over
-            and not self.current_popup1
-            and not self.current_popup2
-        ):
-            self.done = True
-
-        self.popups1.extend(self.gameplay1.get_popups())
-        self.gameplay1.clear_popups()
-
-        self.popups2.extend(self.gameplay2.get_popups())
-        self.gameplay2.clear_popups()
-
-        if self.gameplay1.score.duel_lines > 0:
-            hole = randint(0, 9)
-            self.gameplay2.add_garbage(hole, self.gameplay1.score.duel_lines)
-            self.gameplay1.score.duel_lines = 0
-
-        if self.gameplay2.score.duel_lines > 0:
-            hole = randint(0, 9)
-            self.gameplay1.add_garbage(hole, self.gameplay2.score.duel_lines)
-            self.gameplay2.score.duel_lines = 0
 
     def draw(self) -> None:
         self.gameplay1.draw(130, 80)

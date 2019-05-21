@@ -74,7 +74,7 @@ class Main:
             ctx.now = time.monotonic()
             self.state.update(self.switch_state)
 
-            if self.state.is_done():
+            if self.state.is_finished():
                 self.switch_state("MainMenu")
 
             ctx.surface.fill(pg.Color(*config.background))

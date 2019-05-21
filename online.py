@@ -1,5 +1,4 @@
 import socket
-from pygame.locals import K_ESCAPE
 from random import randint
 from typing import Optional, Callable, List
 from text import Text
@@ -10,7 +9,6 @@ import select
 import config
 from gameplay import Gameplay
 from popup import Popup
-from input import Input
 from state import State
 
 BUFFER_SIZE = 1024
@@ -18,8 +16,6 @@ BUFFER_SIZE = 1024
 
 class Online(State):
     def __init__(self) -> None:
-        self.input = Input(Input.KEYBOARD)
-
         self.gameplay1 = Gameplay(config.input_player1)
         self.gameplay2 = Gameplay(config.input_player1)
 
@@ -31,63 +27,85 @@ class Online(State):
         self.waiting = True
         self.waiting_cycle = 0
         self.last_waiting_cycle = ctx.now
-        self.ending = False
 
         self.buffer = b""
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.settimeout(2.0)
 
-        self.cancel = False
-        self.done = False
-        self.game_over = False
+        self.finished = False
+        self.end_screen = False
 
-    def is_done(self) -> bool:
-        return self.done
+    def is_finished(self) -> bool:
+        return self.finished
 
     def initialize(self) -> None:
         self.gameplay1.initialize()
         self.gameplay2.initialize()
 
-        self.input.subscribe_list([(K_ESCAPE, self.waiting_cancel)])
-
         try:
             self.socket.connect(config.server)
         except (ConnectionRefusedError, socket.timeout):
             print("unable to connect to server")
-            self.done = True
-
-    def waiting_cancel(self) -> None:
-        if self.waiting:
-            self.done = True
-            self.socket.close()
-        else:
-            self.cancel = True
+            self.finished = True
 
     def update(self, switch_state: Callable) -> None:
-        self.input.update()
-        if self.done:
-            return
-
-        if not self.waiting:
-            self.gameplay1.update()
-
         read, write, error = select.select(
-            [self.socket], [self.socket], [self.socket]
+            [self.socket], [self.socket], [self.socket], 0
         )
 
         if self.waiting:
+            self.gameplay1.cancel_input.update()
+
             if self.socket in read:
                 buffer = self.socket.recv(BUFFER_SIZE)
                 if buffer == b"go":
                     self.waiting = False
-                    self.currnet_popup2 = None
+                    self.current_popup2 = None
                 elif buffer == b"ping":
                     self.socket.sendall(b"pong")
                 elif buffer == b"":
                     print("server disconnected")
-                    self.done = True
+                    self.finished = True
+            elif self.gameplay1.cancel:
+                self.socket.close()
+                self.finished = True
 
             return
+
+        if not self.end_screen:
+            if self.gameplay1.game_over and not self.gameplay2.game_over:
+                self.gameplay2.game_over = True
+                self.end_screen = True
+                self.popups1.append(
+                    Popup("You lost!", color="red", gcolor="orange")
+                )
+                self.popups2.append(
+                    Popup("You won!", color="green", gcolor="yellow")
+                )
+            elif self.gameplay2.game_over and not self.gameplay1.game_over:
+                self.gameplay1.game_over = True
+                self.end_screen = True
+                self.popups1.append(
+                    Popup("You won!", color="green", gcolor="yellow")
+                )
+                self.popups2.append(
+                    Popup("You lost!", color="red", gcolor="orange")
+                )
+            elif self.gameplay1.game_over and self.gameplay2.game_over:
+                self.end_screen = True
+                self.popups1.append(Popup("Draw!", color="cyan"))
+                self.popups2.append(Popup("Draw!", color="cyan"))
+
+        if self.gameplay1.cancel:
+            self.gameplay1.send = True
+
+            self.gameplay1.cancel = False
+            self.gameplay1.game_over = True
+
+            if self.end_screen or self.gameplay1.countdown > 0:
+                self.finished = True
+
+        self.gameplay1.update()
 
         if self.socket in read:
             try:
@@ -107,57 +125,21 @@ class Online(State):
                 error = [self.socket]
 
         if self.socket in error:
-            print("socket error")
-            self.done = True
-            return
-
-        if not self.game_over:
-            if self.gameplay1.is_over() and not self.gameplay2.is_over():
-                self.gameplay2.set_over()
-                self.game_over = True
-                self.popups1.append(
-                    Popup("You lost!", color="red", gcolor="orange")
-                )
-                self.popups2.append(
-                    Popup("You won!", color="green", gcolor="yellow")
-                )
-            elif self.gameplay2.is_over() and not self.gameplay1.is_over():
-                self.gameplay1.set_over()
-                self.game_over = True
-                self.popups1.append(
-                    Popup("You won!", color="green", gcolor="yellow")
-                )
-                self.popups2.append(
-                    Popup("You lost!", color="red", gcolor="orange")
-                )
-            elif self.gameplay1.is_over() and self.gameplay2.is_over():
-                self.game_over = True
-                self.popups1.append(Popup("Draw!", color="cyan"))
-                self.popups2.append(Popup("Draw!", color="cyan"))
-        elif self.game_over and self.cancel:
-            self.socket.close()
-            self.done = True
-            return
-
-        if self.cancel:
-            self.cancel = False
-            self.gameplay1.set_over()
-
-        self.gameplay1.score.duel_lines = 0
+            if not self.end_screen:
+                print("communication error")
+                self.finished = True
 
         if self.gameplay2.score.duel_lines > 0:
             hole = randint(0, 9)
             self.gameplay1.add_garbage(hole, self.gameplay2.score.duel_lines)
             self.gameplay2.score.duel_lines = 0
 
+        self.gameplay1.score.duel_lines = 0
+
         self.popups1.extend(self.gameplay1.get_popups())
         self.gameplay1.clear_popups()
 
-        foreign_popups = self.gameplay2.get_popups()
-        for popup in foreign_popups:
-            popup.start = ctx.now
-
-        self.popups2.extend(foreign_popups)
+        self.popups2.extend(self.gameplay2.get_popups())
         self.gameplay2.clear_popups()
 
         if not self.current_popup1 and self.popups1:

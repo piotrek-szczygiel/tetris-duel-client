@@ -4,7 +4,7 @@ from typing import Callable
 
 class State(ABC):
     @abstractmethod
-    def is_done(self) -> bool:
+    def is_finished(self) -> bool:
         pass
 
     @abstractmethod

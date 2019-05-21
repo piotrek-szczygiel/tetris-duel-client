@@ -22,11 +22,16 @@ class Popup:
         self.fade = self.duration / 3
         self.alpha = 1.0
 
-        self.start = ctx.now
+        self.started = False
+        self.start = 0.0
 
     def update(self) -> bool:
         if self.duration == 0.0:
             return True
+
+        if not self.started:
+            self.started = True
+            self.start = ctx.now
 
         if self.start + self.duration < ctx.now:
             return False

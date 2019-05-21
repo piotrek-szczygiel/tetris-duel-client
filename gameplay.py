@@ -45,6 +45,8 @@ class Gameplay:
         self.piece: Piece
         self.score = Score()
         self.input = Input(device)
+        self.cancel_input = Input(device)
+
         self.popups: List[Popup] = []
 
         self.holder: Optional[Piece] = None
@@ -73,13 +75,7 @@ class Gameplay:
         self.garbage_last: float
 
         self.send = False
-        self.cancel = True
-
-    def is_over(self) -> bool:
-        return self.game_over
-
-    def set_over(self) -> None:
-        self.game_over = True
+        self.cancel = False
 
     def get_matrix(self) -> Matrix:
         return self.matrix
@@ -100,7 +96,6 @@ class Gameplay:
         if self.device == Input.KEYBOARD:
             self.input.subscribe_list(
                 [
-                    (K_ESCAPE, self.action_cancel),
                     (K_DOWN, self.action_down, True),
                     (K_RIGHT, self.action_right, True),
                     (K_LEFT, self.action_left, True),
@@ -112,10 +107,10 @@ class Gameplay:
                     (K_c, self.action_hold),
                 ]
             )
+            self.cancel_input.subscribe_list([(K_ESCAPE, self.action_cancel)])
         elif self.device in (Input.JOYSTICK1, Input.JOYSTICK2):
             self.input.subscribe_list(
                 [
-                    (BUTTON_SELECT, self.action_cancel),
                     (DPAD_DOWN, self.action_down, True),
                     (DPAD_RIGHT, self.action_right, True),
                     (DPAD_LEFT, self.action_left, True),
@@ -125,6 +120,9 @@ class Gameplay:
                     (BUTTON_DOWN, self.action_hard_fall),
                     (BUTTON_LEFT, self.action_hold),
                 ]
+            )
+            self.cancel_input.subscribe_list(
+                [(BUTTON_SELECT, self.action_cancel)]
             )
 
         self.new_piece()
@@ -256,6 +254,8 @@ class Gameplay:
         self.garbage_left = count
 
     def update(self) -> None:
+        self.cancel_input.update()
+
         if self.clearing:
             if ctx.now - self.clearing_last > 0.02:
                 self.send = True
@@ -277,7 +277,6 @@ class Gameplay:
                     self.garbage_adding = False
 
         if self.game_over:
-            self.send = True
             return
 
         if self.countdown >= 0:
