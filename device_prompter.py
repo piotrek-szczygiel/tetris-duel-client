@@ -81,7 +81,14 @@ class DevicePrompter(State):
 
     def get_active_device(self) -> Optional[Device]:
         devices: List[Device] = list()
-        for device_name in [config.device1, config.device2]:
+
+        device_names: List[str] = list()
+        if self.done_players == 0:
+            device_names = [config.device1, config.device2]
+        elif self.done_players == 1:
+            device_names = [config.device2, config.device1]
+
+        for device_name in device_names:
             if self.controls[device_name]["type"] == "keyboard":
                 devices += [Device(device_name)]
             elif self.controls[device_name]["type"] == "joystick":
