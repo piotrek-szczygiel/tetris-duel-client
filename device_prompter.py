@@ -80,6 +80,8 @@ class DevicePrompter(State):
             )
 
     def get_active_device(self) -> Optional[Device]:
+        pg.joystick.init()
+
         devices: List[Device] = list()
 
         device_names: List[str] = list()
