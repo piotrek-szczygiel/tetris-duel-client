@@ -30,3 +30,20 @@ rotate_left = 4
 soft_fall = 1
 hard_fall = 2
 hold = 3
+
+
+[ps3]
+type = "joystick"
+
+cancel = 8
+select = 9
+
+up = ["axis", "1", "-", "repeat"]
+down = ["axis", "1", "+", "repeat"]
+right = ["axis", "0", "+", "repeat"]
+left = ["axis", "0", "-", "repeat"]
+rotate_right = 5
+rotate_left = 4
+soft_fall = 1
+hard_fall = 0
+hold = 3
