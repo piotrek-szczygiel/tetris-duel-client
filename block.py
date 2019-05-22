@@ -28,7 +28,7 @@ def color_get(color: RGB, brightness: float, alpha: float) -> RGB:
     else:
         color = color_shade(color, brightness)
 
-    bg = pg.Color(config.background)
+    bg = pg.Color(*config.background)
 
     return (
         (1.0 - alpha) * bg.r + alpha * color[0],

@@ -1,7 +1,7 @@
 [window]
 width = 1300
 height = 700
-background_color = "black"
+background_color = [0, 0, 16]
 
 [input]
 repeat_delay = 0.15

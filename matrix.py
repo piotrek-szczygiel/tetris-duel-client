@@ -178,9 +178,10 @@ class Matrix:
         width = math.ceil(starting_w / display_w)
 
         size = 30
-        grid_color = (32, 32, 32)
+        grid_color = (48, 48, 48)
+        border_color = (192, 192, 192)
 
-        for row in range(self.height + 1):
+        for row in range(1, self.height):
             pg.draw.line(
                 ctx.surface,
                 grid_color,
@@ -189,11 +190,29 @@ class Matrix:
                 width,
             )
 
-        for column in range(self.width + 1):
+        for column in range(1, self.width):
             pg.draw.line(
                 ctx.surface,
                 grid_color,
                 (x + column * size, y),
                 (x + column * size, y + size * self.height),
                 width,
+            )
+
+        for row in (0, self.height):
+            pg.draw.line(
+                ctx.surface,
+                border_color,
+                (x - 1, y + row * size),
+                (x + size * self.width, y + row * size),
+                width + 2,
+            )
+
+        for column in (0, self.width):
+            pg.draw.line(
+                ctx.surface,
+                border_color,
+                (x + column * size, y - 1),
+                (x + column * size, y + size * self.height),
+                width + 2,
             )

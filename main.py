@@ -68,7 +68,7 @@ class Main:
             if self.state.is_finished():
                 self.switch_state(MainMenu())
 
-            ctx.surface.fill(pg.Color(config.background))
+            ctx.surface.fill(pg.Color(*config.background))
             self.state.draw()
 
             fps = "FPS: " + "{0:.1f}".format(fps_clock.get_fps())
