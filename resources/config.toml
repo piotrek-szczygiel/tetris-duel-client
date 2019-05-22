@@ -1,0 +1,14 @@
+[window]
+width = 1300
+height = 700
+background_color = "black"
+
+[input]
+repeat_delay = 0.15
+repeat_interval = 0.05
+controls_1 = "keyboard"
+controls_2 = "snes"
+
+[online]
+ip = "szczygiel.dev"
+port = 7777

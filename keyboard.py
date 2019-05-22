@@ -2,7 +2,7 @@ from typing import Dict, List, Tuple
 
 import pygame as pg
 
-import config
+from config import config
 from ctx import ctx
 
 Key = int

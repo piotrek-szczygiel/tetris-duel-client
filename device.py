@@ -4,7 +4,7 @@ from resources import path
 
 
 class Device:
-    def __init__(self, name: str, joystick_num=0):
+    def __init__(self, name: str, joystick_num: int = 0):
         self.name = name
 
         if name == "dummy":

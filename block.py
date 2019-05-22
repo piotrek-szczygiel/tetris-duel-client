@@ -3,7 +3,7 @@ from typing import Tuple
 
 import pygame as pg
 
-import config
+from config import config
 from ctx import ctx
 
 RGB = Tuple[float, float, float]
@@ -28,7 +28,7 @@ def color_get(color: RGB, brightness: float, alpha: float) -> RGB:
     else:
         color = color_shade(color, brightness)
 
-    bg = pg.Color(*config.background)
+    bg = pg.Color(config.background)
 
     return (
         (1.0 - alpha) * bg.r + alpha * color[0],

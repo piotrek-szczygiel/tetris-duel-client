@@ -6,7 +6,7 @@ from ctx import ctx
 import jsonpickle
 import protocol
 import select
-import config
+from config import config
 from gameplay import Gameplay
 from popup import Popup
 from state import State

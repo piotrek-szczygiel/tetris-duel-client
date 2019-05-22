@@ -5,7 +5,7 @@ from input import Input
 from state import State
 from text import Text
 from device import Device
-import config
+from config import config
 from device_prompter import DevicePrompter
 from marathon import Marathon
 from split_screen import SplitScreen

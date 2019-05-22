@@ -1,12 +1,26 @@
-window_size = 1300, 700
+import toml
+from resources import path
 
-background = (0, 0, 16)
-ui_text = "white"
 
-key_repeat_delay = 0.15
-key_repeat_interval = 0.05
+class Config:
+    def __init__(self) -> None:
+        with open(path("config.toml"), "r") as f:
+            self.toml = toml.loads(f.read())
 
-device1 = "snes"
-device2 = "keyboard"
+        self.window_size = (
+            self.toml["window"]["width"],
+            self.toml["window"]["height"],
+        )
 
-server = ("szczygiel.dev", 7777)
+        self.background = self.toml["window"]["background_color"]
+
+        self.key_repeat_delay = self.toml["input"]["repeat_delay"]
+        self.key_repeat_interval = self.toml["input"]["repeat_interval"]
+
+        self.device1 = self.toml["input"]["controls_1"]
+        self.device2 = self.toml["input"]["controls_2"]
+
+        self.server = (self.toml["online"]["ip"], self.toml["online"]["port"])
+
+
+config = Config()

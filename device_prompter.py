@@ -5,7 +5,7 @@ from resources import path
 from typing import Any, Callable, List, MutableMapping, Optional
 from input import Input
 from state import State
-import config
+from config import config
 from ctx import ctx
 from text import Text
 
@@ -20,6 +20,7 @@ class DevicePrompter(State):
         self.finished = False
 
         self.started = ctx.now
+        self.last_joystick_refresh = 0.0
 
     def is_finished(self) -> bool:
         return self.finished
@@ -80,8 +81,11 @@ class DevicePrompter(State):
             )
 
     def get_active_device(self) -> Optional[Device]:
-        pg.joystick.init()
+        if ctx.now - self.last_joystick_refresh > 1.0:
+            pg.joystick.quit()
+            self.last_joystick_refresh = ctx.now
 
+        pg.joystick.init()
         devices: List[Device] = list()
 
         device_names: List[str] = list()
