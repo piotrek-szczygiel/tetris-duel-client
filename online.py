@@ -33,7 +33,7 @@ class Online(State):
 
         self.buffer = b""
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.settimeout(2.0)
+        self.socket.settimeout(10.0)
 
         self.finished = False
         self.end_screen = False
