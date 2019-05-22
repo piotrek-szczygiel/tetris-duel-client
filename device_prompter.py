@@ -1,12 +1,14 @@
+from typing import Any, Callable, List, MutableMapping, Optional
+
 import pygame as pg
 import toml
-from device import Device
-from resources import path
-from typing import Any, Callable, List, MutableMapping, Optional
-from input import Input
-from state import State
+
 from config import config
 from ctx import ctx
+from device import Device
+from input import Input
+from resources import path
+from state import State
 from text import Text
 
 

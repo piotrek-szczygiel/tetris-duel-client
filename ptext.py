@@ -7,8 +7,9 @@
 
 from __future__ import division, print_function
 
-from math import ceil, sin, cos, radians, exp
 from collections import namedtuple
+from math import ceil, cos, exp, radians, sin
+
 import pygame
 
 DEFAULT_FONT_SIZE = 24

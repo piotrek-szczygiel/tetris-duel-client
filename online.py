@@ -1,16 +1,18 @@
+import select
 import socket
 from random import randint
-from typing import Optional, Callable, List
-from text import Text
-from ctx import ctx
+from typing import Callable, List, Optional
+
 import jsonpickle
+
 import protocol
-import select
 from config import config
+from ctx import ctx
+from device import Device
 from gameplay import Gameplay
 from popup import Popup
 from state import State
-from device import Device
+from text import Text
 
 BUFFER_SIZE = 1024
 

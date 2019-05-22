@@ -2,7 +2,7 @@ import random
 from typing import List
 
 from piece import Piece
-from shape import Shape, SHAPES
+from shape import SHAPES, Shape
 
 
 class Bag:

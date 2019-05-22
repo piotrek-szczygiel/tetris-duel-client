@@ -1,8 +1,10 @@
-from device import Device
-from keyboard import Keyboard
-from joystick import Joystick
+from typing import Callable, Dict, List
+
 import pygame as pg
-from typing import Dict, Callable, List
+
+from device import Device
+from joystick import Joystick
+from keyboard import Keyboard
 
 
 class Input:

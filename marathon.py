@@ -1,10 +1,10 @@
-from typing import Callable, Optional, List
+from typing import Callable, List, Optional
 
+from ctx import ctx
 from gameplay import Gameplay
 from popup import Popup
 from state import State
 from text import Text
-from ctx import ctx
 
 
 class Marathon(State):

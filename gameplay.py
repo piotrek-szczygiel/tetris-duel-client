@@ -1,15 +1,16 @@
 from typing import List, Optional
+
 import shape
 from bag import Bag
 from ctx import ctx
+from device import Device
+from input import Input
 from matrix import Matrix
 from piece import Piece
 from popup import Popup
 from score import Score
 from t_spin import TSpin
 from text import Text
-from input import Input
-from device import Device
 
 
 class Gameplay:

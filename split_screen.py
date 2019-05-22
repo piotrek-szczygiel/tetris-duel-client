@@ -1,10 +1,10 @@
 from random import randint
 from typing import Callable, List, Optional
 
+from ctx import ctx
 from gameplay import Gameplay
 from popup import Popup
 from state import State
-from ctx import ctx
 
 
 class SplitScreen(State):

@@ -2,8 +2,8 @@ from typing import Tuple
 
 import pygame as pg
 
-from ctx import ctx
 import ptext
+from ctx import ctx
 
 Position = Tuple[int, int]
 

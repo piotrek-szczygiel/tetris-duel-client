@@ -2,15 +2,15 @@ import time
 
 import pygame as pg
 
-from config import config
-from ctx import ctx
 import ptext
 import resources
+from config import config
+from ctx import ctx
+from device import Device
 from main_menu import MainMenu
 from mixer import Mixer
 from state import State
 from text import Text
-from device import Device
 
 
 class Main:

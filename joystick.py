@@ -1,7 +1,9 @@
 from typing import Dict, List, Tuple
+
 import pygame as pg
-from ctx import ctx
+
 from config import config
+from ctx import ctx
 
 Button = int
 Axis = int

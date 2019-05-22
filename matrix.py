@@ -4,9 +4,9 @@ from typing import List, Tuple
 
 import pygame as pg
 
+from block import draw_block
 from config import config
 from ctx import ctx
-from block import draw_block
 from piece import Piece
 from shape import GARBAGE_COLOR, SHAPE_COLORS
 

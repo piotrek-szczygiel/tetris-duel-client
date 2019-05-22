@@ -1,6 +1,7 @@
 import pygame as pg
-from mixer import Mixer
+
 from device import Device
+from mixer import Mixer
 
 
 class Ctx:

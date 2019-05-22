@@ -1,15 +1,15 @@
 from typing import Callable
 
+from config import config
 from ctx import ctx
+from device import Device
+from device_prompter import DevicePrompter
 from input import Input
+from marathon import Marathon
+from online import Online
+from split_screen import SplitScreen
 from state import State
 from text import Text
-from device import Device
-from config import config
-from device_prompter import DevicePrompter
-from marathon import Marathon
-from split_screen import SplitScreen
-from online import Online
 
 
 class MainMenu(State):
