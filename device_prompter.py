@@ -90,6 +90,8 @@ class DevicePrompter(State):
         pg.joystick.init()
         devices: List[Device] = list()
 
+        pg.event.pump()
+
         device_names: List[str] = list()
         if self.done_players == 0:
             device_names = [config.device1, config.device2]
