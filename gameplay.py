@@ -31,6 +31,7 @@ class Gameplay:
         self.countdown = 3
         self.countdown_last = ctx.now - 1.0
         self.game_over = False
+        self.game_over_sent = False
 
         self.last_fall: float
         self.fall_interval = 1.0
@@ -241,6 +242,10 @@ class Gameplay:
                     self.reset_piece()
 
         if self.game_over:
+            if not self.game_over_sent:
+                self.game_over_sent = True
+                self.send = True
+
             return
 
         if self.countdown >= 0:
